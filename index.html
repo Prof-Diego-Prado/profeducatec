@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> &#9999;&#65039 Profeducatec - Mural</title>
+  <title>Profeducatec - Mural</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -81,6 +81,13 @@
         </form>
       </div>
     </nav>
+    
+    <!-- CONTADOR DE VISITAS -->
+    <div class="p-3 border-t border-gray-200 bg-gray-50 shrink-0 text-center">
+      <p class="text-xs text-gray-500 flex items-center justify-center gap-1.5">
+        <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-blue-500"></i> Visitas na plataforma: <span id="contador-visitas" class="font-bold text-gray-700">...</span>
+      </p>
+    </div>
   </aside>
 
   <!-- CONTEÚDO PRINCIPAL -->
@@ -97,8 +104,19 @@
         <i data-lucide="menu" class="w-6 h-6"></i>
       </button>
       
-      <div class="flex-1 flex justify-end items-center gap-4 relative z-10">
+      <div class="flex-1 flex justify-end items-center gap-3 relative z-10">
         
+        <!-- RELÓGIO E PRÓXIMO COMPROMISSO -->
+        <div class="hidden sm:flex flex-col items-end text-gray-600 bg-white/80 px-3 py-1 rounded-lg border border-gray-200 shadow-sm backdrop-blur-sm mr-2">
+          <div class="text-sm font-bold flex items-center gap-1.5 text-gray-800">
+            <i data-lucide="clock" class="w-4 h-4 text-blue-600"></i>
+            <span id="relogio-digital">00:00:00</span>
+          </div>
+          <div id="proximo-compromisso" class="text-[10px] text-gray-500 font-medium truncate max-w-[180px]">
+            Carregando agenda...
+          </div>
+        </div>
+
         <!-- SELETOR DE MODO -->
         <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200 shadow-sm bg-white/80 backdrop-blur-sm">
           <button id="modo-aluno" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Aluno</button>
@@ -106,9 +124,9 @@
         </div>
 
         <!-- Botão visível apenas para Admin -->
-        <button id="btn-gerenciar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
-          <i data-lucide="users" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">gerenciar Alunos</span>
+        <button id="btn-gerir-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Gestão</span>
         </button>
 
         <div class="items-center gap-3 hidden sm:flex bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full border border-gray-100">
@@ -353,19 +371,19 @@
   </div>
 
 
-  <!-- MODAL: gerenciar ALUNOS E SOLICITAÇÕES (ADMIN) -->
-  <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+  <!-- MODAL: GESTÃO GERAL (ALUNOS E PROFESSORES) -->
+  <div id="modal-gestao" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
-        <h3 class="font-bold text-gray-800">Gestão de Alunos</h3>
+        <h3 class="font-bold text-gray-800">Gestão da Plataforma</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="p-4 flex-1 overflow-y-auto space-y-6">
         
-        <!-- Bloco de Solicitações Pendentes -->
+        <!-- Bloco de Solicitações Pendentes de Alunos -->
         <div>
           <h4 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
-            <i data-lucide="bell" class="w-4 h-4 text-yellow-500"></i> Solicitações Pendentes
+            <i data-lucide="bell" class="w-4 h-4 text-yellow-500"></i> Solicitações Pendentes (Alunos)
           </h4>
           <ul id="lista-solicitacoes" class="space-y-3">
             <!-- Injetado via JS -->
@@ -388,6 +406,35 @@
           </ul>
         </div>
 
+        <!-- ÁREA MASTER (Apenas para o Admin Principal PradoDiego) -->
+        <div id="admin-master-section" class="hidden border-t-2 border-dashed border-gray-200 pt-6 mt-6">
+          <h4 class="text-base font-bold text-purple-700 mb-4 flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-5 h-5"></i> Área Master (PradoDiego)
+          </h4>
+          
+          <div class="space-y-6">
+            <!-- Solicitações de Professores -->
+            <div>
+              <h5 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
+                <i data-lucide="clock" class="w-4 h-4 text-orange-500"></i> Solicitações de Professores
+              </h5>
+              <ul id="lista-solicitacoes-prof" class="space-y-3">
+                <!-- Injetado via JS -->
+              </ul>
+            </div>
+
+            <!-- Professores Aprovados -->
+            <div>
+              <h5 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Professores Aprovados
+              </h5>
+              <ul id="lista-professores-cadastrados" class="space-y-2 text-sm">
+                <!-- Injetado via JS -->
+              </ul>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -408,13 +455,13 @@
         
         <!-- VISTA 1: SELEÇÃO DE PERFIL -->
         <div id="auth-view-selecao" class="space-y-4">
-          <p class="text-center text-gray-600 font-medium mb-4">Como deseja acessar?</p>
+          <p class="text-center text-gray-600 font-medium mb-4">Como deseja aceder?</p>
           <button onclick="mudarAuthView('login-aluno')" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group">
             <div class="flex items-center gap-3">
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">acessar ao material da disciplina</p>
+                <p class="text-xs text-gray-500">Aceder ao material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -425,7 +472,7 @@
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Professor</p>
-                <p class="text-xs text-gray-500">gerenciar alunos e conteúdos</p>
+                <p class="text-xs text-gray-500">Gerir alunos e conteúdos</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -457,14 +504,13 @@
           <button onclick="mudarAuthView('login-aluno')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
           </button>
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso</h3>
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso (Aluno)</h3>
           <p class="text-sm text-gray-500 mb-6 text-center">Registe-se com o seu e-mail institucional (@uem.br).</p>
           
           <form id="form-cadastro-aluno" class="space-y-3">
             <input type="text" id="cadastro-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             <input type="email" id="cadastro-email" placeholder="nome@uem.br" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             
-            <!-- Campo de Justificativa (Oculto por padrão, exigido se não for @uem.br) -->
             <div id="div-justificativa" class="hidden">
               <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail não institucional detetado. Justifique o pedido:</label>
               <textarea id="cadastro-justificativa" rows="2" placeholder="Qual o motivo do acesso?" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
@@ -475,7 +521,7 @@
           </form>
         </div>
 
-        <!-- VISTA 4: LOGIN DO ADMIN -->
+        <!-- VISTA 4: LOGIN DO ADMIN/PROFESSOR -->
         <div id="auth-view-login-admin" class="hidden">
           <button onclick="mudarAuthView('selecao')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
@@ -484,11 +530,34 @@
           <p class="text-sm text-gray-500 mb-6 text-center">Insira as suas credenciais restritas.</p>
           
           <form id="form-login-admin">
-            <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Utilizador" required>
+            <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="E-mail ou Utilizador" required>
             <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">acessar ao Painel</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Aceder ao Painel</button>
+          </form>
+
+          <div class="mt-6 text-center text-sm border-t pt-4">
+            <span class="text-gray-600">Novo professor?</span>
+            <button onclick="mudarAuthView('cadastro-professor')" class="text-indigo-600 font-semibold hover:underline ml-1">Solicite acesso</button>
+          </div>
+        </div>
+
+        <!-- VISTA 5: CADASTRO DE NOVO PROFESSOR -->
+        <div id="auth-view-cadastro-professor" class="hidden">
+          <button onclick="mudarAuthView('login-admin')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
+          </button>
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso (Professor)</h3>
+          <p class="text-sm text-gray-500 mb-6 text-center">Será avaliado pelo Administrador PradoDiego.</p>
+          
+          <form id="form-cadastro-professor" class="space-y-3">
+            <input type="text" id="cadastro-prof-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+            <input type="email" id="cadastro-prof-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+            <input type="password" id="cadastro-prof-senha" placeholder="Crie uma palavra-passe" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+            
+            <p id="cadastro-prof-msg" class="text-center text-xs hidden"></p>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors mt-2">Enviar Solicitação</button>
           </form>
         </div>
 
@@ -499,14 +568,14 @@
 
   <!-- JAVASCRIPT: LÓGICA E FIREBASE -->
   <script type="module">
-    // --- 0. CONFIGURAÇÃO DE ACESSO DO ADMIN ---
+    // --- 0. CONFIGURAÇÃO DE ACESSO DO ADMIN MASTER ---
     const USUARIO_ADMINISTRADOR = "PradoDiego";
     const SENHA_ADMINISTRADOR = "@Lei30242728";
 
     // --- 1. CONFIGURAÇÃO FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAzZHRIbDFqWCOb-N_Ygob8m3lm2fZCoZk",
@@ -527,6 +596,8 @@
     // --- 2. ESTADO DA APLICAÇÃO ---
     let currentUser = null;
     let isAdminMode = false;
+    let isMasterAdmin = false; // Define se é o PradoDiego
+    let currentAdminName = ""; // Nome do professor logado
     let currentAlunoEmail = null; 
     let visaoCalendario = 'semanal'; 
     let aulaEmEdicaoId = null; 
@@ -537,10 +608,13 @@
     let alunosPermitidos = [];
     let solicitacoesList = [];
     let linksImportantesList = [];
+    
+    let professoresAprovadosList = [];
+    let solicitacoesProfList = [];
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-    // --- 3. AUTENTICAÇÃO ANÓNIMA ---
+    // --- 3. AUTENTICAÇÃO ANÓNIMA E CONTADOR DE VISITAS ---
     const initAuth = async () => {
       try {
         await signInAnonymously(auth);
@@ -550,16 +624,41 @@
     };
     initAuth();
 
-    // --- 4. OUVINTES DO FIRESTORE ---
-    onAuthStateChanged(auth, (user) => {
+    // --- 4. OUVINTES DO FIRESTORE E CONTADOR GLOBAL ---
+    onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       if (!user) return;
 
       const pathPrefix = `artifacts/${appId}/public/data`;
 
+      // Contador de Visitas Lógica
+      const visitasDocRef = doc(db, pathPrefix, 'estatisticas', 'visitas');
+      
+      // Incrementa a visita apenas se a pessoa não tiver visitado na sessão atual
+      if (!sessionStorage.getItem('visited_profeducatec')) {
+          sessionStorage.setItem('visited_profeducatec', 'true');
+          try {
+              await updateDoc(visitasDocRef, { count: increment(1) });
+          } catch (e) {
+              if (e.code === 'not-found') {
+                  await setDoc(visitasDocRef, { count: 1 });
+              }
+          }
+      }
+      
+      // Ouve mudanças no contador em tempo real
+      onSnapshot(visitasDocRef, (docSnap) => {
+          if (docSnap.exists()) {
+              document.getElementById('contador-visitas').innerText = docSnap.data().count;
+          } else {
+              document.getElementById('contador-visitas').innerText = "0";
+          }
+      });
+
       onSnapshot(collection(db, pathPrefix, 'aulas'), (snapshot) => {
         aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         atualizarCalendario();
+        atualizarRelogioECompromisso(); // Atualiza também o contador
       });
 
       onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
@@ -585,6 +684,16 @@
       onSnapshot(collection(db, pathPrefix, 'links_importantes'), (snapshot) => {
         linksImportantesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarLinksImportantes();
+      });
+
+      onSnapshot(collection(db, pathPrefix, 'professores'), (snapshot) => {
+        professoresAprovadosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarListaProfessores();
+      });
+
+      onSnapshot(collection(db, pathPrefix, 'solicitacoes_professores'), (snapshot) => {
+        solicitacoesProfList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarListaSolicitacoesProf();
       });
     });
 
@@ -612,6 +721,28 @@
       } catch (err) { console.error("Erro ao rejeitar:", err); }
     };
 
+    window.aprovarProfessor = async (id, nome, email, senha) => {
+      if (!isMasterAdmin) return;
+      try {
+        await addDoc(collection(db, getPath('professores')), { nome, email: email.toLowerCase(), senha });
+        await deleteDoc(doc(db, getPath('solicitacoes_professores'), id));
+      } catch (err) { console.error("Erro ao aprovar professor:", err); }
+    };
+
+    window.rejeitarProfessor = async (id) => {
+      if (!isMasterAdmin) return;
+      try {
+        await deleteDoc(doc(db, getPath('solicitacoes_professores'), id));
+      } catch (err) { console.error("Erro ao rejeitar professor:", err); }
+    };
+
+    window.apagarProfessor = async (id) => {
+      if (!isMasterAdmin) return;
+      try {
+        await deleteDoc(doc(db, getPath('professores'), id));
+      } catch (err) { console.error("Erro ao remover professor:", err); }
+    };
+
     window.editarAula = (id) => {
       if (!isAdminMode) return;
       const aula = aulasList.find(a => a.id === id);
@@ -635,7 +766,121 @@
       document.getElementById('modal-aula').classList.remove('hidden');
     };
 
+    // --- LOGICA DE RELÓGIO E PRÓXIMO COMPROMISSO ---
+    function atualizarRelogioECompromisso() {
+      const agora = new Date();
+      
+      // Relógio Digital
+      document.getElementById('relogio-digital').innerText = agora.toLocaleTimeString('pt-BR');
+
+      // Lógica do Próximo Compromisso
+      if (!aulasList || aulasList.length === 0) {
+        document.getElementById('proximo-compromisso').innerText = "Sem aulas marcadas";
+        return;
+      }
+
+      const mapeamentoDias = { 0: 'Domingo', 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta', 6: 'Sábado' };
+      const hojeNome = mapeamentoDias[agora.getDay()];
+      const hojeDataString = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
+      const hojeMeioDia = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 12, 0, 0);
+
+      let proximasAulas = [];
+
+      aulasList.forEach(aula => {
+        let ocorreHoje = false;
+        
+        if (aula.tipoRepeticao === 'unico' && aula.dataUnica === hojeDataString) {
+          ocorreHoje = true;
+        } else if (aula.tipoRepeticao === 'semanal' && aula.dia === hojeNome) {
+          let dentroDoPeriodo = true;
+          if (aula.dataInicio && hojeMeioDia < new Date(aula.dataInicio + 'T00:00:00')) dentroDoPeriodo = false;
+          if (aula.dataFim && hojeMeioDia > new Date(aula.dataFim + 'T23:59:59')) dentroDoPeriodo = false;
+          if (dentroDoPeriodo) ocorreHoje = true;
+        }
+
+        if (ocorreHoje && aula.hora) {
+          const horaInicioStr = aula.hora.split('-')[0].trim();
+          const [h, m] = horaInicioStr.split(':').map(Number);
+          if (!isNaN(h) && !isNaN(m)) {
+            const dataAula = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), h, m, 0);
+            const diffMs = dataAula - agora;
+            proximasAulas.push({ ...aula, dataAula, diffMs });
+          }
+        }
+      });
+
+      // Filtra aulas que começaram há menos de 1h30min (5400000ms) atrás e ordena
+      const aulasFuturas = proximasAulas.filter(a => a.diffMs > -5400000).sort((a, b) => a.diffMs - b.diffMs);
+
+      const painelAviso = document.getElementById('proximo-compromisso');
+
+      if (aulasFuturas.length > 0) {
+        const proxima = aulasFuturas[0];
+        
+        if (proxima.diffMs <= 0) {
+          painelAviso.innerText = `Agora: ${proxima.titulo}`;
+          painelAviso.className = "text-[10px] text-green-600 font-bold truncate max-w-[150px] animate-pulse";
+        } else {
+          const diffMin = Math.floor(proxima.diffMs / 60000);
+          const h = Math.floor(diffMin / 60);
+          const m = diffMin % 60;
+          let tempoStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
+          
+          painelAviso.innerText = `A seguir em ${tempoStr}: ${proxima.titulo}`;
+          painelAviso.className = "text-[10px] text-blue-600 font-medium truncate max-w-[150px]";
+        }
+      } else {
+        painelAviso.innerText = "Livre pelo resto do dia";
+        painelAviso.className = "text-[10px] text-gray-500 font-medium truncate max-w-[150px]";
+      }
+    }
+    setInterval(atualizarRelogioECompromisso, 1000);
+
     // --- 6. RENDERIZAÇÃO DA UI ---
+
+    function renderizarListaSolicitacoesProf() {
+      const container = document.getElementById('lista-solicitacoes-prof');
+      if (!container) return; 
+      
+      if (solicitacoesProfList.length === 0) {
+        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhuma solicitação de professor.</li>`;
+        return;
+      }
+
+      container.innerHTML = solicitacoesProfList.map(sol => `
+        <li class="bg-orange-50 p-3 rounded-lg border border-orange-200 text-sm">
+          <div class="font-bold text-gray-800">${sol.nome}</div>
+          <div class="text-xs text-gray-500 mb-1">${sol.email}</div>
+          <div class="flex gap-2 mt-2">
+            <button onclick="aprovarProfessor('${sol.id}', '${sol.nome}', '${sol.email}', '${sol.senha}')" class="flex-1 bg-green-600 text-white px-2 py-1.5 rounded text-xs font-medium hover:bg-green-700 transition-colors">Aprovar Prof</button>
+            <button onclick="rejeitarProfessor('${sol.id}')" class="flex-1 bg-red-100 text-red-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-red-200 transition-colors">Rejeitar</button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    function renderizarListaProfessores() {
+      const container = document.getElementById('lista-professores-cadastrados');
+      if (!container) return;
+      
+      if (professoresAprovadosList.length === 0) {
+        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum professor aprovado além de si.</li>`;
+        return;
+      }
+      container.innerHTML = professoresAprovadosList.map(prof => `
+        <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
+          <div>
+            <span class="text-gray-700 truncate pr-2 font-medium block text-sm">${prof.nome}</span>
+            <span class="text-gray-500 truncate pr-2 text-xs">${prof.email}</span>
+          </div>
+          <button onclick="apagarProfessor('${prof.id}')" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50" title="Remover acesso">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </li>
+      `).join('');
+      lucide.createIcons();
+    }
+
 
     function renderizarLinksImportantes() {
       const container = document.getElementById('links-importantes-lista');
@@ -644,13 +889,10 @@
         return;
       }
       
-      // Ordena por título alfabeticamente para organização
       const linksOrdenados = [...linksImportantesList].sort((a,b) => a.titulo.localeCompare(b.titulo));
 
       container.innerHTML = linksOrdenados.map(link => {
-        // Usa a API do Google Favicon para capturar o logotipo com base na URL
         const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain_url=${encodeURIComponent(link.url)}&sz=64`;
-        
         return `
         <div class="relative group border border-gray-100 rounded-lg p-3 hover:bg-gray-50 transition-colors shadow-sm bg-white">
           <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="flex gap-3 items-start">
@@ -1004,12 +1246,14 @@
       document.getElementById('auth-view-login-aluno').classList.add('hidden');
       document.getElementById('auth-view-cadastro-aluno').classList.add('hidden');
       document.getElementById('auth-view-login-admin').classList.add('hidden');
+      document.getElementById('auth-view-cadastro-professor').classList.add('hidden');
       
       document.getElementById(`auth-view-${viewName}`).classList.remove('hidden');
       
       document.getElementById('login-erro').classList.add('hidden');
       document.getElementById('admin-erro').classList.add('hidden');
       document.getElementById('cadastro-msg').classList.add('hidden');
+      document.getElementById('cadastro-prof-msg').classList.add('hidden');
     };
 
     const btnModoAluno = document.getElementById('modo-aluno');
@@ -1018,15 +1262,17 @@
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
-    const btngerenciarAlunos = document.getElementById('btn-gerenciar-alunos');
+    const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
     const inputNomeRecado = document.getElementById('input-nome-recado');
     const inputRecado = document.getElementById('input-recado');
     const btnEnviarRecado = document.getElementById('btn-enviar-recado');
 
-    function alternarModoUI(paraAdmin, emailAluno = null) {
+    function alternarModoUI(paraAdmin, emailAluno = null, isMaster = false, adminName = "") {
       isAdminMode = paraAdmin;
+      isMasterAdmin = isMaster;
+      currentAdminName = adminName;
       
       if (paraAdmin) {
         currentAlunoEmail = null;
@@ -1038,12 +1284,19 @@
         btnModoAluno.classList.replace('shadow-sm', 'hover:text-gray-700');
         btnModoAluno.classList.replace('text-gray-800', 'bg-transparent');
         
-        roleText.innerText = "Prof. " + USUARIO_ADMINISTRADOR;
-        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + USUARIO_ADMINISTRADOR;
+        roleText.innerText = "Prof. " + adminName;
+        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + adminName;
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
-        btngerenciarAlunos.classList.remove('hidden');
+        btnGerirAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
+        
+        // Área master de gestão
+        if (isMaster) {
+          document.getElementById('admin-master-section').classList.remove('hidden');
+        } else {
+          document.getElementById('admin-master-section').classList.add('hidden');
+        }
         
         // Configurações do formulário de recados para ADMIN
         inputNomeRecado.classList.add('hidden');
@@ -1067,7 +1320,7 @@
         userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
-        btngerenciarAlunos.classList.add('hidden');
+        btnGerirAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
         
         // Configurações do formulário de recados para ALUNO
@@ -1104,18 +1357,32 @@
       document.getElementById('modal-auth').classList.remove('hidden');
     }, 200);
 
+    // LOGIN DO PROFESSOR (Híbrido)
     document.getElementById('form-login-admin').addEventListener('submit', (e) => {
       e.preventDefault();
       const usuarioDigitado = document.getElementById('admin-usuario-input').value.trim();
       const senhaDigitada = document.getElementById('admin-senha-input').value;
       
+      // 1. Verifica se é o Admin Master (PradoDiego)
       if (usuarioDigitado === USUARIO_ADMINISTRADOR && senhaDigitada === SENHA_ADMINISTRADOR) {
         document.getElementById('modal-auth').classList.add('hidden');
-        alternarModoUI(true);
+        alternarModoUI(true, null, true, USUARIO_ADMINISTRADOR);
         e.target.reset();
-      } else {
-        document.getElementById('admin-erro').classList.remove('hidden');
+        return;
+      } 
+      
+      // 2. Verifica se é um professor aprovado na base de dados
+      const profAprovado = professoresAprovadosList.find(p => (p.email.toLowerCase() === usuarioDigitado.toLowerCase() || p.nome === usuarioDigitado) && p.senha === senhaDigitada);
+      
+      if (profAprovado) {
+        document.getElementById('modal-auth').classList.add('hidden');
+        alternarModoUI(true, null, false, profAprovado.nome);
+        e.target.reset();
+        return;
       }
+      
+      // 3. Se errar tudo
+      document.getElementById('admin-erro').classList.remove('hidden');
     });
 
     document.getElementById('form-login-aluno').addEventListener('submit', (e) => {
@@ -1140,6 +1407,7 @@
       }
     });
 
+    // Cadastro de Aluno
     const emailCadastroInput = document.getElementById('cadastro-email');
     const divJustificativa = document.getElementById('div-justificativa');
     const justifInput = document.getElementById('cadastro-justificativa');
@@ -1195,6 +1463,45 @@
       }
     });
 
+    // Cadastro de Professor
+    document.getElementById('form-cadastro-professor').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('cadastro-prof-nome').value.trim();
+      const email = document.getElementById('cadastro-prof-email').value.trim().toLowerCase();
+      const senha = document.getElementById('cadastro-prof-senha').value;
+      
+      const msgEl = document.getElementById('cadastro-prof-msg');
+      msgEl.classList.remove('hidden');
+
+      if (professoresAprovadosList.some(p => p.email === email)) {
+        msgEl.textContent = "Professor já cadastrado. Faça login.";
+        msgEl.className = "text-center text-xs text-blue-600 font-medium";
+        return;
+      }
+
+      if (solicitacoesProfList.some(s => s.email === email)) {
+        msgEl.textContent = "A sua solicitação já está em análise.";
+        msgEl.className = "text-center text-xs text-yellow-600 font-medium";
+        return;
+      }
+
+      try {
+        const docData = { nome, email, senha, data: Date.now() };
+        await addDoc(collection(db, getPath('solicitacoes_professores')), docData);
+        
+        e.target.reset();
+        
+        msgEl.textContent = "Solicitação enviada ao Admin! Aguarde aprovação.";
+        msgEl.className = "text-center text-xs text-green-600 font-bold";
+        
+        setTimeout(() => mudarAuthView('login-admin'), 3000);
+      } catch (error) {
+        console.error("Erro no cadastro de professor:", error);
+        msgEl.textContent = "Erro ao enviar pedido.";
+        msgEl.className = "text-center text-xs text-red-600 font-medium";
+      }
+    });
+
     document.getElementById('form-aluno-manual').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
@@ -1232,7 +1539,7 @@
     });
     
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
-    btngerenciarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
@@ -1252,7 +1559,7 @@
 
       let autor = '';
       if (isAdminMode) {
-        autor = `👨‍🏫 Prof. ${USUARIO_ADMINISTRADOR}`;
+        autor = `👨‍🏫 Prof. ${currentAdminName}`;
       } else {
         const nomeDigitado = inputNomeRecado.value.trim();
         if (!nomeDigitado) return;
