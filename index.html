@@ -113,19 +113,28 @@
     </header>
 
     <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-      <div class="mb-8 flex justify-between items-end">
+      <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900">A Sua Semana</h2>
-          <p class="text-gray-600 mt-1">Calendário:</p>
+          <h2 id="titulo-calendario" class="text-2xl font-bold text-gray-900">A Sua Semana</h2>
+          <p class="text-gray-600 mt-1">Gira as suas aulas e aceda às salas de reunião.</p>
         </div>
-        <!-- Botão visível apenas para Admin -->
-        <button id="btn-nova-aula" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
-          <i data-lucide="calendar-plus" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Nova Aula</span>
-        </button>
+        
+        <div class="flex items-center gap-4">
+          <!-- TOGGLE DE VISÃO DO CALENDÁRIO -->
+          <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
+            <button id="btn-visao-semanal" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Semanal</button>
+            <button id="btn-visao-mensal" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Mensal</button>
+          </div>
+
+          <!-- Botão visível apenas para Admin -->
+          <button id="btn-nova-aula" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+            <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Nova Aula</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Grade do Calendário Semanal -->
+      <!-- Grade do Calendário -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[400px]">
         <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full">
           <div class="col-span-full flex items-center justify-center p-12 text-gray-500">
@@ -156,17 +165,21 @@
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Horário (Ex: 08:00 - 10:00)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Horário (Ex: 08:00)</label>
             <input type="text" id="aula-hora" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Local / Link Zoom</label>
-            <input type="text" id="aula-local" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Local Físico</label>
+            <input type="text" id="aula-local" placeholder="Ex: Sala 301" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
           </div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Título da Disciplina</label>
           <input type="text" id="aula-titulo" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"><i data-lucide="video" class="w-4 h-4 text-blue-500"></i> Link da Aula (Meet/Zoom)</label>
+          <input type="url" id="aula-link" placeholder="https://meet.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Cor do Card</label>
@@ -271,19 +284,40 @@
           <p id="login-erro" class="text-red-500 text-xs mb-3 hidden">E-mail não encontrado na lista de alunos.</p>
           <button type="submit" class="w-full py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">Entrar</button>
         </form>
-        <button type="button" id="btn-cancelar-login" class="mt-4 text-xs text-gray-500 hover:text-gray-700">Voltar para Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOGIN ADMIN -->
+  <div id="modal-admin-auth" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden p-6 text-center">
+      <div class="mx-auto w-12 h-12 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center mb-4">
+        <i data-lucide="lock" class="w-6 h-6"></i>
+      </div>
+      <h3 class="font-bold text-gray-800 text-lg mb-1">Acesso Restrito</h3>
+      <p class="text-sm text-gray-500 mb-6">Insira a senha de administrador.</p>
+      
+      <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" placeholder="Senha">
+      <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden">Senha incorreta!</p>
+      
+      <div class="flex gap-2">
+        <button id="btn-cancelar-admin" class="flex-1 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancelar</button>
+        <button id="btn-confirmar-admin" class="flex-1 py-2 text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 rounded-lg transition-colors">Acessar</button>
       </div>
     </div>
   </div>
 
   <!-- JAVASCRIPT: LÓGICA E FIREBASE -->
   <script type="module">
+    // --- 0. CONFIGURAÇÃO DE SENHA DO ADMIN ---
+    // Você pode alterar a senha de acesso da área de professor aqui:
+    const SENHA_ADMINISTRADOR = "@Lei30242728";
+
     // --- 1. CONFIGURAÇÃO FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Configuração oficial do seu projeto
     const firebaseConfig = {
       apiKey: "AIzaSyAzZHRIbDFqWCOb-N_Ygob8m3lm2fZCoZk",
       authDomain: "profeducatec-798ec.firebaseapp.com",
@@ -304,6 +338,8 @@
     let currentUser = null;
     let isAdminMode = false;
     let currentAlunoEmail = null; 
+    let visaoCalendario = 'semanal'; // Pode ser 'semanal' ou 'mensal'
+    
     let aulasList = [];
     let arquivosList = [];
     let recadosList = [];
@@ -314,8 +350,6 @@
     // --- 3. AUTENTICAÇÃO ---
     const initAuth = async () => {
       try {
-        // Como está a usar as suas próprias credenciais do Firebase,
-        // usamos diretamente a autenticação anónima que ativou no seu projeto.
         await signInAnonymously(auth);
       } catch (error) {
         console.error("Erro de Autenticação:", error);
@@ -330,51 +364,47 @@
 
       const pathPrefix = `artifacts/${appId}/public/data`;
 
-      // Ouvir Aulas
       onSnapshot(collection(db, pathPrefix, 'aulas'), (snapshot) => {
         aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderizarCalendario();
-      }, (error) => console.error("Erro aulas:", error));
+        atualizarCalendario();
+      });
 
-      // Ouvir Arquivos
       onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
         arquivosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarArquivos();
-      }, (error) => console.error("Erro arquivos:", error));
+      });
 
-      // Ouvir Recados
       onSnapshot(collection(db, pathPrefix, 'recados'), (snapshot) => {
         recadosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarMural();
-      }, (error) => console.error("Erro recados:", error));
+      });
 
-      // Ouvir Alunos
       onSnapshot(collection(db, pathPrefix, 'alunos'), (snapshot) => {
         alunosPermitidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarListaAlunos();
-      }, (error) => console.error("Erro alunos:", error));
+      });
     });
 
     // --- 5. FUNÇÕES DE ELIMINAÇÃO ---
     const getPath = (col) => `artifacts/${appId}/public/data/${col}`;
 
     window.apagarArquivo = async (id) => {
-      if (!currentUser || !isAdminMode) return;
+      if (!isAdminMode) return;
       await deleteDoc(doc(db, getPath('arquivos'), id));
     };
 
     window.apagarAula = async (id) => {
-      if (!currentUser || !isAdminMode) return;
+      if (!isAdminMode) return;
       await deleteDoc(doc(db, getPath('aulas'), id));
     };
 
     window.apagarAluno = async (id) => {
-      if (!currentUser || !isAdminMode) return;
+      if (!isAdminMode) return;
       await deleteDoc(doc(db, getPath('alunos'), id));
     };
 
     window.apagarRecado = async (id) => {
-      if (!currentUser || !isAdminMode) return;
+      if (!isAdminMode) return;
       await deleteDoc(doc(db, getPath('recados'), id));
     };
 
@@ -462,26 +492,51 @@
       lucide.createIcons();
     }
 
-    function renderizarCalendario() {
+    // --- LÓGICA DO CALENDÁRIO ---
+    
+    function atualizarCalendario() {
+      if (visaoCalendario === 'semanal') {
+        renderizarCalendarioSemanal();
+      } else {
+        renderizarCalendarioMensal();
+      }
+    }
+
+    function renderizarCalendarioSemanal() {
       const container = document.getElementById('calendario-grid');
+      container.className = "grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full";
+      
       container.innerHTML = diasSemana.map(dia => {
         const aulasDoDia = aulasList.filter(aula => aula.dia === dia);
         
         let aulasHTML = '';
         if (aulasDoDia.length > 0) {
           aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
-          aulasHTML = aulasDoDia.map(aula => `
-            <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 ${aula.cor}">
-              <p class="text-xs font-bold mb-1 opacity-80">${aula.hora}</p>
-              <h4 class="font-semibold text-sm leading-tight mb-2">${aula.titulo}</h4>
-              <p class="text-xs opacity-90 flex items-center gap-1">${aula.local}</p>
+          
+          aulasHTML = aulasDoDia.map(aula => {
+            // Se houver um link preenchido, renderiza o botão do Meet
+            const btnLink = aula.link 
+              ? `<a href="${aula.link}" target="_blank" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm"><i data-lucide="video" class="w-3 h-3"></i> Acessar Aula</a>` 
+              : '';
+
+            return `
+            <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 flex flex-col ${aula.cor}">
+              <div class="flex-1">
+                <p class="text-xs font-bold mb-1 opacity-80">${aula.hora}</p>
+                <h4 class="font-semibold text-sm leading-tight mb-2">${aula.titulo}</h4>
+                <p class="text-xs opacity-90 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${aula.local}</p>
+              </div>
+              
+              ${btnLink}
+
               ${isAdminMode ? `
                 <button onclick="apagarAula('${aula.id}')" class="absolute top-2 right-2 p-1 bg-white/50 hover:bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                   <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
               ` : ''}
             </div>
-          `).join('');
+          `;
+          }).join('');
         } else {
           aulasHTML = `<div class="h-full flex items-center justify-center text-sm text-gray-400 italic py-6">Livre</div>`;
         }
@@ -500,7 +555,112 @@
       lucide.createIcons();
     }
 
-    // --- 7. CONTROLOS DA INTERFACE (MODOS) ---
+    function renderizarCalendarioMensal() {
+      const container = document.getElementById('calendario-grid');
+      container.className = "w-full"; // Limpa as classes de grade semanal
+
+      const dataAtual = new Date();
+      const ano = dataAtual.getFullYear();
+      const mes = dataAtual.getMonth(); // 0 a 11
+      const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+      const primeiroDiaSemana = new Date(ano, mes, 1).getDay(); // 0 = Dom, 1 = Seg...
+
+      const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+      document.getElementById('titulo-calendario').innerText = `Mês de ${nomesMeses[mes]} / ${ano}`;
+
+      const headerDias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      const mapeamentoDias = { 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta' };
+
+      let html = '<div class="grid grid-cols-7 gap-px bg-gray-200 w-full">';
+
+      // Cabeçalho dos dias
+      headerDias.forEach(dia => {
+        html += `<div class="bg-gray-50 p-2 text-center text-xs font-bold text-gray-500 uppercase">${dia}</div>`;
+      });
+
+      // Células vazias (Dias do mês anterior)
+      for(let i = 0; i < primeiroDiaSemana; i++) {
+        html += `<div class="bg-gray-50 min-h-[120px]"></div>`;
+      }
+
+      // Dias do mês atual
+      for(let dia = 1; dia <= diasNoMes; dia++) {
+        const dataDia = new Date(ano, mes, dia);
+        const diaDaSemanaNum = dataDia.getDay();
+        const nomeDiaAula = mapeamentoDias[diaDaSemanaNum];
+
+        let aulasDoDia = [];
+        if (nomeDiaAula) {
+          aulasDoDia = aulasList.filter(a => a.dia === nomeDiaAula);
+          aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
+        }
+
+        const hoje = new Date().getDate() === dia ? 'bg-blue-50' : 'bg-white hover:bg-gray-50';
+
+        html += `<div class="${hoje} p-2 min-h-[120px] relative transition-colors border-t border-gray-100 flex flex-col">`;
+        html += `  <span class="text-xs font-bold text-gray-400 self-end mb-1">${dia}</span>`;
+        html += `  <div class="space-y-1.5 flex-1">`;
+        
+        aulasDoDia.forEach(aula => {
+          html += `
+            <div class="text-[10px] p-1.5 rounded leading-tight ${aula.cor} opacity-90 relative group" title="${aula.titulo}">
+              <div class="font-bold truncate mb-0.5">${aula.hora.split(' ')[0]} - ${aula.titulo}</div>
+              ${aula.link ? `<a href="${aula.link}" target="_blank" class="flex items-center gap-1 text-blue-700 hover:text-blue-900 mt-1" title="Entrar no Meet/Zoom"><i data-lucide="video" class="w-3 h-3"></i> Chamada</a>` : `<span class="text-gray-600 truncate"><i data-lucide="map-pin" class="w-2.5 h-2.5 inline mr-0.5"></i>${aula.local}</span>`}
+            </div>
+          `;
+        });
+
+        html += `  </div>`;
+        html += `</div>`;
+      }
+
+      // Completar com células vazias (Dias do mês seguinte)
+      const totalCelulas = primeiroDiaSemana + diasNoMes;
+      const celulasRestantes = totalCelulas % 7 === 0 ? 0 : 7 - (totalCelulas % 7);
+      for(let i = 0; i < celulasRestantes; i++) {
+        html += `<div class="bg-gray-50 min-h-[120px] border-t border-gray-100"></div>`;
+      }
+
+      html += '</div>';
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    // Lógica do Toggle Semanal/Mensal
+    const btnSemanal = document.getElementById('btn-visao-semanal');
+    const btnMensal = document.getElementById('btn-visao-mensal');
+
+    btnSemanal.addEventListener('click', () => {
+      visaoCalendario = 'semanal';
+      document.getElementById('titulo-calendario').innerText = "A Sua Semana";
+      
+      btnSemanal.classList.replace('text-gray-500', 'text-gray-800');
+      btnSemanal.classList.replace('hover:text-gray-700', 'shadow-sm');
+      btnSemanal.classList.add('bg-white');
+      
+      btnMensal.classList.replace('bg-white', 'text-gray-500');
+      btnMensal.classList.replace('shadow-sm', 'hover:text-gray-700');
+      btnMensal.classList.replace('text-gray-800', 'bg-transparent');
+      
+      atualizarCalendario();
+    });
+
+    btnMensal.addEventListener('click', () => {
+      visaoCalendario = 'mensal';
+      
+      btnMensal.classList.replace('text-gray-500', 'text-gray-800');
+      btnMensal.classList.replace('hover:text-gray-700', 'shadow-sm');
+      btnMensal.classList.add('bg-white');
+      
+      btnSemanal.classList.replace('bg-white', 'text-gray-500');
+      btnSemanal.classList.replace('shadow-sm', 'hover:text-gray-700');
+      btnSemanal.classList.replace('text-gray-800', 'bg-transparent');
+      
+      atualizarCalendario();
+    });
+
+
+    // --- 7. CONTROLOS DA INTERFACE (MODOS & AUTH) ---
     const btnModoAluno = document.getElementById('modo-aluno');
     const btnModoAdmin = document.getElementById('modo-admin');
     const roleText = document.getElementById('user-role-text');
@@ -556,25 +716,40 @@
       }
       
       renderizarArquivos();
-      renderizarCalendario();
+      atualizarCalendario();
       renderizarMural();
     }
 
+    // MODAL DE SENHA DO ADMIN
     btnModoAdmin.addEventListener('click', () => {
-      document.getElementById('modal-login').classList.add('hidden');
-      alternarModo(true);
-    });
-    
-    btnModoAluno.addEventListener('click', () => {
-      if (!currentAlunoEmail) {
-        document.getElementById('modal-login').classList.remove('hidden');
-        document.getElementById('login-erro').classList.add('hidden');
+      if (!isAdminMode) {
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-admin-auth').classList.remove('hidden');
+        document.getElementById('admin-senha-input').value = '';
+        document.getElementById('admin-erro').classList.add('hidden');
       }
     });
 
-    document.getElementById('btn-cancelar-login').addEventListener('click', () => {
-      document.getElementById('modal-login').classList.add('hidden');
-      alternarModo(true);
+    document.getElementById('btn-confirmar-admin').addEventListener('click', () => {
+      const senhaDigitada = document.getElementById('admin-senha-input').value;
+      if (senhaDigitada === SENHA_ADMINISTRADOR) {
+        document.getElementById('modal-admin-auth').classList.add('hidden');
+        alternarModo(true);
+      } else {
+        document.getElementById('admin-erro').classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('btn-cancelar-admin').addEventListener('click', () => {
+      document.getElementById('modal-admin-auth').classList.add('hidden');
+    });
+    
+    // BOTÃO MODO ALUNO
+    btnModoAluno.addEventListener('click', () => {
+      if (isAdminMode) {
+        document.getElementById('modal-login').classList.remove('hidden');
+        document.getElementById('login-erro').classList.add('hidden');
+      }
     });
 
     document.getElementById('form-login').addEventListener('submit', (e) => {
@@ -591,8 +766,10 @@
       }
     });
 
-    // Iniciar como admin
-    setTimeout(() => alternarModo(true), 200);
+    // Iniciar na tela de login de aluno
+    setTimeout(() => {
+      document.getElementById('modal-login').classList.remove('hidden');
+    }, 200);
 
     // --- 8. LÓGICA DE MODAIS E FORMULÁRIOS ---
     const modalAula = document.getElementById('modal-aula');
@@ -616,7 +793,6 @@
 
     document.getElementById('form-recado').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!currentUser) return;
       const texto = inputRecado.value.trim();
       if (!texto) return;
 
@@ -631,7 +807,7 @@
 
     document.getElementById('form-aluno').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!currentUser || !isAdminMode) return;
+      if (!isAdminMode) return;
       
       const email = document.getElementById('aluno-email').value.trim().toLowerCase();
       if (!email) return;
@@ -653,12 +829,13 @@
 
     document.getElementById('form-aula').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!currentUser) return;
+      if (!isAdminMode) return;
       const novaAula = {
         dia: document.getElementById('aula-dia').value,
         hora: document.getElementById('aula-hora').value,
         titulo: document.getElementById('aula-titulo').value,
         local: document.getElementById('aula-local').value,
+        link: document.getElementById('aula-link').value, // Recebe o link do Google Meet
         cor: document.getElementById('aula-cor').value,
       };
       try {
@@ -672,7 +849,7 @@
 
     document.getElementById('form-arquivo').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!currentUser) return;
+      if (!isAdminMode) return;
       const novoArquivo = {
         nome: document.getElementById('arq-nome').value,
         tipo: document.getElementById('arq-tipo').value,
