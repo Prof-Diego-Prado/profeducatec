@@ -124,7 +124,7 @@
         </div>
 
         <!-- Botão visível apenas para Admin -->
-        <button id="btn-gerir-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
+        <button id="btn-gerenciar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
           <i data-lucide="settings" class="w-4 h-4"></i>
           <span class="hidden sm:inline">Gestão</span>
         </button>
@@ -455,13 +455,13 @@
         
         <!-- VISTA 1: SELEÇÃO DE PERFIL -->
         <div id="auth-view-selecao" class="space-y-4">
-          <p class="text-center text-gray-600 font-medium mb-4">Como deseja aceder?</p>
+          <p class="text-center text-gray-600 font-medium mb-4">Como deseja acessar?</p>
           <button onclick="mudarAuthView('login-aluno')" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group">
             <div class="flex items-center gap-3">
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">Aceder ao material da disciplina</p>
+                <p class="text-xs text-gray-500">acessar ao material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -472,7 +472,7 @@
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Professor</p>
-                <p class="text-xs text-gray-500">Gerir alunos e conteúdos</p>
+                <p class="text-xs text-gray-500">gerenciar alunos e conteúdos</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -534,7 +534,7 @@
             <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Aceder ao Painel</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">acessar ao Painel</button>
           </form>
 
           <div class="mt-6 text-center text-sm border-t pt-4">
@@ -673,12 +673,12 @@
 
       onSnapshot(collection(db, pathPrefix, 'alunos'), (snapshot) => {
         alunosPermitidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderizarListaAlunos();
+        if (isAdminMode) renderizarListaAlunos();
       });
 
       onSnapshot(collection(db, pathPrefix, 'solicitacoes'), (snapshot) => {
         solicitacoesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderizarListaSolicitacoes();
+        if (isAdminMode) renderizarListaSolicitacoes();
       });
 
       onSnapshot(collection(db, pathPrefix, 'links_importantes'), (snapshot) => {
@@ -688,12 +688,12 @@
 
       onSnapshot(collection(db, pathPrefix, 'professores'), (snapshot) => {
         professoresAprovadosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderizarListaProfessores();
+        if (isAdminMode) renderizarListaProfessores();
       });
 
       onSnapshot(collection(db, pathPrefix, 'solicitacoes_professores'), (snapshot) => {
         solicitacoesProfList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderizarListaSolicitacoesProf();
+        if (isAdminMode) renderizarListaSolicitacoesProf();
       });
     });
 
@@ -771,11 +771,15 @@
       const agora = new Date();
       
       // Relógio Digital
-      document.getElementById('relogio-digital').innerText = agora.toLocaleTimeString('pt-BR');
+      const painelRelogio = document.getElementById('relogio-digital');
+      if (painelRelogio) painelRelogio.innerText = agora.toLocaleTimeString('pt-BR');
 
       // Lógica do Próximo Compromisso
+      const painelAviso = document.getElementById('proximo-compromisso');
+      if (!painelAviso) return;
+
       if (!aulasList || aulasList.length === 0) {
-        document.getElementById('proximo-compromisso').innerText = "Sem aulas marcadas";
+        painelAviso.innerText = "Sem aulas marcadas";
         return;
       }
 
@@ -811,8 +815,6 @@
 
       // Filtra aulas que começaram há menos de 1h30min (5400000ms) atrás e ordena
       const aulasFuturas = proximasAulas.filter(a => a.diffMs > -5400000).sort((a, b) => a.diffMs - b.diffMs);
-
-      const painelAviso = document.getElementById('proximo-compromisso');
 
       if (aulasFuturas.length > 0) {
         const proxima = aulasFuturas[0];
@@ -884,6 +886,8 @@
 
     function renderizarLinksImportantes() {
       const container = document.getElementById('links-importantes-lista');
+      if (!container) return;
+      
       if (linksImportantesList.length === 0) {
         container.innerHTML = `<p class="text-sm text-gray-400 text-center mt-8 italic">Nenhum link importante adicionado.</p>`;
         return;
@@ -956,6 +960,8 @@
 
     function renderizarMural() {
       const container = document.getElementById('mural-lista');
+      if (!container) return;
+      
       if (recadosList.length === 0) {
         container.innerHTML = `<p class="text-gray-400 text-xs text-center mt-4">Nenhum recado ainda. Seja o primeiro!</p>`;
         return;
@@ -985,6 +991,8 @@
 
     function renderizarArquivos() {
       const container = document.getElementById('arquivos-lista');
+      if (!container) return;
+      
       if (arquivosList.length === 0) {
         container.innerHTML = `<p class="text-xs text-gray-400 mt-4 text-center">Nenhum material disponível.</p>`;
         return;
@@ -1027,6 +1035,7 @@
 
     function renderizarCalendarioSemanal() {
       const container = document.getElementById('calendario-grid');
+      if (!container) return;
       container.className = "grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full";
       
       container.innerHTML = diasSemana.map(dia => {
@@ -1097,6 +1106,7 @@
 
     function renderizarCalendarioMensal() {
       const container = document.getElementById('calendario-grid');
+      if (!container) return;
       container.className = "w-full";
 
       const dataAtual = new Date();
@@ -1200,44 +1210,48 @@
     const btnSemanal = document.getElementById('btn-visao-semanal');
     const btnMensal = document.getElementById('btn-visao-mensal');
 
-    btnSemanal.addEventListener('click', () => {
-      visaoCalendario = 'semanal';
-      document.getElementById('titulo-calendario').innerText = "A Sua Semana";
-      btnSemanal.classList.replace('text-gray-500', 'text-gray-800');
-      btnSemanal.classList.replace('hover:text-gray-700', 'shadow-sm');
-      btnSemanal.classList.add('bg-white');
-      btnMensal.classList.replace('bg-white', 'text-gray-500');
-      btnMensal.classList.replace('shadow-sm', 'hover:text-gray-700');
-      btnMensal.classList.replace('text-gray-800', 'bg-transparent');
-      atualizarCalendario();
-    });
+    if(btnSemanal && btnMensal) {
+      btnSemanal.addEventListener('click', () => {
+        visaoCalendario = 'semanal';
+        document.getElementById('titulo-calendario').innerText = "A Sua Semana";
+        btnSemanal.classList.replace('text-gray-500', 'text-gray-800');
+        btnSemanal.classList.replace('hover:text-gray-700', 'shadow-sm');
+        btnSemanal.classList.add('bg-white');
+        btnMensal.classList.replace('bg-white', 'text-gray-500');
+        btnMensal.classList.replace('shadow-sm', 'hover:text-gray-700');
+        btnMensal.classList.replace('text-gray-800', 'bg-transparent');
+        atualizarCalendario();
+      });
 
-    btnMensal.addEventListener('click', () => {
-      visaoCalendario = 'mensal';
-      btnMensal.classList.replace('text-gray-500', 'text-gray-800');
-      btnMensal.classList.replace('hover:text-gray-700', 'shadow-sm');
-      btnMensal.classList.add('bg-white');
-      btnSemanal.classList.replace('bg-white', 'text-gray-500');
-      btnSemanal.classList.replace('shadow-sm', 'hover:text-gray-700');
-      btnSemanal.classList.replace('text-gray-800', 'bg-transparent');
-      atualizarCalendario();
-    });
+      btnMensal.addEventListener('click', () => {
+        visaoCalendario = 'mensal';
+        btnMensal.classList.replace('text-gray-500', 'text-gray-800');
+        btnMensal.classList.replace('hover:text-gray-700', 'shadow-sm');
+        btnMensal.classList.add('bg-white');
+        btnSemanal.classList.replace('bg-white', 'text-gray-500');
+        btnSemanal.classList.replace('shadow-sm', 'hover:text-gray-700');
+        btnSemanal.classList.replace('text-gray-800', 'bg-transparent');
+        atualizarCalendario();
+      });
+    }
 
     const selectTipoRepeticao = document.getElementById('aula-tipo-repeticao');
     const camposSemanal = document.getElementById('campos-repeticao-semanal');
     const camposUnico = document.getElementById('campos-evento-unico');
 
-    selectTipoRepeticao.addEventListener('change', (e) => {
-      if (e.target.value === 'unico') {
-        camposSemanal.classList.add('hidden');
-        camposUnico.classList.remove('hidden');
-        document.getElementById('aula-data-unica').required = true;
-      } else {
-        camposSemanal.classList.remove('hidden');
-        camposUnico.classList.add('hidden');
-        document.getElementById('aula-data-unica').required = false;
-      }
-    });
+    if(selectTipoRepeticao) {
+      selectTipoRepeticao.addEventListener('change', (e) => {
+        if (e.target.value === 'unico') {
+          camposSemanal.classList.add('hidden');
+          camposUnico.classList.remove('hidden');
+          document.getElementById('aula-data-unica').required = true;
+        } else {
+          camposSemanal.classList.remove('hidden');
+          camposUnico.classList.add('hidden');
+          document.getElementById('aula-data-unica').required = false;
+        }
+      });
+    }
 
     // --- 7. FLUXO DE AUTENTICAÇÃO E MODAL UNIFICADO ---
     
@@ -1262,7 +1276,7 @@
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
-    const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
+    const btngerenciarAlunos = document.getElementById('btn-gerenciar-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
     const inputNomeRecado = document.getElementById('input-nome-recado');
@@ -1288,7 +1302,7 @@
         userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + adminName;
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
-        btnGerirAlunos.classList.remove('hidden');
+        btngerenciarAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
         
         // Área master de gestão
@@ -1306,6 +1320,14 @@
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
         inputRecado.placeholder = "Avisar turma...";
+
+        // Força renderização dos painéis de admin
+        renderizarListaSolicitacoes();
+        renderizarListaAlunos();
+        if(isMaster) {
+          renderizarListaSolicitacoesProf();
+          renderizarListaProfessores();
+        }
       } else {
         currentAlunoEmail = emailAluno;
         btnModoAluno.classList.replace('text-gray-500', 'text-gray-800');
@@ -1320,7 +1342,7 @@
         userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
-        btnGerirAlunos.classList.add('hidden');
+        btngerenciarAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
         
         // Configurações do formulário de recados para ALUNO
@@ -1525,7 +1547,7 @@
     // --- 8. OUTROS MODAIS E FORMULÁRIOS DE CONTEÚDO ---
     const modalAula = document.getElementById('modal-aula');
     const modalArquivo = document.getElementById('modal-arquivo');
-    const modalAlunos = document.getElementById('modal-alunos');
+    const modalAlunos = document.getElementById('modal-gestao');
     const modalLinkImportante = document.getElementById('modal-link-importante');
 
     btnNovaAula.addEventListener('click', () => {
@@ -1539,7 +1561,7 @@
     });
     
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
-    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btngerenciarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
