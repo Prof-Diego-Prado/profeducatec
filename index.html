@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduDash - Plataforma de Aulas</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    /* Ocultar scrollbars para um visual mais limpo */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR MOBILE OVERLAY -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-72 bg-white border-r border-gray-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex flex-col">
+    <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gray-900 text-white">
+      <div class="flex items-center gap-2">
+        <i data-lucide="book-open" class="w-6 h-6 text-blue-400"></i>
+        <span class="text-lg font-bold tracking-wider">EduDash</span>
+      </div>
+      <button id="btn-close-sidebar" class="lg:hidden text-gray-300 hover:text-white">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+
+    <nav class="flex-1 px-4 py-6 space-y-8 overflow-y-auto">
+      <div>
+        <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Menu</h3>
+        <ul class="space-y-1">
+          <li>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-md">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+              Calendário de Aulas
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between px-3 mb-2">
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Material Didático</h3>
+          <!-- Botão visível apenas para Admin -->
+          <button id="btn-novo-arquivo" class="hidden text-blue-600 hover:text-blue-800" title="Adicionar Arquivo">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <div id="arquivos-lista" class="space-y-2 mt-3 text-sm text-gray-500 text-center">
+          A carregar materiais...
+        </div>
+      </div>
+
+      <!-- NOVA SEÇÃO: MURAL DE RECADOS -->
+      <div class="mt-8 flex flex-col h-72 border-t border-gray-200 pt-4">
+        <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+          <i data-lucide="message-square" class="w-4 h-4"></i> Mural de Recados
+        </h3>
+        <div id="mural-lista" class="flex-1 overflow-y-auto px-3 space-y-3 mb-2 text-sm">
+          <p class="text-gray-400 text-xs text-center mt-4">A carregar recados...</p>
+        </div>
+        <form id="form-recado" class="px-3 mt-auto">
+          <div class="flex gap-2">
+            <input type="text" id="input-recado" class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Escreva um recado..." required disabled>
+            <button type="submit" id="btn-enviar-recado" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-2 py-1.5 transition-colors disabled:opacity-50" disabled>
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </nav>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
+    
+    <header class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 shadow-sm shrink-0">
+      <button id="btn-open-sidebar" class="lg:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+      
+      <div class="flex-1 flex justify-between items-center lg:justify-end gap-4">
+        <h1 class="text-xl font-semibold text-gray-800 lg:hidden">Dashboard</h1>
+        
+        <!-- SELETOR DE MODO (Simulação de Login) -->
+        <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
+          <button id="modo-aluno" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Aluno</button>
+          <button id="modo-admin" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Admin</button>
+        </div>
+
+        <!-- Botão visível apenas para Admin -->
+        <button id="btn-gerir-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Gerir Alunos</span>
+        </button>
+
+        <div class="items-center gap-3 hidden sm:flex">
+          <span id="user-role-text" class="text-sm font-medium text-gray-600">Visão do Aluno</span>
+          <img class="w-8 h-8 rounded-full bg-gray-300 border border-gray-200" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Student" id="user-avatar" alt="Avatar" />
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <div class="mb-8 flex justify-between items-end">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">A Sua Semana</h2>
+          <p class="text-gray-600 mt-1">Gira as suas aulas e aceda aos materiais vinculados.</p>
+        </div>
+        <!-- Botão visível apenas para Admin -->
+        <button id="btn-nova-aula" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+          <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+          Nova Aula
+        </button>
+      </div>
+
+      <!-- Grade do Calendário Semanal -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[400px]">
+        <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
+          <div class="col-span-full flex items-center justify-center p-12 text-gray-500">
+             A carregar calendário...
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: NOVA AULA -->
+  <div id="modal-aula" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+        <h3 class="font-bold text-gray-800">Adicionar Nova Aula</h3>
+        <button class="fechar-modal text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="form-aula" class="p-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Dia da Semana</label>
+          <select id="aula-dia" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            <option value="Segunda">Segunda-feira</option>
+            <option value="Terça">Terça-feira</option>
+            <option value="Quarta">Quarta-feira</option>
+            <option value="Quinta">Quinta-feira</option>
+            <option value="Sexta">Sexta-feira</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Horário (Ex: 08:00 - 10:00)</label>
+            <input type="text" id="aula-hora" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Local / Link Zoom</label>
+            <input type="text" id="aula-local" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Título da Disciplina</label>
+          <input type="text" id="aula-titulo" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cor do Card</label>
+          <select id="aula-cor" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="bg-blue-100 border-blue-300 text-blue-800">Azul</option>
+            <option value="bg-green-100 border-green-300 text-green-800">Verde</option>
+            <option value="bg-purple-100 border-purple-300 text-purple-800">Roxo</option>
+            <option value="bg-orange-100 border-orange-300 text-orange-800">Laranja</option>
+            <option value="bg-indigo-100 border-indigo-300 text-indigo-800">Índigo</option>
+          </select>
+        </div>
+        <div class="pt-4 flex justify-end gap-2">
+          <button type="button" class="fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Guardar Aula</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVO ARQUIVO -->
+  <div id="modal-arquivo" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+        <h3 class="font-bold text-gray-800">Cadastrar Novo Link de Arquivo</h3>
+        <button class="fechar-modal text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="form-arquivo" class="p-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nome de Exibição</label>
+          <input type="text" id="arq-nome" placeholder="Ex: Apostila de React" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <select id="arq-tipo" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="pdf">PDF / Documento</option>
+              <option value="video">Vídeo</option>
+              <option value="code">Código (ZIP)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Hospedagem</label>
+            <select id="arq-fonte" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="drive">Google Drive</option>
+              <option value="github">GitHub</option>
+              <option value="link">Outro Link</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">URL (Link de Partilha)</label>
+          <input type="url" id="arq-url" placeholder="https://" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tamanho (Opcional, Ex: 2MB)</label>
+          <input type="text" id="arq-tamanho" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="pt-4 flex justify-end gap-2">
+          <button type="button" class="fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Adicionar Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GERIR ALUNOS (ADMIN) -->
+  <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
+        <h3 class="font-bold text-gray-800">Alunos Autorizados</h3>
+        <button class="fechar-modal text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto">
+        <p class="text-xs text-gray-500 mb-4">Adicione os e-mails dos alunos que podem aceder à plataforma.</p>
+        <form id="form-aluno" class="flex gap-2 mb-4">
+          <input type="email" id="aluno-email" placeholder="E-mail do aluno..." class="flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+          <button type="submit" class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg whitespace-nowrap">Cadastrar</button>
+        </form>
+        <div class="space-y-2">
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Lista de E-mails Autorizados</h4>
+          <ul id="lista-alunos-cadastrados" class="space-y-2 text-sm">
+            <!-- Injetado via JS -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOGIN ALUNO -->
+  <div id="modal-login" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden">
+      <div class="p-6 text-center">
+        <div class="mx-auto w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
+          <i data-lucide="user-check" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-bold text-gray-800 text-lg mb-1">Acesso do Aluno</h3>
+        <p class="text-sm text-gray-500 mb-6">Por favor, insira o e-mail cadastrado pelo seu professor.</p>
+        
+        <form id="form-login">
+          <input type="email" id="login-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" required>
+          <p id="login-erro" class="text-red-500 text-xs mb-3 hidden">E-mail não encontrado na lista de alunos.</p>
+          <button type="submit" class="w-full py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">Entrar</button>
+        </form>
+        <button type="button" id="btn-cancelar-login" class="mt-4 text-xs text-gray-500 hover:text-gray-700">Voltar para Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT: LÓGICA E FIREBASE -->
+  <script type="module">
+    // --- 1. CONFIGURAÇÃO FIREBASE ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // O ambiente de execução injeta estas variáveis
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'edudash-app';
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- 2. ESTADO DA APLICAÇÃO ---
+    let currentUser = null;
+    let isAdminMode = false; // Toggle para a interface
+    let currentAlunoEmail = null; // Guarda o email do aluno logado
+    let aulasList = [];
+    let arquivosList = [];
+    let recadosList = [];
+    let alunosPermitidos = [];
+
+    const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+
+    // --- 3. AUTENTICAÇÃO (Obrigatório antes do Firestore) ---
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Erro de Autenticação:", error);
+      }
+    };
+    initAuth();
+
+    // --- 4. OUVINTES DO FIRESTORE ---
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      if (!user) return;
+
+      // Ouvir Coleção de Aulas (Dados Públicos)
+      const aulasRef = collection(db, 'artifacts', appId, 'public', 'data', 'aulas');
+      onSnapshot(aulasRef, (snapshot) => {
+        aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarCalendario();
+      }, (error) => console.error("Erro ao ler aulas:", error));
+
+      // Ouvir Coleção de Arquivos (Dados Públicos)
+      const arquivosRef = collection(db, 'artifacts', appId, 'public', 'data', 'arquivos');
+      onSnapshot(arquivosRef, (snapshot) => {
+        arquivosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarArquivos();
+      }, (error) => console.error("Erro ao ler arquivos:", error));
+
+      // Ouvir Coleção de Recados
+      const recadosRef = collection(db, 'artifacts', appId, 'public', 'data', 'recados');
+      onSnapshot(recadosRef, (snapshot) => {
+        recadosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarMural();
+      }, (error) => console.error("Erro ao ler recados:", error));
+
+      // Ouvir Coleção de Alunos Permitidos (Email)
+      const alunosRef = collection(db, 'artifacts', appId, 'public', 'data', 'alunos');
+      onSnapshot(alunosRef, (snapshot) => {
+        alunosPermitidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarListaAlunos();
+      }, (error) => console.error("Erro ao ler alunos:", error));
+    });
+
+    // --- 5. RENDERIZAÇÃO DA UI ---
+
+    window.apagarArquivo = async (id) => {
+      if (!currentUser || !isAdminMode) return;
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'arquivos', id));
+    };
+
+    window.apagarAula = async (id) => {
+      if (!currentUser || !isAdminMode) return;
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'aulas', id));
+    };
+
+    window.apagarAluno = async (id) => {
+      if (!currentUser || !isAdminMode) return;
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'alunos', id));
+    };
+
+    window.apagarRecado = async (id) => {
+      if (!currentUser || !isAdminMode) return;
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'recados', id));
+    };
+
+    function renderizarMural() {
+      const container = document.getElementById('mural-lista');
+      
+      if (recadosList.length === 0) {
+        container.innerHTML = `<p class="text-gray-400 text-xs text-center mt-4">Nenhum recado ainda. Seja o primeiro!</p>`;
+        return;
+      }
+
+      // Ordenar por data (mais antigos em cima)
+      const recadosOrdenados = [...recadosList].sort((a, b) => a.timestamp - b.timestamp);
+
+      container.innerHTML = recadosOrdenados.map(recado => {
+        const data = new Date(recado.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        return `
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 relative group">
+            <div class="flex justify-between items-start mb-1">
+              <span class="text-xs font-bold text-gray-700 truncate mr-2">${recado.autor}</span>
+              <span class="text-[10px] text-gray-400 whitespace-nowrap">${data}</span>
+            </div>
+            <p class="text-xs text-gray-600 break-words">${recado.texto}</p>
+            ${isAdminMode ? `
+              <button onclick="apagarRecado('${recado.id}')" class="absolute -top-2 -right-2 p-1.5 bg-red-100 text-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-200">
+                <i data-lucide="x" class="w-3 h-3"></i>
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+      
+      // Auto-scroll para as mensagens mais recentes
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+    function renderizarListaAlunos() {
+      const container = document.getElementById('lista-alunos-cadastrados');
+      if (alunosPermitidos.length === 0) {
+        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum aluno cadastrado.</li>`;
+        return;
+      }
+
+      container.innerHTML = alunosPermitidos.map(aluno => `
+        <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
+          <span class="text-gray-700 truncate pr-2">${aluno.email}</span>
+          <button onclick="apagarAluno('${aluno.id}')" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </li>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderizarArquivos() {
+      const container = document.getElementById('arquivos-lista');
+      if (arquivosList.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 mt-4 text-center">Nenhum material disponível.</p>`;
+        return;
+      }
+
+      container.innerHTML = arquivosList.map(arquivo => {
+        let iconeFonte = arquivo.fonte === 'github' ? 'github' : (arquivo.fonte === 'drive' ? 'hard-drive' : 'link');
+        let iconeTipo = (arquivo.tipo === 'pdf' || arquivo.tipo === 'doc') ? 'file-text' : (arquivo.tipo === 'video' ? 'video' : 'book-open');
+        let corTipo = arquivo.tipo === 'pdf' ? 'text-red-500' : (arquivo.tipo === 'video' ? 'text-purple-500' : 'text-gray-700');
+
+        return `
+        <div class="relative group">
+          <a href="${arquivo.url}" target="_blank" rel="noopener noreferrer" class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
+            <div class="mt-0.5"><i data-lucide="${iconeTipo}" class="w-5 h-5 ${corTipo}"></i></div>
+            <div class="flex-1 min-w-0 text-left">
+              <p class="text-sm font-medium text-gray-700 truncate group-hover:text-blue-600">${arquivo.nome}</p>
+              <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                <i data-lucide="${iconeFonte}" class="w-3 h-3"></i>
+                <span class="capitalize">${arquivo.fonte}</span>
+                ${arquivo.tamanho ? `<span>•</span><span>${arquivo.tamanho}</span>` : ''}
+              </div>
+            </div>
+          </a>
+          ${isAdminMode ? `
+            <button onclick="apagarArquivo('${arquivo.id}')" class="absolute right-2 top-2 p-1.5 bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          ` : ''}
+        </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function renderizarCalendario() {
+      const container = document.getElementById('calendario-grid');
+      
+      container.innerHTML = diasSemana.map(dia => {
+        // As queries complexas no firebase não são recomendadas aqui, por isso filtramos no JS
+        const aulasDoDia = aulasList.filter(aula => aula.dia === dia);
+        
+        let aulasHTML = '';
+        if (aulasDoDia.length > 0) {
+          // Ordena alfabeticamente pela hora apenas para estética
+          aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
+
+          aulasHTML = aulasDoDia.map(aula => `
+            <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 ${aula.cor}">
+              <p class="text-xs font-bold mb-1 opacity-80">${aula.hora}</p>
+              <h4 class="font-semibold text-sm leading-tight mb-2">${aula.titulo}</h4>
+              <p class="text-xs opacity-90 flex items-center gap-1">${aula.local}</p>
+              
+              ${isAdminMode ? `
+                <button onclick="apagarAula('${aula.id}')" class="absolute top-2 right-2 p-1 bg-white/50 hover:bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              ` : ''}
+            </div>
+          `).join('');
+        } else {
+          aulasHTML = `<div class="h-full flex items-center justify-center text-sm text-gray-400 italic py-6">Livre</div>`;
+        }
+
+        return `
+          <div class="min-h-[400px] flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 last:border-0">
+            <div class="py-3 px-4 bg-gray-50 border-b border-gray-200 text-center">
+              <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">${dia}</h3>
+            </div>
+            <div class="flex-1 p-3 space-y-3 bg-white">
+              ${aulasHTML}
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // --- 6. CONTROLOS DA INTERFACE (MUDAR DE MODO) ---
+    const btnModoAluno = document.getElementById('modo-aluno');
+    const btnModoAdmin = document.getElementById('modo-admin');
+    const roleText = document.getElementById('user-role-text');
+    const userAvatar = document.getElementById('user-avatar');
+    const btnNovaAula = document.getElementById('btn-nova-aula');
+    const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
+    const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
+    
+    // Elementos do Mural
+    const inputRecado = document.getElementById('input-recado');
+    const btnEnviarRecado = document.getElementById('btn-enviar-recado');
+
+    function alternarModo(paraAdmin, emailAluno = null) {
+      isAdminMode = paraAdmin;
+      
+      if (paraAdmin) {
+        currentAlunoEmail = null;
+        btnModoAdmin.classList.replace('text-gray-500', 'text-gray-800');
+        btnModoAdmin.classList.replace('hover:text-gray-700', 'shadow-sm');
+        btnModoAdmin.classList.add('bg-white');
+        
+        btnModoAluno.classList.replace('bg-white', 'text-gray-500');
+        btnModoAluno.classList.replace('shadow-sm', 'hover:text-gray-700');
+        btnModoAluno.classList.replace('text-gray-800', 'bg-transparent');
+        
+        roleText.innerText = "Modo Professor / Admin";
+        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=Professor";
+        btnNovaAula.classList.remove('hidden');
+        btnNovoArquivo.classList.remove('hidden');
+        btnGerirAlunos.classList.remove('hidden');
+        
+        inputRecado.disabled = false;
+        btnEnviarRecado.disabled = false;
+        inputRecado.placeholder = "Avisar turma...";
+      } else {
+        currentAlunoEmail = emailAluno;
+        btnModoAluno.classList.replace('text-gray-500', 'text-gray-800');
+        btnModoAluno.classList.replace('hover:text-gray-700', 'shadow-sm');
+        btnModoAluno.classList.add('bg-white');
+        
+        btnModoAdmin.classList.replace('bg-white', 'text-gray-500');
+        btnModoAdmin.classList.replace('shadow-sm', 'hover:text-gray-700');
+        btnModoAdmin.classList.replace('text-gray-800', 'bg-transparent');
+
+        roleText.innerText = `Aluno: ${emailAluno.split('@')[0]}`;
+        userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
+        btnNovaAula.classList.add('hidden');
+        btnNovoArquivo.classList.add('hidden');
+        btnGerirAlunos.classList.add('hidden');
+        
+        inputRecado.disabled = false;
+        btnEnviarRecado.disabled = false;
+        inputRecado.placeholder = "Escreva um recado...";
+      }
+      
+      renderizarArquivos();
+      renderizarCalendario();
+      renderizarMural();
+    }
+
+    btnModoAdmin.addEventListener('click', () => {
+      document.getElementById('modal-login').classList.add('hidden');
+      alternarModo(true);
+    });
+    
+    btnModoAluno.addEventListener('click', () => {
+      if (!currentAlunoEmail) {
+        document.getElementById('modal-login').classList.remove('hidden');
+        document.getElementById('login-erro').classList.add('hidden');
+      }
+    });
+
+    document.getElementById('btn-cancelar-login').addEventListener('click', () => {
+      document.getElementById('modal-login').classList.add('hidden');
+      alternarModo(true);
+    });
+
+    document.getElementById('form-login').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailDigitado = document.getElementById('login-email').value.trim().toLowerCase();
+      
+      const alunoExiste = alunosPermitidos.some(a => a.email === emailDigitado);
+      
+      if (alunoExiste) {
+        document.getElementById('modal-login').classList.add('hidden');
+        alternarModo(false, emailDigitado);
+        e.target.reset();
+      } else {
+        document.getElementById('login-erro').classList.remove('hidden');
+      }
+    });
+
+    // Iniciar como admin para testar facilmente
+    setTimeout(() => alternarModo(true), 200);
+
+    // --- 7. LÓGICA DE MODAIS E INSERÇÃO DE DADOS ---
+    const modalAula = document.getElementById('modal-aula');
+    const modalArquivo = document.getElementById('modal-arquivo');
+    const modalAlunos = document.getElementById('modal-alunos');
+
+    btnNovaAula.addEventListener('click', () => modalAula.classList.remove('hidden'));
+    btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
+    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    
+    document.querySelectorAll('.fechar-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modalAula.classList.add('hidden');
+        modalArquivo.classList.add('hidden');
+        modalAlunos.classList.add('hidden');
+      });
+    });
+
+    document.getElementById('form-recado').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      
+      const texto = inputRecado.value.trim();
+      if (!texto) return;
+
+      const autor = isAdminMode ? '👨‍🏫 Professor' : currentAlunoEmail.split('@')[0];
+
+      try {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recados'), {
+          texto,
+          autor,
+          timestamp: Date.now()
+        });
+        e.target.reset();
+      } catch (error) {
+        console.error("Erro ao enviar recado:", error);
+      }
+    });
+
+    document.getElementById('form-aluno').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser || !isAdminMode) return;
+      
+      const email = document.getElementById('aluno-email').value.trim().toLowerCase();
+      if (!email) return;
+      
+      if (alunosPermitidos.some(a => a.email === email)) {
+        alert("E-mail já está cadastrado.");
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'alunos'), { email });
+        e.target.reset();
+      } catch (error) {
+        console.error("Erro ao cadastrar aluno:", error);
+      }
+    });
+
+    document.getElementById('form-aula').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      
+      const novaAula = {
+        dia: document.getElementById('aula-dia').value,
+        hora: document.getElementById('aula-hora').value,
+        titulo: document.getElementById('aula-titulo').value,
+        local: document.getElementById('aula-local').value,
+        cor: document.getElementById('aula-cor').value,
+      };
+
+      try {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'aulas'), novaAula);
+        modalAula.classList.add('hidden');
+        e.target.reset();
+      } catch (error) {
+        console.error("Erro ao guardar aula:", error);
+      }
+    });
+
+    document.getElementById('form-arquivo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      
+      const novoArquivo = {
+        nome: document.getElementById('arq-nome').value,
+        tipo: document.getElementById('arq-tipo').value,
+        fonte: document.getElementById('arq-fonte').value,
+        url: document.getElementById('arq-url').value,
+        tamanho: document.getElementById('arq-tamanho').value || '',
+      };
+
+      try {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'arquivos'), novoArquivo);
+        modalArquivo.classList.add('hidden');
+        e.target.reset();
+      } catch (error) {
+        console.error("Erro ao guardar arquivo:", error);
+      }
+    });
+
+    // --- 8. MENU MOBILE ---
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    document.getElementById('btn-open-sidebar').addEventListener('click', () => {
+      sidebar.classList.remove('-translate-x-full');
+      overlay.classList.remove('hidden');
+    });
+
+    const closeSidebar = () => {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    };
+    document.getElementById('btn-close-sidebar').addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
