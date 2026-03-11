@@ -149,55 +149,87 @@
 
   <!-- MODAL: NOVA AULA -->
   <div id="modal-aula" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
         <h3 class="font-bold text-gray-800">Adicionar Nova Aula</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <form id="form-aula" class="p-4 space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Dia da Semana</label>
-          <select id="aula-dia" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-            <option value="Segunda">Segunda-feira</option>
-            <option value="Terça">Terça-feira</option>
-            <option value="Quarta">Quarta-feira</option>
-            <option value="Quinta">Quinta-feira</option>
-            <option value="Sexta">Sexta-feira</option>
-          </select>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
+      <div class="p-4 flex-1 overflow-y-auto">
+        <form id="form-aula" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Horário (Ex: 08:00)</label>
-            <input type="text" id="aula-hora" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Evento</label>
+            <select id="aula-tipo-repeticao" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="semanal">Repete Semanalmente</option>
+              <option value="unico">Evento Único</option>
+            </select>
+          </div>
+
+          <!-- Campos para Evento Semanal -->
+          <div id="campos-repeticao-semanal" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Dia da Semana</label>
+              <select id="aula-dia" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="Segunda">Segunda-feira</option>
+                <option value="Terça">Terça-feira</option>
+                <option value="Quarta">Quarta-feira</option>
+                <option value="Quinta">Quinta-feira</option>
+                <option value="Sexta">Sexta-feira</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Data de Início</label>
+                <input type="date" id="aula-data-inicio" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Data de Término</label>
+                <input type="date" id="aula-data-fim" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              </div>
+            </div>
+          </div>
+
+          <!-- Campos para Evento Único -->
+          <div id="campos-evento-unico" class="hidden space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Data do Evento</label>
+              <input type="date" id="aula-data-unica" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Horário (Ex: 08:00)</label>
+              <input type="text" id="aula-hora" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Local Físico</label>
+              <input type="text" id="aula-local" placeholder="Ex: Sala 301" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Local Físico</label>
-            <input type="text" id="aula-local" placeholder="Ex: Sala 301" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Título da Disciplina/Evento</label>
+            <input type="text" id="aula-titulo" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
           </div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Título da Disciplina</label>
-          <input type="text" id="aula-titulo" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"><i data-lucide="video" class="w-4 h-4 text-blue-500"></i> Link da Aula (Meet/Zoom)</label>
-          <input type="url" id="aula-link" placeholder="https://meet.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Cor do Card</label>
-          <select id="aula-cor" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            <option value="bg-blue-100 border-blue-300 text-blue-800">Azul</option>
-            <option value="bg-green-100 border-green-300 text-green-800">Verde</option>
-            <option value="bg-purple-100 border-purple-300 text-purple-800">Roxo</option>
-            <option value="bg-orange-100 border-orange-300 text-orange-800">Laranja</option>
-            <option value="bg-indigo-100 border-indigo-300 text-indigo-800">Índigo</option>
-          </select>
-        </div>
-        <div class="pt-4 flex justify-end gap-2">
-          <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Guardar Aula</button>
-        </div>
-      </form>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"><i data-lucide="video" class="w-4 h-4 text-blue-500"></i> Link da Aula (Meet/Zoom)</label>
+            <input type="url" id="aula-link" placeholder="https://meet.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Cor do Card</label>
+            <select id="aula-cor" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="bg-blue-100 border-blue-300 text-blue-800">Azul</option>
+              <option value="bg-green-100 border-green-300 text-green-800">Verde</option>
+              <option value="bg-purple-100 border-purple-300 text-purple-800">Roxo</option>
+              <option value="bg-orange-100 border-orange-300 text-orange-800">Laranja</option>
+              <option value="bg-indigo-100 border-indigo-300 text-indigo-800">Índigo</option>
+            </select>
+          </div>
+          <div class="pt-4 flex justify-end gap-2 border-t border-gray-200 mt-4">
+            <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg mt-2">Cancelar</button>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg mt-2">Guardar Aula</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -622,7 +654,23 @@
       container.className = "grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full";
       
       container.innerHTML = diasSemana.map(dia => {
-        const aulasDoDia = aulasList.filter(aula => aula.dia === dia);
+        // Na visão semanal, filtramos para mostrar eventos semanais que caem neste dia
+        // E eventos únicos que caem na data de "hoje" correspondente a esse dia da semana
+        // Para simplificar a visualização geral da semana, mostramos todos os eventos que caem nesse dia da semana
+        const aulasDoDia = aulasList.filter(aula => {
+          if (aula.tipoRepeticao === 'semanal') {
+            return aula.dia === dia;
+          } else if (aula.tipoRepeticao === 'unico') {
+            // Para eventos únicos na visão semanal, precisamos descobrir em qual dia da semana cai a data única
+            if (aula.dataUnica) {
+              const dataEvento = new Date(aula.dataUnica + 'T12:00:00');
+              const diaDaSemanaNum = dataEvento.getDay();
+              const mapeamentoDias = { 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta' };
+              return mapeamentoDias[diaDaSemanaNum] === dia;
+            }
+          }
+          return false;
+        });
         
         let aulasHTML = '';
         if (aulasDoDia.length > 0) {
@@ -631,11 +679,16 @@
             const btnLink = aula.link 
               ? `<a href="${aula.link}" target="_blank" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm"><i data-lucide="video" class="w-3 h-3"></i> Acessar Aula</a>` 
               : '';
+            
+            // Adiciona um selo se for evento único
+            const badgeUnico = aula.tipoRepeticao === 'unico' 
+              ? `<span class="bg-white/50 text-gray-700 text-[10px] px-1.5 py-0.5 rounded ml-2 border border-gray-200/50">${new Date(aula.dataUnica + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})}</span>` 
+              : '';
 
             return `
             <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 flex flex-col ${aula.cor}">
               <div class="flex-1">
-                <p class="text-xs font-bold mb-1 opacity-80">${aula.hora}</p>
+                <p class="text-xs font-bold mb-1 opacity-80 flex items-center">${aula.hora} ${badgeUnico}</p>
                 <h4 class="font-semibold text-sm leading-tight mb-2">${aula.titulo}</h4>
                 <p class="text-xs opacity-90 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${aula.local}</p>
               </div>
@@ -685,11 +738,12 @@
       let html = '<div class="grid grid-cols-7 gap-px bg-gray-200 w-full">';
 
       headerDias.forEach(dia => {
-        html += `<div class="bg-gray-50 p-2 text-center text-xs font-bold text-gray-500 uppercase">${dia}</div>`;
+        html += `<div class="bg-gray-50 p-2 text-center text-xs font-bold text-gray-500 uppercase hidden md:block">${dia}</div>`;
+        html += `<div class="bg-gray-50 p-1 text-center text-[10px] font-bold text-gray-500 uppercase md:hidden">${dia.substring(0,1)}</div>`;
       });
 
       for(let i = 0; i < primeiroDiaSemana; i++) {
-        html += `<div class="bg-gray-50 min-h-[120px]"></div>`;
+        html += `<div class="bg-gray-50 min-h-[80px] md:min-h-[120px]"></div>`;
       }
 
       for(let dia = 1; dia <= diasNoMes; dia++) {
@@ -697,23 +751,68 @@
         const diaDaSemanaNum = dataDia.getDay();
         const nomeDiaAula = mapeamentoDias[diaDaSemanaNum];
 
+        // Formata a data atual do loop para comparação (YYYY-MM-DD)
+        const anoStr = dataDia.getFullYear();
+        const mesStr = String(dataDia.getMonth() + 1).padStart(2, '0');
+        const diaStr = String(dataDia.getDate()).padStart(2, '0');
+        const dataAtualFormatada = `${anoStr}-${mesStr}-${diaStr}`;
+        
+        // Objeto Date para comparação de períodos
+        const dataAtualLoopObj = new Date(ano, mes, dia, 12, 0, 0); // Meio-dia para evitar problemas de timezone
+
         let aulasDoDia = [];
-        if (nomeDiaAula) {
-          aulasDoDia = aulasList.filter(a => a.dia === nomeDiaAula);
-          aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
-        }
+        
+        // Filtra as aulas para ver se ocorrem neste dia específico do mês
+        aulasList.forEach(aula => {
+          if (aula.tipoRepeticao === 'unico') {
+            // Se for evento único, verifica se a data exata coincide
+            if (aula.dataUnica === dataAtualFormatada) {
+              aulasDoDia.push(aula);
+            }
+          } else if (aula.tipoRepeticao === 'semanal') {
+             // Se for evento semanal, primeiro verifica o dia da semana
+             if (nomeDiaAula && aula.dia === nomeDiaAula) {
+               // Verifica se está dentro do período
+               let dentroDoPeriodo = true;
+               
+               if (aula.dataInicio) {
+                 const dataInicioObj = new Date(aula.dataInicio + 'T00:00:00');
+                 if (dataAtualLoopObj < dataInicioObj) dentroDoPeriodo = false;
+               }
+               
+               if (aula.dataFim) {
+                 const dataFimObj = new Date(aula.dataFim + 'T23:59:59');
+                 if (dataAtualLoopObj > dataFimObj) dentroDoPeriodo = false;
+               }
+               
+               if (dentroDoPeriodo) {
+                 aulasDoDia.push(aula);
+               }
+             }
+          } else {
+            // Retrocompatibilidade para aulas cadastradas antes desta atualização
+            if (nomeDiaAula && aula.dia === nomeDiaAula) {
+              aulasDoDia.push(aula);
+            }
+          }
+        });
 
-        const hoje = new Date().getDate() === dia ? 'bg-blue-50' : 'bg-white hover:bg-gray-50';
+        aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
 
-        html += `<div class="${hoje} p-2 min-h-[120px] relative transition-colors border-t border-gray-100 flex flex-col">`;
-        html += `  <span class="text-xs font-bold text-gray-400 self-end mb-1">${dia}</span>`;
-        html += `  <div class="space-y-1.5 flex-1">`;
+        const hojeDate = new Date();
+        const isHoje = hojeDate.getDate() === dia && hojeDate.getMonth() === mes && hojeDate.getFullYear() === ano;
+        const classeHoje = isHoje ? 'bg-blue-50 ring-inset ring-2 ring-blue-300' : 'bg-white hover:bg-gray-50';
+        const classeTextoDia = isHoje ? 'text-blue-700' : 'text-gray-400';
+
+        html += `<div class="${classeHoje} p-1 md:p-2 min-h-[80px] md:min-h-[120px] relative transition-colors border-t border-gray-100 flex flex-col overflow-hidden">`;
+        html += `  <span class="text-[10px] md:text-xs font-bold ${classeTextoDia} self-end mb-1 z-10 relative">${dia}</span>`;
+        html += `  <div class="space-y-1 flex-1 overflow-y-auto no-scrollbar">`;
         
         aulasDoDia.forEach(aula => {
           html += `
-            <div class="text-[10px] p-1.5 rounded leading-tight ${aula.cor} opacity-90 relative group" title="${aula.titulo}">
+            <div class="text-[9px] md:text-[10px] p-1 md:p-1.5 rounded leading-tight ${aula.cor} opacity-90 relative group" title="${aula.titulo}">
               <div class="font-bold truncate mb-0.5">${aula.hora.split(' ')[0]} - ${aula.titulo}</div>
-              ${aula.link ? `<a href="${aula.link}" target="_blank" class="flex items-center gap-1 text-blue-700 hover:text-blue-900 mt-1" title="Entrar no Meet/Zoom"><i data-lucide="video" class="w-3 h-3"></i> Chamada</a>` : `<span class="text-gray-600 truncate"><i data-lucide="map-pin" class="w-2.5 h-2.5 inline mr-0.5"></i>${aula.local}</span>`}
+              ${aula.link ? `<a href="${aula.link}" target="_blank" class="hidden md:flex items-center gap-1 text-blue-700 hover:text-blue-900 mt-1" title="Entrar no Meet/Zoom"><i data-lucide="video" class="w-3 h-3"></i> Chamada</a>` : `<span class="hidden md:inline text-gray-600 truncate"><i data-lucide="map-pin" class="w-2.5 h-2.5 inline mr-0.5"></i>${aula.local}</span>`}
             </div>
           `;
         });
@@ -725,7 +824,7 @@
       const totalCelulas = primeiroDiaSemana + diasNoMes;
       const celulasRestantes = totalCelulas % 7 === 0 ? 0 : 7 - (totalCelulas % 7);
       for(let i = 0; i < celulasRestantes; i++) {
-        html += `<div class="bg-gray-50 min-h-[120px] border-t border-gray-100"></div>`;
+        html += `<div class="bg-gray-50 min-h-[80px] md:min-h-[120px] border-t border-gray-100"></div>`;
       }
 
       html += '</div>';
@@ -757,6 +856,23 @@
       btnSemanal.classList.replace('shadow-sm', 'hover:text-gray-700');
       btnSemanal.classList.replace('text-gray-800', 'bg-transparent');
       atualizarCalendario();
+    });
+
+    // Lógica para mostrar/esconder campos baseados no tipo de repetição
+    const selectTipoRepeticao = document.getElementById('aula-tipo-repeticao');
+    const camposSemanal = document.getElementById('campos-repeticao-semanal');
+    const camposUnico = document.getElementById('campos-evento-unico');
+
+    selectTipoRepeticao.addEventListener('change', (e) => {
+      if (e.target.value === 'unico') {
+        camposSemanal.classList.add('hidden');
+        camposUnico.classList.remove('hidden');
+        document.getElementById('aula-data-unica').required = true;
+      } else {
+        camposSemanal.classList.remove('hidden');
+        camposUnico.classList.add('hidden');
+        document.getElementById('aula-data-unica').required = false;
+      }
     });
 
     // --- 7. FLUXO DE AUTENTICAÇÃO E MODAL UNIFICADO ---
@@ -980,7 +1096,14 @@
     const modalArquivo = document.getElementById('modal-arquivo');
     const modalAlunos = document.getElementById('modal-alunos');
 
-    btnNovaAula.addEventListener('click', () => modalAula.classList.remove('hidden'));
+    btnNovaAula.addEventListener('click', () => {
+      document.getElementById('form-aula').reset();
+      camposSemanal.classList.remove('hidden');
+      camposUnico.classList.add('hidden');
+      document.getElementById('aula-data-unica').required = false;
+      modalAula.classList.remove('hidden');
+    });
+    
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
     btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     
@@ -1009,14 +1132,22 @@
     document.getElementById('form-aula').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
+      
+      const tipoRepeticao = document.getElementById('aula-tipo-repeticao').value;
+      
       const novaAula = {
-        dia: document.getElementById('aula-dia').value,
+        tipoRepeticao: tipoRepeticao,
+        dia: document.getElementById('aula-dia').value, // Usado para eventos semanais
+        dataInicio: document.getElementById('aula-data-inicio').value,
+        dataFim: document.getElementById('aula-data-fim').value,
+        dataUnica: document.getElementById('aula-data-unica').value,
         hora: document.getElementById('aula-hora').value,
         titulo: document.getElementById('aula-titulo').value,
         local: document.getElementById('aula-local').value,
         link: document.getElementById('aula-link').value,
         cor: document.getElementById('aula-cor').value,
       };
+      
       try {
         await addDoc(collection(db, getPath('aulas')), novaAula);
         modalAula.classList.add('hidden');
