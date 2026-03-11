@@ -151,7 +151,7 @@
   <div id="modal-aula" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
-        <h3 class="font-bold text-gray-800">Adicionar Nova Aula</h3>
+        <h3 id="titulo-modal-aula" class="font-bold text-gray-800">Adicionar Nova Aula</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="p-4 flex-1 overflow-y-auto">
@@ -433,7 +433,7 @@
     // --- 1. CONFIGURAÇÃO FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAzZHRIbDFqWCOb-N_Ygob8m3lm2fZCoZk",
@@ -456,6 +456,7 @@
     let isAdminMode = false;
     let currentAlunoEmail = null; 
     let visaoCalendario = 'semanal'; 
+    let aulaEmEdicaoId = null; // Variável para rastrear qual aula está sendo editada
     
     let aulasList = [];
     let arquivosList = [];
@@ -533,6 +534,33 @@
       try {
         await deleteDoc(doc(db, getPath('solicitacoes'), id));
       } catch (err) { console.error("Erro ao rejeitar:", err); }
+    };
+
+    // Abrir Modal para Edição de Aula
+    window.editarAula = (id) => {
+      if (!isAdminMode) return;
+      const aula = aulasList.find(a => a.id === id);
+      if (!aula) return;
+
+      aulaEmEdicaoId = id; // Marca que estamos a editar
+      document.getElementById('titulo-modal-aula').innerText = "Editar Aula";
+
+      // Preenche os campos com os dados da aula
+      document.getElementById('aula-tipo-repeticao').value = aula.tipoRepeticao || 'semanal';
+      document.getElementById('aula-dia').value = aula.dia || 'Segunda';
+      document.getElementById('aula-data-inicio').value = aula.dataInicio || '';
+      document.getElementById('aula-data-fim').value = aula.dataFim || '';
+      document.getElementById('aula-data-unica').value = aula.dataUnica || '';
+      document.getElementById('aula-hora').value = aula.hora || '';
+      document.getElementById('aula-local').value = aula.local || '';
+      document.getElementById('aula-titulo').value = aula.titulo || '';
+      document.getElementById('aula-link').value = aula.link || '';
+      document.getElementById('aula-cor').value = aula.cor || 'bg-blue-100 border-blue-300 text-blue-800';
+
+      // Dispara o evento change para mostrar/ocultar os campos de datas corretamente
+      document.getElementById('aula-tipo-repeticao').dispatchEvent(new Event('change'));
+
+      document.getElementById('modal-aula').classList.remove('hidden');
     };
 
     // --- 6. RENDERIZAÇÃO DA UI ---
@@ -656,12 +684,10 @@
       container.innerHTML = diasSemana.map(dia => {
         // Na visão semanal, filtramos para mostrar eventos semanais que caem neste dia
         // E eventos únicos que caem na data de "hoje" correspondente a esse dia da semana
-        // Para simplificar a visualização geral da semana, mostramos todos os eventos que caem nesse dia da semana
         const aulasDoDia = aulasList.filter(aula => {
           if (aula.tipoRepeticao === 'semanal') {
             return aula.dia === dia;
           } else if (aula.tipoRepeticao === 'unico') {
-            // Para eventos únicos na visão semanal, precisamos descobrir em qual dia da semana cai a data única
             if (aula.dataUnica) {
               const dataEvento = new Date(aula.dataUnica + 'T12:00:00');
               const diaDaSemanaNum = dataEvento.getDay();
@@ -689,14 +715,19 @@
             <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 flex flex-col ${aula.cor}">
               <div class="flex-1">
                 <p class="text-xs font-bold mb-1 opacity-80 flex items-center">${aula.hora} ${badgeUnico}</p>
-                <h4 class="font-semibold text-sm leading-tight mb-2">${aula.titulo}</h4>
+                <h4 class="font-semibold text-sm leading-tight mb-2 pr-12">${aula.titulo}</h4>
                 <p class="text-xs opacity-90 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${aula.local}</p>
               </div>
               ${btnLink}
               ${isAdminMode ? `
-                <button onclick="apagarAula('${aula.id}')" class="absolute top-2 right-2 p-1 bg-white/50 hover:bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
+                <div class="absolute top-2 right-2 flex flex-col md:flex-row gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onclick="editarAula('${aula.id}')" class="p-1 bg-white/70 hover:bg-blue-100 text-blue-600 rounded" title="Editar">
+                    <i data-lucide="edit" class="w-4 h-4"></i>
+                  </button>
+                  <button onclick="apagarAula('${aula.id}')" class="p-1 bg-white/70 hover:bg-red-100 text-red-600 rounded" title="Excluir">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
               ` : ''}
             </div>
           `;
@@ -811,8 +842,14 @@
         aulasDoDia.forEach(aula => {
           html += `
             <div class="text-[9px] md:text-[10px] p-1 md:p-1.5 rounded leading-tight ${aula.cor} opacity-90 relative group" title="${aula.titulo}">
-              <div class="font-bold truncate mb-0.5">${aula.hora.split(' ')[0]} - ${aula.titulo}</div>
+              <div class="font-bold truncate mb-0.5 pr-4">${aula.hora.split(' ')[0]} - ${aula.titulo}</div>
               ${aula.link ? `<a href="${aula.link}" target="_blank" class="hidden md:flex items-center gap-1 text-blue-700 hover:text-blue-900 mt-1" title="Entrar no Meet/Zoom"><i data-lucide="video" class="w-3 h-3"></i> Chamada</a>` : `<span class="hidden md:inline text-gray-600 truncate"><i data-lucide="map-pin" class="w-2.5 h-2.5 inline mr-0.5"></i>${aula.local}</span>`}
+              
+              ${isAdminMode ? `
+                <button onclick="apagarAula('${aula.id}')" class="absolute top-1 right-1 p-0.5 bg-white/80 hover:bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Excluir Aula">
+                  <i data-lucide="trash-2" class="w-3 h-3"></i>
+                </button>
+              ` : ''}
             </div>
           `;
         });
@@ -1097,6 +1134,8 @@
     const modalAlunos = document.getElementById('modal-alunos');
 
     btnNovaAula.addEventListener('click', () => {
+      aulaEmEdicaoId = null; // Reseta variável de edição
+      document.getElementById('titulo-modal-aula').innerText = "Adicionar Nova Aula";
       document.getElementById('form-aula').reset();
       camposSemanal.classList.remove('hidden');
       camposUnico.classList.add('hidden');
@@ -1112,6 +1151,7 @@
         modalAula.classList.add('hidden');
         modalArquivo.classList.add('hidden');
         modalAlunos.classList.add('hidden');
+        aulaEmEdicaoId = null; // Reseta caso a modal seja fechada no meio da edição
       });
     });
 
@@ -1135,7 +1175,7 @@
       
       const tipoRepeticao = document.getElementById('aula-tipo-repeticao').value;
       
-      const novaAula = {
+      const aulaData = {
         tipoRepeticao: tipoRepeticao,
         dia: document.getElementById('aula-dia').value, // Usado para eventos semanais
         dataInicio: document.getElementById('aula-data-inicio').value,
@@ -1149,9 +1189,17 @@
       };
       
       try {
-        await addDoc(collection(db, getPath('aulas')), novaAula);
+        if (aulaEmEdicaoId) {
+          // Atualiza aula existente
+          await updateDoc(doc(db, getPath('aulas'), aulaEmEdicaoId), aulaData);
+        } else {
+          // Cria nova aula
+          await addDoc(collection(db, getPath('aulas')), aulaData);
+        }
+        
         modalAula.classList.add('hidden');
         e.target.reset();
+        aulaEmEdicaoId = null; // Limpa o ID de edição
       } catch (error) {
         console.error("Erro aula:", error);
       }
