@@ -22,6 +22,9 @@
 </head>
 <body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
 
+  <!-- TOAST CONTAINER (Notificações) -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
   <!-- SIDEBAR MOBILE OVERLAY -->
   <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
 
@@ -52,7 +55,7 @@
           </ul>
         </div>
 
-        <!-- Material Didático (AGORA COM PASTAS) -->
+        <!-- Material Didático -->
         <div>
           <div class="flex items-center justify-between px-3 mb-2">
             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Material Didático</h3>
@@ -324,7 +327,7 @@
     </div>
   </div>
 
-  <!-- MODAL: NOVO ARQUIVO -->
+  <!-- MODAL: NOVO ARQUIVO (LINK EXTERNO) -->
   <div id="modal-arquivo" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
@@ -333,8 +336,9 @@
       </div>
       <form id="form-arquivo" class="p-4 space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Pasta Destino</label>
-          <select id="arq-pasta" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pasta Destino (Opcional)</label>
+          <select id="arq-pasta" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="">Nenhuma pasta (Mural Geral)</option>
             <!-- Opções injetadas via JS -->
           </select>
         </div>
@@ -669,10 +673,30 @@
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-    // Tratamento global de erros para evitar logs vermelhos no console por causa do bloqueio de domínio
+    // TOAST NOTIFICATIONS (Substituindo os alerts)
+    window.mostrarNotificacao = function(mensagem, isError = false) {
+      const toast = document.createElement('div');
+      toast.className = `p-3 rounded-lg shadow-lg text-sm text-white transition-opacity duration-300 pointer-events-auto ${isError ? 'bg-red-600' : 'bg-green-600'}`;
+      toast.innerText = mensagem;
+      document.getElementById('toast-container').appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    };
+
+    const handleError = (error, contexto) => {
+        console.error(`Erro em ${contexto}:`, error);
+        if (error.message && (error.message.includes('blocked') || error.message.includes('permission') || error.message.includes('referer'))) {
+            window.mostrarNotificacao("Ação bloqueada pelo Google Cloud! Para cadastrar novos itens, acesse a plataforma pelo seu link oficial do GitHub Pages.", true);
+        } else {
+            window.mostrarNotificacao(`Erro ao processar ação.`, true);
+        }
+    };
+
     const warnIfBlocked = (error, context) => {
       if (error.code === 'auth/requests-from-referer-blocked' || (error.message && error.message.includes('referer'))) {
-        console.warn(`Aviso (${context}): O acesso foi bloqueado pelas regras de segurança da chave API (Referenciador restrito). O aplicativo funcionará normalmente no domínio autorizado (GitHub Pages).`);
+        console.warn(`Aviso (${context}): Conexão de leitura bloqueada pela proteção de domínio do Firebase.`);
       } else {
         console.warn(`Erro (${context}):`, error.message);
       }
@@ -732,7 +756,7 @@
         // Atualiza as opções de pasta no modal de adicionar arquivo
         const selectPasta = document.getElementById('arq-pasta');
         if(selectPasta) {
-           selectPasta.innerHTML = pastasList.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+           selectPasta.innerHTML = '<option value="">Nenhuma pasta (Mural Geral)</option>' + pastasList.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
         }
       }, (error) => warnIfBlocked(error, "Snapshot Pastas"));
 
@@ -778,7 +802,11 @@
     window.apagarArquivo = async (event, id) => { 
         event.preventDefault();
         event.stopPropagation();
-        if (isAdminMode) await deleteDoc(doc(db, getPath('arquivos'), id)); 
+        if (!isAdminMode) return;
+        try {
+          await deleteDoc(doc(db, getPath('arquivos'), id)); 
+          window.mostrarNotificacao("Arquivo apagado!");
+        } catch(e) { handleError(e, "apagar arquivo"); }
     };
 
     window.apagarPasta = async (event, id) => {
@@ -793,29 +821,59 @@
                 await deleteDoc(doc(db, getPath('arquivos'), a.id));
             }
             await deleteDoc(doc(db, getPath('pastas'), id));
+            window.mostrarNotificacao("Pasta e arquivos removidos com sucesso.");
         } catch(e) {
-            console.error("Erro ao apagar pasta:", e);
+            handleError(e, "apagar pasta");
         }
     };
 
-    window.apagarAula = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('aulas'), id)); };
-    window.apagarAluno = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('alunos'), id)); };
-    window.apagarRecado = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('recados'), id)); };
-    window.apagarLinkImportante = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('links_importantes'), id)); };
+    window.apagarAula = async (id) => { 
+      if (!isAdminMode) return;
+      try { 
+        await deleteDoc(doc(db, getPath('aulas'), id)); 
+        window.mostrarNotificacao("Aula apagada.");
+      } catch(e) { handleError(e, "apagar aula"); }
+    };
+    
+    window.apagarAluno = async (id) => { 
+      if (!isAdminMode) return;
+      try {
+        await deleteDoc(doc(db, getPath('alunos'), id));
+        window.mostrarNotificacao("Aluno removido.");
+      } catch(e) { handleError(e, "apagar aluno"); }
+    };
+
+    window.apagarRecado = async (id) => { 
+      if (!isAdminMode) return;
+      try {
+        await deleteDoc(doc(db, getPath('recados'), id));
+        window.mostrarNotificacao("Recado apagado.");
+      } catch(e) { handleError(e, "apagar recado"); }
+    };
+
+    window.apagarLinkImportante = async (id) => { 
+      if (!isAdminMode) return;
+      try {
+        await deleteDoc(doc(db, getPath('links_importantes'), id));
+        window.mostrarNotificacao("Link removido.");
+      } catch(e) { handleError(e, "apagar link"); }
+    };
 
     window.aprovarSolicitacao = async (id, email) => {
       if (!isAdminMode) return;
       try {
         await addDoc(collection(db, getPath('alunos')), { email: email.toLowerCase() });
         await deleteDoc(doc(db, getPath('solicitacoes'), id));
-      } catch (err) { console.error("Erro ao aprovar:", err); }
+        window.mostrarNotificacao("Aluno aprovado!");
+      } catch (err) { handleError(err, "aprovar aluno"); }
     };
 
     window.rejeitarSolicitacao = async (id) => {
       if (!isAdminMode) return;
       try {
         await deleteDoc(doc(db, getPath('solicitacoes'), id));
-      } catch (err) { console.error("Erro ao rejeitar:", err); }
+        window.mostrarNotificacao("Solicitação de aluno rejeitada.");
+      } catch (err) { handleError(err, "rejeitar aluno"); }
     };
 
     window.aprovarProfessor = async (id, nome, email, senha) => {
@@ -823,21 +881,24 @@
       try {
         await addDoc(collection(db, getPath('professores')), { nome, email: email.toLowerCase(), senha });
         await deleteDoc(doc(db, getPath('solicitacoes_professores'), id));
-      } catch (err) { console.error("Erro ao aprovar professor:", err); }
+        window.mostrarNotificacao("Professor aprovado com sucesso!");
+      } catch (err) { handleError(err, "aprovar professor"); }
     };
 
     window.rejeitarProfessor = async (id) => {
       if (!isMasterAdmin) return;
       try {
         await deleteDoc(doc(db, getPath('solicitacoes_professores'), id));
-      } catch (err) { console.error("Erro ao rejeitar professor:", err); }
+        window.mostrarNotificacao("Solicitação de professor rejeitada.");
+      } catch (err) { handleError(err, "rejeitar professor"); }
     };
 
     window.apagarProfessor = async (id) => {
       if (!isMasterAdmin) return;
       try {
         await deleteDoc(doc(db, getPath('professores'), id));
-      } catch (err) { console.error("Erro ao remover professor:", err); }
+        window.mostrarNotificacao("Professor removido do sistema.");
+      } catch (err) { handleError(err, "apagar professor"); }
     };
 
     window.editarAula = (id) => {
@@ -1151,7 +1212,7 @@
       const arquivosSemPasta = arquivosList.filter(a => !a.pastaId || !pastasList.find(p => p.id === a.pastaId));
       if(arquivosSemPasta.length > 0) {
          html += `<div class="mt-4 pt-2 border-t border-gray-200 space-y-1">
-            <p class="text-[10px] font-semibold text-gray-400 px-1 mb-2 uppercase tracking-wider">Outros Arquivos</p>
+            <p class="text-[10px] font-semibold text-gray-400 px-1 mb-2 uppercase tracking-wider">Mural Geral</p>
             ${arquivosSemPasta.map(arquivo => {
               let iconeFonte = arquivo.fonte === 'github' ? 'github' : (arquivo.fonte === 'drive' ? 'hard-drive' : 'link');
               let iconeTipo = (arquivo.tipo === 'pdf' || arquivo.tipo === 'doc') ? 'file-text' : (arquivo.tipo === 'video' ? 'video' : 'book-open');
@@ -1632,8 +1693,9 @@
         erroEl.classList.add('hidden');
         pendingUsernameEmail = null;
         pendingUsernameId = null;
+        window.mostrarNotificacao("Nome de usuário salvo com sucesso!");
       } catch (err) {
-         warnIfBlocked(err, "Salvar Nome do Usuário");
+         handleError(err, "Salvar Nome do Usuário");
          erroEl.textContent = "Erro ao salvar nome. Verifique a conexão.";
          erroEl.classList.remove('hidden');
       }
@@ -1689,7 +1751,7 @@
         
         setTimeout(() => mudarAuthView('login-aluno'), 3000);
       } catch (error) {
-        warnIfBlocked(error, "Cadastro de Aluno");
+        handleError(error, "Cadastro de Aluno");
         msgEl.textContent = "Erro ao enviar pedido. Tente acessar do endereço principal.";
         msgEl.className = "text-center text-xs text-red-600 font-medium";
       }
@@ -1728,7 +1790,7 @@
         
         setTimeout(() => mudarAuthView('login-admin'), 3000);
       } catch (error) {
-        warnIfBlocked(error, "Cadastro de Professor");
+        handleError(error, "Cadastro de Professor");
         msgEl.textContent = "Erro ao enviar pedido.";
         msgEl.className = "text-center text-xs text-red-600 font-medium";
       }
@@ -1742,15 +1804,16 @@
       if (!email) return;
       
       if (alunosPermitidos.some(a => a.email === email)) {
-        alert("Este e-mail já está na lista.");
+        window.mostrarNotificacao("Este e-mail já está na lista.", true);
         return;
       }
 
       try {
         await addDoc(collection(db, getPath('alunos')), { email });
         e.target.reset();
+        window.mostrarNotificacao("Aluno adicionado manualmente com sucesso!");
       } catch (error) {
-        console.error("Erro aluno manual:", error);
+        handleError(error, "aluno manual");
       }
     });
 
@@ -1774,10 +1837,6 @@
     btnNovaPasta.addEventListener('click', () => modalPasta.classList.remove('hidden'));
     
     btnNovoArquivo.addEventListener('click', () => {
-      if (pastasList.length === 0) {
-          alert('Por favor, crie uma pasta primeiro clicando no ícone de pasta com um "+".');
-          return;
-      }
       modalArquivo.classList.remove('hidden');
     });
     
@@ -1813,7 +1872,7 @@
         await addDoc(collection(db, getPath('recados')), { texto, autor, timestamp: Date.now() });
         inputRecado.value = ''; 
       } catch (error) {
-        console.error("Erro recado:", error);
+        handleError(error, "recado");
       }
     });
 
@@ -1839,15 +1898,17 @@
       try {
         if (aulaEmEdicaoId) {
           await updateDoc(doc(db, getPath('aulas'), aulaEmEdicaoId), aulaData);
+          window.mostrarNotificacao("Aula atualizada com sucesso!");
         } else {
           await addDoc(collection(db, getPath('aulas')), aulaData);
+          window.mostrarNotificacao("Aula criada com sucesso!");
         }
         
         modalAula.classList.add('hidden');
         e.target.reset();
         aulaEmEdicaoId = null; 
       } catch (error) {
-        console.error("Erro aula:", error);
+        handleError(error, "salvar aula");
       }
     });
 
@@ -1865,8 +1926,9 @@
         await addDoc(collection(db, getPath('pastas')), novaPasta);
         modalPasta.classList.add('hidden');
         e.target.reset();
+        window.mostrarNotificacao("Pasta criada!");
       } catch (error) {
-        console.error("Erro ao criar pasta:", error);
+        handleError(error, "criar pasta");
       }
     });
 
@@ -1887,8 +1949,9 @@
         await addDoc(collection(db, getPath('arquivos')), novoArquivo);
         modalArquivo.classList.add('hidden');
         e.target.reset();
+        window.mostrarNotificacao("Arquivo adicionado!");
       } catch (error) {
-        console.error("Erro arquivo:", error);
+        handleError(error, "arquivo");
       }
     });
 
@@ -1908,8 +1971,9 @@
         await addDoc(collection(db, getPath('links_importantes')), novoLink);
         modalLinkImportante.classList.add('hidden');
         e.target.reset();
+        window.mostrarNotificacao("Link salvo com sucesso!");
       } catch (error) {
-        console.error("Erro ao adicionar link importante:", error);
+        handleError(error, "link importante");
       }
     });
 
