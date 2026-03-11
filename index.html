@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,16 +14,9 @@
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    
-    /* Esconder seta padrão do details/summary para as Pastas */
-    details > summary { list-style: none; }
-    details > summary::-webkit-details-marker { display: none; }
   </style>
 </head>
 <body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
-
-  <!-- TOAST CONTAINER (Notificações) -->
-  <div id="toast-container" class="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- SIDEBAR MOBILE OVERLAY -->
   <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
@@ -59,17 +52,12 @@
         <div>
           <div class="flex items-center justify-between px-3 mb-2">
             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Material Didático</h3>
-            <div class="flex items-center gap-1">
-              <button id="btn-nova-pasta" class="hidden text-indigo-600 hover:text-indigo-800 p-1 hover:bg-indigo-50 rounded" title="Nova Pasta de Arquivos">
-                <i data-lucide="folder-plus" class="w-4 h-4"></i>
-              </button>
-              <button id="btn-novo-arquivo" class="hidden text-blue-600 hover:text-blue-800 p-1 hover:bg-blue-50 rounded" title="Adicionar Arquivo">
-                <i data-lucide="file-plus" class="w-4 h-4"></i>
-              </button>
-            </div>
+            <button id="btn-novo-arquivo" class="hidden text-blue-600 hover:text-blue-800" title="Adicionar Ficheiro">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            </button>
           </div>
-          <div id="arquivos-lista" class="space-y-2 mt-3 text-sm text-gray-500 px-3">
-            <p class="text-center text-xs mt-4">Carregando materiais...</p>
+          <div id="arquivos-lista" class="space-y-2 mt-3 text-sm text-gray-500 text-center">
+            A carregar materiais...
           </div>
         </div>
       </div>
@@ -80,7 +68,7 @@
           <i data-lucide="message-square" class="w-4 h-4"></i> Mural de Recados
         </h3>
         <div id="mural-lista" class="flex-1 overflow-y-auto px-5 space-y-3 mb-2 text-sm">
-          <p class="text-gray-400 text-xs text-center mt-4">Carregando recados...</p>
+          <p class="text-gray-400 text-xs text-center mt-4">A carregar recados...</p>
         </div>
         <form id="form-recado" class="px-5 pb-4 mt-auto flex flex-col gap-2">
           <input type="text" id="input-nome-recado" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none hidden" placeholder="Seu nome" required disabled>
@@ -93,71 +81,48 @@
         </form>
       </div>
     </nav>
-    
-    <!-- CONTADOR DE VISITAS -->
-    <div class="p-3 border-t border-gray-200 bg-gray-50 shrink-0 text-center">
-      <p class="text-xs text-gray-500 flex items-center justify-center gap-1.5">
-        <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-blue-500"></i> Visitas na plataforma: <span id="contador-visitas" class="font-bold text-gray-700">...</span>
-      </p>
-    </div>
   </aside>
 
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
     
-    <header class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 shadow-sm shrink-0 relative overflow-hidden">
-      <!-- LOGÓTIPO ALINHADO À ESQUERDA NO HEADER -->
-      <div class="absolute inset-y-0 left-0 pl-12 lg:pl-6 flex items-center pointer-events-none z-0">
-        <!-- O link do Google Drive ajustado para permitir hotlinking (lh3) -->
-        <img src="https://lh3.googleusercontent.com/d/1UujVFZpJovnbBQlbYaExnZRJYvUWa1NX" class="h-8 md:h-12 opacity-30 lg:opacity-100 object-contain" alt="Logo">
-      </div>
-
-      <button id="btn-open-sidebar" class="lg:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none relative z-10 bg-white/80 rounded-md backdrop-blur-sm">
+    <header class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 shadow-sm shrink-0">
+      <button id="btn-open-sidebar" class="lg:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none">
         <i data-lucide="menu" class="w-6 h-6"></i>
       </button>
       
-      <div class="flex-1 flex justify-end items-center gap-3 relative z-10">
+      <div class="flex-1 flex justify-between items-center lg:justify-end gap-4">
+        <h1 class="text-xl font-semibold text-gray-800 lg:hidden">Dashboard</h1>
         
-        <!-- RELÓGIO E PRÓXIMO COMPROMISSO -->
-        <div class="hidden sm:flex flex-col items-end text-gray-600 bg-white/80 px-3 py-1 rounded-lg border border-gray-200 shadow-sm backdrop-blur-sm mr-2">
-          <div class="text-sm font-bold flex items-center gap-1.5 text-gray-800">
-            <i data-lucide="clock" class="w-4 h-4 text-blue-600"></i>
-            <span id="relogio-digital">00:00:00</span>
-          </div>
-          <div id="proximo-compromisso" class="text-[10px] text-gray-500 font-medium truncate max-w-[180px]">
-            Carregando agenda...
-          </div>
-        </div>
-
         <!-- SELETOR DE MODO -->
-        <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200 shadow-sm bg-white/80 backdrop-blur-sm">
+        <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
           <button id="modo-aluno" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Aluno</button>
           <button id="modo-admin" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Admin</button>
         </div>
 
         <!-- Botão visível apenas para Admin -->
-        <button id="btn-gerir-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
-          <i data-lucide="settings" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Gerenciamento</span>
+        <button id="btn-acessar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">acessar Alunos</span>
         </button>
 
-        <div class="items-center gap-3 hidden sm:flex bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full border border-gray-100">
-          <span id="user-role-text" class="text-sm font-medium text-gray-600 pl-2">Visão do Aluno</span>
+        <div class="items-center gap-3 hidden sm:flex">
+          <span id="user-role-text" class="text-sm font-medium text-gray-600">Visão do Aluno</span>
           <img class="w-8 h-8 rounded-full bg-gray-300 border border-gray-200" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Student" id="user-avatar" alt="Avatar" />
         </div>
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
       
-      <div class="flex flex-col xl:flex-row gap-8 flex-1">
+      <div class="flex flex-col xl:flex-row gap-8 h-full">
         
         <!-- COLUNA ESQUERDA: CALENDÁRIO -->
         <div class="flex-1 flex flex-col min-w-0">
           <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
-              <h2 id="titulo-calendario" class="text-2xl font-bold text-gray-900">Sua Semana</h2>
-              <p class="text-gray-600 mt-1">Gerencie suas aulas e acesse as salas de reunião.</p>
+              <h2 id="titulo-calendario" class="text-2xl font-bold text-gray-900">A Sua Semana</h2>
+              <p class="text-gray-600 mt-1">Gira as suas aulas e aceda às salas de reunião.</p>
             </div>
             
             <div class="flex items-center gap-4">
@@ -179,7 +144,7 @@
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1 min-h-[400px]">
             <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full">
               <div class="col-span-full flex items-center justify-center p-12 text-gray-500">
-                 Carregando calendário...
+                 A carregar calendário...
               </div>
             </div>
           </div>
@@ -197,25 +162,11 @@
           </div>
           
           <div id="links-importantes-lista" class="flex-1 overflow-y-auto space-y-3 pr-1">
-            <p class="text-sm text-gray-400 text-center mt-4 italic">Carregando links...</p>
+            <p class="text-sm text-gray-400 text-center mt-4 italic">A carregar links...</p>
           </div>
         </div>
 
       </div>
-
-      <!-- AVISO DE ISENÇÃO DE RESPONSABILIDADE (DISCLAIMER) -->
-      <div class="mt-8 p-4 bg-gray-100 border border-gray-200 rounded-xl text-xs text-gray-500 text-center shrink-0 shadow-sm">
-        <p class="flex items-center justify-center gap-2 mb-1">
-          <i data-lucide="info" class="w-4 h-4 text-blue-500"></i>
-          <strong class="text-gray-700">Aviso Importante</strong>
-        </p>
-        <p class="max-w-4xl mx-auto leading-relaxed">
-          Esta plataforma <strong>não é</strong> uma plataforma oficial do programa ou da Universidade Estadual de Maringá (UEM). 
-          Foi desenvolvida por um acadêmico exclusivamente para agrupar avisos gerais e facilitar o acesso a materiais. 
-          <strong>Notícias e avisos oficiais devem sempre ser observados na página oficial do programa.</strong>
-        </p>
-      </div>
-
     </div>
   </main>
 
@@ -300,48 +251,21 @@
           </div>
           <div class="pt-4 flex justify-end gap-2 border-t border-gray-200 mt-4">
             <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg mt-2">Cancelar</button>
-            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg mt-2">Salvar Aula</button>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg mt-2">Guardar Aula</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: NOVA PASTA -->
-  <div id="modal-pasta" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden">
-      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
-        <h3 class="font-bold text-gray-800">Criar Nova Pasta</h3>
-        <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
-      </div>
-      <form id="form-pasta" class="p-4 space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Pasta</label>
-          <input type="text" id="pasta-nome-input" placeholder="Ex: Aula - 11/03 (Escrita Acadêmica)" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-        </div>
-        <div class="pt-2 flex justify-end gap-2">
-          <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Criar Pasta</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: NOVO ARQUIVO (LINK EXTERNO) -->
+  <!-- MODAL: NOVO ARQUIVO -->
   <div id="modal-arquivo" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
-        <h3 class="font-bold text-gray-800">Cadastrar Novo Link de Arquivo</h3>
+        <h3 class="font-bold text-gray-800">Cadastrar Novo Link de Ficheiro</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form id="form-arquivo" class="p-4 space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Pasta Destino (Opcional)</label>
-          <select id="arq-pasta" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            <option value="">Nenhuma pasta (Mural Geral)</option>
-            <!-- Opções injetadas via JS -->
-          </select>
-        </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nome de Exibição</label>
           <input type="text" id="arq-nome" placeholder="Ex: PDF de React" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
@@ -395,7 +319,7 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Endereço (URL)</label>
           <input type="url" id="link-imp-url" placeholder="https://" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-          <p class="text-[10px] text-gray-400 mt-1">O logotipo será gerado automaticamente através deste endereço.</p>
+          <p class="text-[10px] text-gray-400 mt-1">O logótipo será gerado automaticamente através deste endereço.</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Descrição Breve</label>
@@ -403,26 +327,26 @@
         </div>
         <div class="pt-4 flex justify-end gap-2">
           <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Salvar Link</button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Guardar Link</button>
         </div>
       </form>
     </div>
   </div>
 
 
-  <!-- MODAL: GESTÃO GERAL (ALUNOS E PROFESSORES) -->
-  <div id="modal-gestao" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+  <!-- MODAL: acessar ALUNOS E SOLICITAÇÕES (ADMIN) -->
+  <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
-        <h3 class="font-bold text-gray-800">Gerenciamento da Plataforma</h3>
+        <h3 class="font-bold text-gray-800">Gestão de Alunos</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="p-4 flex-1 overflow-y-auto space-y-6">
         
-        <!-- Bloco de Solicitações Pendentes de Alunos -->
+        <!-- Bloco de Solicitações Pendentes -->
         <div>
           <h4 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
-            <i data-lucide="bell" class="w-4 h-4 text-yellow-500"></i> Solicitações Pendentes (Alunos)
+            <i data-lucide="bell" class="w-4 h-4 text-yellow-500"></i> Solicitações Pendentes
           </h4>
           <ul id="lista-solicitacoes" class="space-y-3">
             <!-- Injetado via JS -->
@@ -443,35 +367,6 @@
           <ul id="lista-alunos-cadastrados" class="space-y-2 text-sm">
             <!-- Injetado via JS -->
           </ul>
-        </div>
-
-        <!-- ÁREA MASTER (Apenas para o Admin Principal PradoDiego) -->
-        <div id="admin-master-section" class="hidden border-t-2 border-dashed border-gray-200 pt-6 mt-6">
-          <h4 class="text-base font-bold text-purple-700 mb-4 flex items-center gap-2">
-            <i data-lucide="shield-check" class="w-5 h-5"></i> Área Master (PradoDiego)
-          </h4>
-          
-          <div class="space-y-6">
-            <!-- Solicitações de Professores -->
-            <div>
-              <h5 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
-                <i data-lucide="clock" class="w-4 h-4 text-orange-500"></i> Solicitações de Professores
-              </h5>
-              <ul id="lista-solicitacoes-prof" class="space-y-3">
-                <!-- Injetado via JS -->
-              </ul>
-            </div>
-
-            <!-- Professores Aprovados -->
-            <div>
-              <h5 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
-                <i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Professores Aprovados
-              </h5>
-              <ul id="lista-professores-cadastrados" class="space-y-2 text-sm">
-                <!-- Injetado via JS -->
-              </ul>
-            </div>
-          </div>
         </div>
 
       </div>
@@ -500,7 +395,7 @@
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">Acessar o material da disciplina</p>
+                <p class="text-xs text-gray-500">acessar ao material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -511,7 +406,7 @@
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Professor</p>
-                <p class="text-xs text-gray-500">Gerenciar alunos e conteúdos</p>
+                <p class="text-xs text-gray-500">acessar alunos e conteúdos</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -543,15 +438,16 @@
           <button onclick="mudarAuthView('login-aluno')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
           </button>
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso (Aluno)</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Cadastre-se com seu e-mail institucional (@uem.br).</p>
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso</h3>
+          <p class="text-sm text-gray-500 mb-6 text-center">Registe-se com o seu e-mail institucional (@uem.br).</p>
           
           <form id="form-cadastro-aluno" class="space-y-3">
             <input type="text" id="cadastro-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             <input type="email" id="cadastro-email" placeholder="nome@uem.br" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             
+            <!-- Campo de Justificativa (Oculto por padrão, exigido se não for @uem.br) -->
             <div id="div-justificativa" class="hidden">
-              <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail não institucional detectado. Justifique o pedido:</label>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail não institucional detetado. Justifique o pedido:</label>
               <textarea id="cadastro-justificativa" rows="2" placeholder="Qual o motivo do acesso?" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
             </div>
 
@@ -560,58 +456,20 @@
           </form>
         </div>
 
-        <!-- VISTA 4: LOGIN DO ADMIN/PROFESSOR -->
+        <!-- VISTA 4: LOGIN DO ADMIN -->
         <div id="auth-view-login-admin" class="hidden">
           <button onclick="mudarAuthView('selecao')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
           </button>
           <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso do Professor</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Insira suas credenciais restritas.</p>
+          <p class="text-sm text-gray-500 mb-6 text-center">Insira as suas credenciais restritas.</p>
           
           <form id="form-login-admin">
-            <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="E-mail ou Usuário" required>
-            <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Senha" required>
+            <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Utilizador" required>
+            <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Acessar o Painel</button>
-          </form>
-
-          <div class="mt-6 text-center text-sm border-t pt-4">
-            <span class="text-gray-600">Novo professor?</span>
-            <button onclick="mudarAuthView('cadastro-professor')" class="text-indigo-600 font-semibold hover:underline ml-1">Solicite acesso</button>
-          </div>
-        </div>
-
-        <!-- VISTA 5: CADASTRO DE NOVO PROFESSOR -->
-        <div id="auth-view-cadastro-professor" class="hidden">
-          <button onclick="mudarAuthView('login-admin')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
-            <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
-          </button>
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso (Professor)</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Será avaliado pelo Administrador PradoDiego.</p>
-          
-          <form id="form-cadastro-professor" class="space-y-3">
-            <input type="text" id="cadastro-prof-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
-            <input type="email" id="cadastro-prof-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
-            <input type="password" id="cadastro-prof-senha" placeholder="Crie uma senha" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
-            
-            <p id="cadastro-prof-msg" class="text-center text-xs hidden"></p>
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors mt-2">Enviar Solicitação</button>
-          </form>
-        </div>
-
-        <!-- VISTA 6: CRIAR NOME DE USUÁRIO (ALUNO 1º ACESSO) -->
-        <div id="auth-view-criar-usuario" class="hidden">
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Bem-vindo(a)!</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Como este é o seu primeiro acesso, crie um nome de usuário que será visível para a turma.</p>
-          
-          <form id="form-criar-usuario" class="space-y-3">
-            <div>
-               <input type="text" id="novo-nome-usuario" placeholder="Seu nome (Máx 15 letras)" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center" maxlength="15" required>
-               <p class="text-[10px] text-gray-400 mt-1 text-center">Apenas letras e espaços (máx. 15 caracteres).</p>
-            </div>
-            <p id="criar-usuario-erro" class="text-red-500 text-xs hidden text-center"></p>
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors mt-2">Salvar e Entrar</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">acessar ao Painel</button>
           </form>
         </div>
 
@@ -622,18 +480,17 @@
 
   <!-- JAVASCRIPT: LÓGICA E FIREBASE -->
   <script type="module">
-    // --- 0. CONFIGURAÇÃO DE ACESSO DO ADMIN MASTER ---
+    // --- 0. CONFIGURAÇÃO DE ACESSO DO ADMIN ---
     const USUARIO_ADMINISTRADOR = "PradoDiego";
     const SENHA_ADMINISTRADOR = "@Lei30242728";
 
     // --- 1. CONFIGURAÇÃO FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // REVERTIDO PARA SUAS CREDENCIAIS ORIGINAIS (A chave continua dividida para proteger do GitHub Scanner)
     const firebaseConfig = {
-      apiKey: "AIzaSyAzZ" + "HRIbDFqWCOb-N_Ygob8m3lm2fZCoZk",
+      apiKey: "AIzaSyAzZHRIbDFqWCOb-N_Ygob8m3lm2fZCoZk",
       authDomain: "profeducatec-798ec.firebaseapp.com",
       projectId: "profeducatec-798ec",
       storageBucket: "profeducatec-798ec.firebasestorage.app",
@@ -651,254 +508,89 @@
     // --- 2. ESTADO DA APLICAÇÃO ---
     let currentUser = null;
     let isAdminMode = false;
-    let isMasterAdmin = false;
-    let currentAdminName = ""; 
     let currentAlunoEmail = null; 
-    let currentAlunoNome = ""; 
     let visaoCalendario = 'semanal'; 
     let aulaEmEdicaoId = null; 
-    let pendingUsernameEmail = null; 
-    let pendingUsernameId = null;    
     
     let aulasList = [];
     let arquivosList = [];
-    let pastasList = [];
     let recadosList = [];
     let alunosPermitidos = [];
     let solicitacoesList = [];
     let linksImportantesList = [];
-    
-    let professoresAprovadosList = [];
-    let solicitacoesProfList = [];
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-    // TOAST NOTIFICATIONS (Substituindo os alerts)
-    window.mostrarNotificacao = function(mensagem, isError = false) {
-      const toast = document.createElement('div');
-      toast.className = `p-3 rounded-lg shadow-lg text-sm text-white transition-opacity duration-300 pointer-events-auto ${isError ? 'bg-red-600' : 'bg-green-600'}`;
-      toast.innerText = mensagem;
-      document.getElementById('toast-container').appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-      }, 4000);
-    };
-
-    const handleError = (error, contexto) => {
-        console.error(`Erro em ${contexto}:`, error);
-        if (error.message && (error.message.includes('blocked') || error.message.includes('permission') || error.message.includes('referer'))) {
-            window.mostrarNotificacao("Ação bloqueada pelo Google Cloud! Para cadastrar novos itens, acesse a plataforma pelo seu link oficial do GitHub Pages.", true);
-        } else {
-            window.mostrarNotificacao(`Erro ao processar ação.`, true);
-        }
-    };
-
-    const warnIfBlocked = (error, context) => {
-      if (error.code === 'auth/requests-from-referer-blocked' || (error.message && error.message.includes('referer'))) {
-        console.warn(`Aviso (${context}): Conexão de leitura bloqueada pela proteção de domínio do Firebase.`);
-      } else {
-        console.warn(`Erro (${context}):`, error.message);
-      }
-    };
-
-    // --- 3. AUTENTICAÇÃO ANÔNIMA E CONTADOR DE VISITAS ---
+    // --- 3. AUTENTICAÇÃO ANÓNIMA ---
     const initAuth = async () => {
       try {
         await signInAnonymously(auth);
       } catch (error) {
-        warnIfBlocked(error, "Autenticação");
+        console.error("Erro de Autenticação:", error);
       }
     };
     initAuth();
 
-    // --- 4. OUVINTES DO FIRESTORE E CONTADOR GLOBAL ---
-    onAuthStateChanged(auth, async (user) => {
+    // --- 4. OUVINTES DO FIRESTORE ---
+    onAuthStateChanged(auth, (user) => {
       currentUser = user;
       if (!user) return;
 
       const pathPrefix = `artifacts/${appId}/public/data`;
 
-      // Contador de Visitas Lógica
-      const visitasDocRef = doc(db, pathPrefix, 'estatisticas', 'visitas');
-      
-      if (!sessionStorage.getItem('visited_profeducatec')) {
-          sessionStorage.setItem('visited_profeducatec', 'true');
-          try {
-              await updateDoc(visitasDocRef, { count: increment(1) });
-          } catch (error) {
-              if (error.code === 'not-found') {
-                  try { await setDoc(visitasDocRef, { count: 1 }); } catch (e) { warnIfBlocked(e, "Set Contador"); }
-              } else {
-                  warnIfBlocked(error, "Update Contador");
-              }
-          }
-      }
-      
-      onSnapshot(visitasDocRef, (docSnap) => {
-          if (docSnap.exists()) {
-              document.getElementById('contador-visitas').innerText = docSnap.data().count;
-          } else {
-              document.getElementById('contador-visitas').innerText = "0";
-          }
-      }, (error) => warnIfBlocked(error, "Snapshot Visitas"));
-
       onSnapshot(collection(db, pathPrefix, 'aulas'), (snapshot) => {
         aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         atualizarCalendario();
-        atualizarRelogioECompromisso();
-      }, (error) => warnIfBlocked(error, "Snapshot Aulas"));
-      
-      onSnapshot(collection(db, pathPrefix, 'pastas'), (snapshot) => {
-        pastasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderizarArquivos();
-        
-        // Atualiza as opções de pasta no modal de adicionar arquivo
-        const selectPasta = document.getElementById('arq-pasta');
-        if(selectPasta) {
-           selectPasta.innerHTML = '<option value="">Nenhuma pasta (Mural Geral)</option>' + pastasList.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
-        }
-      }, (error) => warnIfBlocked(error, "Snapshot Pastas"));
+      });
 
       onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
         arquivosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarArquivos();
-      }, (error) => warnIfBlocked(error, "Snapshot Arquivos"));
+      });
 
       onSnapshot(collection(db, pathPrefix, 'recados'), (snapshot) => {
         recadosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarMural();
-      }, (error) => warnIfBlocked(error, "Snapshot Recados"));
+      });
 
       onSnapshot(collection(db, pathPrefix, 'alunos'), (snapshot) => {
         alunosPermitidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (isAdminMode) renderizarListaAlunos();
-      }, (error) => warnIfBlocked(error, "Snapshot Alunos"));
+        renderizarListaAlunos();
+      });
 
       onSnapshot(collection(db, pathPrefix, 'solicitacoes'), (snapshot) => {
         solicitacoesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (isAdminMode) renderizarListaSolicitacoes();
-      }, (error) => warnIfBlocked(error, "Snapshot Solicitacoes Alunos"));
+        renderizarListaSolicitacoes();
+      });
 
       onSnapshot(collection(db, pathPrefix, 'links_importantes'), (snapshot) => {
         linksImportantesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarLinksImportantes();
-      }, (error) => warnIfBlocked(error, "Snapshot Links"));
-
-      onSnapshot(collection(db, pathPrefix, 'professores'), (snapshot) => {
-        professoresAprovadosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (isAdminMode) renderizarListaProfessores();
-      }, (error) => warnIfBlocked(error, "Snapshot Professores"));
-
-      onSnapshot(collection(db, pathPrefix, 'solicitacoes_professores'), (snapshot) => {
-        solicitacoesProfList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (isAdminMode) renderizarListaSolicitacoesProf();
-      }, (error) => warnIfBlocked(error, "Snapshot Solicitacoes Professores"));
+      });
     });
 
     // --- 5. FUNÇÕES DE GESTÃO DO BANCO DE DADOS ---
     const getPath = (col) => `artifacts/${appId}/public/data/${col}`;
 
-    window.apagarArquivo = async (event, id) => { 
-        event.preventDefault();
-        event.stopPropagation();
-        if (!isAdminMode) return;
-        try {
-          await deleteDoc(doc(db, getPath('arquivos'), id)); 
-          window.mostrarNotificacao("Arquivo apagado!");
-        } catch(e) { handleError(e, "apagar arquivo"); }
-    };
-
-    window.apagarPasta = async (event, id) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (!isAdminMode) return;
-        if (!confirm("Tem certeza que deseja apagar esta pasta e TODOS os arquivos dentro dela?")) return;
-        
-        try {
-            const arquivosParaApagar = arquivosList.filter(a => a.pastaId === id);
-            for (let a of arquivosParaApagar) {
-                await deleteDoc(doc(db, getPath('arquivos'), a.id));
-            }
-            await deleteDoc(doc(db, getPath('pastas'), id));
-            window.mostrarNotificacao("Pasta e arquivos removidos com sucesso.");
-        } catch(e) {
-            handleError(e, "apagar pasta");
-        }
-    };
-
-    window.apagarAula = async (id) => { 
-      if (!isAdminMode) return;
-      try { 
-        await deleteDoc(doc(db, getPath('aulas'), id)); 
-        window.mostrarNotificacao("Aula apagada.");
-      } catch(e) { handleError(e, "apagar aula"); }
-    };
-    
-    window.apagarAluno = async (id) => { 
-      if (!isAdminMode) return;
-      try {
-        await deleteDoc(doc(db, getPath('alunos'), id));
-        window.mostrarNotificacao("Aluno removido.");
-      } catch(e) { handleError(e, "apagar aluno"); }
-    };
-
-    window.apagarRecado = async (id) => { 
-      if (!isAdminMode) return;
-      try {
-        await deleteDoc(doc(db, getPath('recados'), id));
-        window.mostrarNotificacao("Recado apagado.");
-      } catch(e) { handleError(e, "apagar recado"); }
-    };
-
-    window.apagarLinkImportante = async (id) => { 
-      if (!isAdminMode) return;
-      try {
-        await deleteDoc(doc(db, getPath('links_importantes'), id));
-        window.mostrarNotificacao("Link removido.");
-      } catch(e) { handleError(e, "apagar link"); }
-    };
+    window.apagarArquivo = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('arquivos'), id)); };
+    window.apagarAula = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('aulas'), id)); };
+    window.apagarAluno = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('alunos'), id)); };
+    window.apagarRecado = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('recados'), id)); };
+    window.apagarLinkImportante = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('links_importantes'), id)); };
 
     window.aprovarSolicitacao = async (id, email) => {
       if (!isAdminMode) return;
       try {
         await addDoc(collection(db, getPath('alunos')), { email: email.toLowerCase() });
         await deleteDoc(doc(db, getPath('solicitacoes'), id));
-        window.mostrarNotificacao("Aluno aprovado!");
-      } catch (err) { handleError(err, "aprovar aluno"); }
+      } catch (err) { console.error("Erro ao aprovar:", err); }
     };
 
     window.rejeitarSolicitacao = async (id) => {
       if (!isAdminMode) return;
       try {
         await deleteDoc(doc(db, getPath('solicitacoes'), id));
-        window.mostrarNotificacao("Solicitação de aluno rejeitada.");
-      } catch (err) { handleError(err, "rejeitar aluno"); }
-    };
-
-    window.aprovarProfessor = async (id, nome, email, senha) => {
-      if (!isMasterAdmin) return;
-      try {
-        await addDoc(collection(db, getPath('professores')), { nome, email: email.toLowerCase(), senha });
-        await deleteDoc(doc(db, getPath('solicitacoes_professores'), id));
-        window.mostrarNotificacao("Professor aprovado com sucesso!");
-      } catch (err) { handleError(err, "aprovar professor"); }
-    };
-
-    window.rejeitarProfessor = async (id) => {
-      if (!isMasterAdmin) return;
-      try {
-        await deleteDoc(doc(db, getPath('solicitacoes_professores'), id));
-        window.mostrarNotificacao("Solicitação de professor rejeitada.");
-      } catch (err) { handleError(err, "rejeitar professor"); }
-    };
-
-    window.apagarProfessor = async (id) => {
-      if (!isMasterAdmin) return;
-      try {
-        await deleteDoc(doc(db, getPath('professores'), id));
-        window.mostrarNotificacao("Professor removido do sistema.");
-      } catch (err) { handleError(err, "apagar professor"); }
+      } catch (err) { console.error("Erro ao rejeitar:", err); }
     };
 
     window.editarAula = (id) => {
@@ -924,134 +616,22 @@
       document.getElementById('modal-aula').classList.remove('hidden');
     };
 
-    // --- LOGICA DE RELÓGIO E PRÓXIMO COMPROMISSO ---
-    function atualizarRelogioECompromisso() {
-      const agora = new Date();
-      
-      const painelRelogio = document.getElementById('relogio-digital');
-      if (painelRelogio) painelRelogio.innerText = agora.toLocaleTimeString('pt-BR');
-
-      const painelAviso = document.getElementById('proximo-compromisso');
-      if (!painelAviso) return;
-
-      if (!aulasList || aulasList.length === 0) {
-        painelAviso.innerText = "Sem aulas marcadas";
-        return;
-      }
-
-      const mapeamentoDias = { 0: 'Domingo', 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta', 6: 'Sábado' };
-      const hojeNome = mapeamentoDias[agora.getDay()];
-      const hojeDataString = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
-      const hojeMeioDia = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 12, 0, 0);
-
-      let proximasAulas = [];
-
-      aulasList.forEach(aula => {
-        let ocorreHoje = false;
-        
-        if (aula.tipoRepeticao === 'unico' && aula.dataUnica === hojeDataString) {
-          ocorreHoje = true;
-        } else if (aula.tipoRepeticao === 'semanal' && aula.dia === hojeNome) {
-          let dentroDoPeriodo = true;
-          if (aula.dataInicio && hojeMeioDia < new Date(aula.dataInicio + 'T00:00:00')) dentroDoPeriodo = false;
-          if (aula.dataFim && hojeMeioDia > new Date(aula.dataFim + 'T23:59:59')) dentroDoPeriodo = false;
-          if (dentroDoPeriodo) ocorreHoje = true;
-        }
-
-        if (ocorreHoje && aula.hora) {
-          const horaInicioStr = aula.hora.split('-')[0].trim();
-          const [h, m] = horaInicioStr.split(':').map(Number);
-          if (!isNaN(h) && !isNaN(m)) {
-            const dataAula = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), h, m, 0);
-            const diffMs = dataAula - agora;
-            proximasAulas.push({ ...aula, dataAula, diffMs });
-          }
-        }
-      });
-
-      const aulasFuturas = proximasAulas.filter(a => a.diffMs > -5400000).sort((a, b) => a.diffMs - b.diffMs);
-
-      if (aulasFuturas.length > 0) {
-        const proxima = aulasFuturas[0];
-        
-        if (proxima.diffMs <= 0) {
-          painelAviso.innerText = `Agora: ${proxima.titulo}`;
-          painelAviso.className = "text-[10px] text-green-600 font-bold truncate max-w-[150px] animate-pulse";
-        } else {
-          const diffMin = Math.floor(proxima.diffMs / 60000);
-          const h = Math.floor(diffMin / 60);
-          const m = diffMin % 60;
-          let tempoStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
-          
-          painelAviso.innerText = `A seguir em ${tempoStr}: ${proxima.titulo}`;
-          painelAviso.className = "text-[10px] text-blue-600 font-medium truncate max-w-[150px]";
-        }
-      } else {
-        painelAviso.innerText = "Livre pelo resto do dia";
-        painelAviso.className = "text-[10px] text-gray-500 font-medium truncate max-w-[150px]";
-      }
-    }
-    setInterval(atualizarRelogioECompromisso, 1000);
-
     // --- 6. RENDERIZAÇÃO DA UI ---
-
-    function renderizarListaSolicitacoesProf() {
-      const container = document.getElementById('lista-solicitacoes-prof');
-      if (!container) return; 
-      
-      if (solicitacoesProfList.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhuma solicitação de professor.</li>`;
-        return;
-      }
-
-      container.innerHTML = solicitacoesProfList.map(sol => `
-        <li class="bg-orange-50 p-3 rounded-lg border border-orange-200 text-sm">
-          <div class="font-bold text-gray-800">${sol.nome}</div>
-          <div class="text-xs text-gray-500 mb-1">${sol.email}</div>
-          <div class="flex gap-2 mt-2">
-            <button onclick="aprovarProfessor('${sol.id}', '${sol.nome}', '${sol.email}', '${sol.senha}')" class="flex-1 bg-green-600 text-white px-2 py-1.5 rounded text-xs font-medium hover:bg-green-700 transition-colors">Aprovar Prof</button>
-            <button onclick="rejeitarProfessor('${sol.id}')" class="flex-1 bg-red-100 text-red-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-red-200 transition-colors">Rejeitar</button>
-          </div>
-        </li>
-      `).join('');
-    }
-
-    function renderizarListaProfessores() {
-      const container = document.getElementById('lista-professores-cadastrados');
-      if (!container) return;
-      
-      if (professoresAprovadosList.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum professor aprovado além de você.</li>`;
-        return;
-      }
-      container.innerHTML = professoresAprovadosList.map(prof => `
-        <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
-          <div>
-            <span class="text-gray-700 truncate pr-2 font-medium block text-sm">${prof.nome}</span>
-            <span class="text-gray-500 truncate pr-2 text-xs">${prof.email}</span>
-          </div>
-          <button onclick="apagarProfessor('${prof.id}')" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50" title="Remover acesso">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-          </button>
-        </li>
-      `).join('');
-      lucide.createIcons();
-    }
-
 
     function renderizarLinksImportantes() {
       const container = document.getElementById('links-importantes-lista');
-      if (!container) return;
-      
       if (linksImportantesList.length === 0) {
         container.innerHTML = `<p class="text-sm text-gray-400 text-center mt-8 italic">Nenhum link importante adicionado.</p>`;
         return;
       }
       
+      // Ordena por título alfabeticamente para organização
       const linksOrdenados = [...linksImportantesList].sort((a,b) => a.titulo.localeCompare(b.titulo));
 
       container.innerHTML = linksOrdenados.map(link => {
+        // Usa a API do Google Favicon para capturar o logotipo com base na URL
         const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain_url=${encodeURIComponent(link.url)}&sz=64`;
+        
         return `
         <div class="relative group border border-gray-100 rounded-lg p-3 hover:bg-gray-50 transition-colors shadow-sm bg-white">
           <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="flex gap-3 items-start">
@@ -1099,7 +679,7 @@
       if (!container) return;
       
       if (alunosPermitidos.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum aluno cadastrado.</li>`;
+        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum aluno aprovado.</li>`;
         return;
       }
       container.innerHTML = alunosPermitidos.map(aluno => `
@@ -1115,8 +695,6 @@
 
     function renderizarMural() {
       const container = document.getElementById('mural-lista');
-      if (!container) return;
-      
       if (recadosList.length === 0) {
         container.innerHTML = `<p class="text-gray-400 text-xs text-center mt-4">Nenhum recado ainda. Seja o primeiro!</p>`;
         return;
@@ -1146,101 +724,37 @@
 
     function renderizarArquivos() {
       const container = document.getElementById('arquivos-lista');
-      if (!container) return;
-      
-      if (arquivosList.length === 0 && pastasList.length === 0) {
+      if (arquivosList.length === 0) {
         container.innerHTML = `<p class="text-xs text-gray-400 mt-4 text-center">Nenhum material disponível.</p>`;
         return;
       }
 
-      let html = '';
+      container.innerHTML = arquivosList.map(arquivo => {
+        let iconeFonte = arquivo.fonte === 'github' ? 'github' : (arquivo.fonte === 'drive' ? 'hard-drive' : 'link');
+        let iconeTipo = (arquivo.tipo === 'pdf' || arquivo.tipo === 'doc') ? 'file-text' : (arquivo.tipo === 'video' ? 'video' : 'book-open');
+        let corTipo = arquivo.tipo === 'pdf' ? 'text-red-500' : (arquivo.tipo === 'video' ? 'text-purple-500' : 'text-gray-700');
 
-      // Agrupar arquivos por pasta
-      pastasList.sort((a,b) => a.timestamp - b.timestamp).forEach(pasta => {
-        const arquivosDaPasta = arquivosList.filter(a => a.pastaId === pasta.id);
-        
-        let arquivosHtml = '';
-        if(arquivosDaPasta.length === 0) {
-           arquivosHtml = `<p class="text-[10px] text-gray-400 italic p-2">Pasta vazia.</p>`;
-        } else {
-           arquivosHtml = arquivosDaPasta.map(arquivo => {
-              let iconeFonte = arquivo.fonte === 'github' ? 'github' : (arquivo.fonte === 'drive' ? 'hard-drive' : 'link');
-              let iconeTipo = (arquivo.tipo === 'pdf' || arquivo.tipo === 'doc') ? 'file-text' : (arquivo.tipo === 'video' ? 'video' : 'book-open');
-              let corTipo = arquivo.tipo === 'pdf' ? 'text-red-500' : (arquivo.tipo === 'video' ? 'text-purple-500' : 'text-gray-700');
-
-              return `
-              <a href="${arquivo.url}" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 p-2 rounded-md hover:bg-gray-100 transition-colors bg-white border border-gray-100 shadow-sm relative group">
-                  <div class="mt-0.5"><i data-lucide="${iconeTipo}" class="w-4 h-4 ${corTipo}"></i></div>
-                  <div class="flex-1 min-w-0 text-left pr-4">
-                      <p class="text-xs font-medium text-gray-700 truncate group-hover:text-blue-600">${arquivo.nome}</p>
-                      <div class="flex items-center gap-2 mt-0.5 text-[10px] text-gray-500">
-                        <i data-lucide="${iconeFonte}" class="w-3 h-3"></i>
-                        <span class="capitalize">${arquivo.fonte}</span>
-                        ${arquivo.tamanho ? `<span>•</span><span>${arquivo.tamanho}</span>` : ''}
-                      </div>
-                  </div>
-                  ${isAdminMode ? `
-                      <button onclick="apagarArquivo(event, '${arquivo.id}')" class="absolute right-1 top-1 p-1 bg-red-50 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 z-10" title="Excluir Arquivo">
-                        <i data-lucide="trash-2" class="w-3 h-3"></i>
-                      </button>
-                  ` : ''}
-              </a>
-              `;
-           }).join('');
-        }
-
-        html += `
-          <details class="group bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm mb-2" open>
-            <summary class="flex items-center justify-between p-2.5 text-sm font-semibold cursor-pointer text-gray-700 hover:bg-gray-50 relative">
-              <div class="flex items-center gap-2 pr-12">
-                <i data-lucide="folder" class="w-4 h-4 text-indigo-500 fill-indigo-100"></i>
-                <span class="truncate">${pasta.nome}</span>
+        return `
+        <div class="relative group">
+          <a href="${arquivo.url}" target="_blank" rel="noopener noreferrer" class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
+            <div class="mt-0.5"><i data-lucide="${iconeTipo}" class="w-5 h-5 ${corTipo}"></i></div>
+            <div class="flex-1 min-w-0 text-left">
+              <p class="text-sm font-medium text-gray-700 truncate group-hover:text-blue-600">${arquivo.nome}</p>
+              <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                <i data-lucide="${iconeFonte}" class="w-3 h-3"></i>
+                <span class="capitalize">${arquivo.fonte}</span>
+                ${arquivo.tamanho ? `<span>•</span><span>${arquivo.tamanho}</span>` : ''}
               </div>
-              <div class="flex items-center gap-1.5 absolute right-2 top-2.5">
-                  ${isAdminMode ? `<button onclick="apagarPasta(event, '${pasta.id}')" class="text-gray-300 hover:text-red-500 p-0.5 rounded" title="Apagar Pasta"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
-                  <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180"></i>
-              </div>
-            </summary>
-            <div class="p-1.5 border-t border-gray-100 bg-gray-50 space-y-1">
-              ${arquivosHtml}
             </div>
-          </details>
+          </a>
+          ${isAdminMode ? `
+            <button onclick="apagarArquivo('${arquivo.id}')" class="absolute right-2 top-2 p-1.5 bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          ` : ''}
+        </div>
         `;
-      });
-
-      // Arquivos sem pasta (legados de versões anteriores, se houver)
-      const arquivosSemPasta = arquivosList.filter(a => !a.pastaId || !pastasList.find(p => p.id === a.pastaId));
-      if(arquivosSemPasta.length > 0) {
-         html += `<div class="mt-4 pt-2 border-t border-gray-200 space-y-1">
-            <p class="text-[10px] font-semibold text-gray-400 px-1 mb-2 uppercase tracking-wider">Mural Geral</p>
-            ${arquivosSemPasta.map(arquivo => {
-              let iconeFonte = arquivo.fonte === 'github' ? 'github' : (arquivo.fonte === 'drive' ? 'hard-drive' : 'link');
-              let iconeTipo = (arquivo.tipo === 'pdf' || arquivo.tipo === 'doc') ? 'file-text' : (arquivo.tipo === 'video' ? 'video' : 'book-open');
-              let corTipo = arquivo.tipo === 'pdf' ? 'text-red-500' : (arquivo.tipo === 'video' ? 'text-purple-500' : 'text-gray-700');
-              
-              return `
-              <a href="${arquivo.url}" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 p-2 rounded-md hover:bg-gray-100 transition-colors bg-white border border-gray-100 shadow-sm relative group">
-                  <div class="mt-0.5"><i data-lucide="${iconeTipo}" class="w-4 h-4 ${corTipo}"></i></div>
-                  <div class="flex-1 min-w-0 text-left pr-4">
-                      <p class="text-xs font-medium text-gray-700 truncate group-hover:text-blue-600">${arquivo.nome}</p>
-                      <div class="flex items-center gap-2 mt-0.5 text-[10px] text-gray-500">
-                        <i data-lucide="${iconeFonte}" class="w-3 h-3"></i>
-                        <span class="capitalize">${arquivo.fonte}</span>
-                        ${arquivo.tamanho ? `<span>•</span><span>${arquivo.tamanho}</span>` : ''}
-                      </div>
-                  </div>
-                  ${isAdminMode ? `
-                      <button onclick="apagarArquivo(event, '${arquivo.id}')" class="absolute right-1 top-1 p-1 bg-red-50 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 z-10" title="Excluir Arquivo">
-                        <i data-lucide="trash-2" class="w-3 h-3"></i>
-                      </button>
-                  ` : ''}
-              </a>
-              `;
-            }).join('')}
-         </div>`;
-      }
-
-      container.innerHTML = html;
+      }).join('');
       lucide.createIcons();
     }
 
@@ -1252,7 +766,6 @@
 
     function renderizarCalendarioSemanal() {
       const container = document.getElementById('calendario-grid');
-      if (!container) return;
       container.className = "grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full";
       
       container.innerHTML = diasSemana.map(dia => {
@@ -1323,7 +836,6 @@
 
     function renderizarCalendarioMensal() {
       const container = document.getElementById('calendario-grid');
-      if (!container) return;
       container.className = "w-full";
 
       const dataAtual = new Date();
@@ -1427,48 +939,44 @@
     const btnSemanal = document.getElementById('btn-visao-semanal');
     const btnMensal = document.getElementById('btn-visao-mensal');
 
-    if(btnSemanal && btnMensal) {
-      btnSemanal.addEventListener('click', () => {
-        visaoCalendario = 'semanal';
-        document.getElementById('titulo-calendario').innerText = "Sua Semana";
-        btnSemanal.classList.replace('text-gray-500', 'text-gray-800');
-        btnSemanal.classList.replace('hover:text-gray-700', 'shadow-sm');
-        btnSemanal.classList.add('bg-white');
-        btnMensal.classList.replace('bg-white', 'text-gray-500');
-        btnMensal.classList.replace('shadow-sm', 'hover:text-gray-700');
-        btnMensal.classList.replace('text-gray-800', 'bg-transparent');
-        atualizarCalendario();
-      });
+    btnSemanal.addEventListener('click', () => {
+      visaoCalendario = 'semanal';
+      document.getElementById('titulo-calendario').innerText = "A Sua Semana";
+      btnSemanal.classList.replace('text-gray-500', 'text-gray-800');
+      btnSemanal.classList.replace('hover:text-gray-700', 'shadow-sm');
+      btnSemanal.classList.add('bg-white');
+      btnMensal.classList.replace('bg-white', 'text-gray-500');
+      btnMensal.classList.replace('shadow-sm', 'hover:text-gray-700');
+      btnMensal.classList.replace('text-gray-800', 'bg-transparent');
+      atualizarCalendario();
+    });
 
-      btnMensal.addEventListener('click', () => {
-        visaoCalendario = 'mensal';
-        btnMensal.classList.replace('text-gray-500', 'text-gray-800');
-        btnMensal.classList.replace('hover:text-gray-700', 'shadow-sm');
-        btnMensal.classList.add('bg-white');
-        btnSemanal.classList.replace('bg-white', 'text-gray-500');
-        btnSemanal.classList.replace('shadow-sm', 'hover:text-gray-700');
-        btnSemanal.classList.replace('text-gray-800', 'bg-transparent');
-        atualizarCalendario();
-      });
-    }
+    btnMensal.addEventListener('click', () => {
+      visaoCalendario = 'mensal';
+      btnMensal.classList.replace('text-gray-500', 'text-gray-800');
+      btnMensal.classList.replace('hover:text-gray-700', 'shadow-sm');
+      btnMensal.classList.add('bg-white');
+      btnSemanal.classList.replace('bg-white', 'text-gray-500');
+      btnSemanal.classList.replace('shadow-sm', 'hover:text-gray-700');
+      btnSemanal.classList.replace('text-gray-800', 'bg-transparent');
+      atualizarCalendario();
+    });
 
     const selectTipoRepeticao = document.getElementById('aula-tipo-repeticao');
     const camposSemanal = document.getElementById('campos-repeticao-semanal');
     const camposUnico = document.getElementById('campos-evento-unico');
 
-    if(selectTipoRepeticao) {
-      selectTipoRepeticao.addEventListener('change', (e) => {
-        if (e.target.value === 'unico') {
-          camposSemanal.classList.add('hidden');
-          camposUnico.classList.remove('hidden');
-          document.getElementById('aula-data-unica').required = true;
-        } else {
-          camposSemanal.classList.remove('hidden');
-          camposUnico.classList.add('hidden');
-          document.getElementById('aula-data-unica').required = false;
-        }
-      });
-    }
+    selectTipoRepeticao.addEventListener('change', (e) => {
+      if (e.target.value === 'unico') {
+        camposSemanal.classList.add('hidden');
+        camposUnico.classList.remove('hidden');
+        document.getElementById('aula-data-unica').required = true;
+      } else {
+        camposSemanal.classList.remove('hidden');
+        camposUnico.classList.add('hidden');
+        document.getElementById('aula-data-unica').required = false;
+      }
+    });
 
     // --- 7. FLUXO DE AUTENTICAÇÃO E MODAL UNIFICADO ---
     
@@ -1477,16 +985,12 @@
       document.getElementById('auth-view-login-aluno').classList.add('hidden');
       document.getElementById('auth-view-cadastro-aluno').classList.add('hidden');
       document.getElementById('auth-view-login-admin').classList.add('hidden');
-      document.getElementById('auth-view-cadastro-professor').classList.add('hidden');
-      document.getElementById('auth-view-criar-usuario').classList.add('hidden');
       
       document.getElementById(`auth-view-${viewName}`).classList.remove('hidden');
       
       document.getElementById('login-erro').classList.add('hidden');
       document.getElementById('admin-erro').classList.add('hidden');
       document.getElementById('cadastro-msg').classList.add('hidden');
-      document.getElementById('cadastro-prof-msg').classList.add('hidden');
-      document.getElementById('criar-usuario-erro').classList.add('hidden');
     };
 
     const btnModoAluno = document.getElementById('modo-aluno');
@@ -1495,22 +999,18 @@
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
-    const btnNovaPasta = document.getElementById('btn-nova-pasta');
-    const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
+    const btnacessarAlunos = document.getElementById('btn-acessar-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
     const inputNomeRecado = document.getElementById('input-nome-recado');
     const inputRecado = document.getElementById('input-recado');
     const btnEnviarRecado = document.getElementById('btn-enviar-recado');
 
-    function alternarModoUI(paraAdmin, emailAluno = null, isMaster = false, adminName = "", alunoNome = "") {
+    function alternarModoUI(paraAdmin, emailAluno = null) {
       isAdminMode = paraAdmin;
-      isMasterAdmin = isMaster;
-      currentAdminName = adminName;
       
       if (paraAdmin) {
         currentAlunoEmail = null;
-        currentAlunoNome = "";
         btnModoAdmin.classList.replace('text-gray-500', 'text-gray-800');
         btnModoAdmin.classList.replace('hover:text-gray-700', 'shadow-sm');
         btnModoAdmin.classList.add('bg-white');
@@ -1519,20 +1019,12 @@
         btnModoAluno.classList.replace('shadow-sm', 'hover:text-gray-700');
         btnModoAluno.classList.replace('text-gray-800', 'bg-transparent');
         
-        roleText.innerText = "Prof. " + adminName;
-        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + adminName;
+        roleText.innerText = "Prof. " + USUARIO_ADMINISTRADOR;
+        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + USUARIO_ADMINISTRADOR;
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
-        btnNovaPasta.classList.remove('hidden');
-        btnGerirAlunos.classList.remove('hidden');
+        btnacessarAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
-        
-        // Área master de gestão
-        if (isMaster) {
-          document.getElementById('admin-master-section').classList.remove('hidden');
-        } else {
-          document.getElementById('admin-master-section').classList.add('hidden');
-        }
         
         // Configurações do formulário de recados para ADMIN
         inputNomeRecado.classList.add('hidden');
@@ -1542,18 +1034,8 @@
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
         inputRecado.placeholder = "Avisar turma...";
-
-        // Força renderização dos painéis de admin
-        renderizarListaSolicitacoes();
-        renderizarListaAlunos();
-        if(isMaster) {
-          renderizarListaSolicitacoesProf();
-          renderizarListaProfessores();
-        }
       } else {
         currentAlunoEmail = emailAluno;
-        currentAlunoNome = alunoNome; // Salva o nome amigável do aluno
-        
         btnModoAluno.classList.replace('text-gray-500', 'text-gray-800');
         btnModoAluno.classList.replace('hover:text-gray-700', 'shadow-sm');
         btnModoAluno.classList.add('bg-white');
@@ -1562,18 +1044,17 @@
         btnModoAdmin.classList.replace('shadow-sm', 'hover:text-gray-700');
         btnModoAdmin.classList.replace('text-gray-800', 'bg-transparent');
 
-        roleText.innerText = `Aluno: ${alunoNome}`;
-        userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${alunoNome}`;
+        roleText.innerText = `Aluno: ${emailAluno.split('@')[0]}`;
+        userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
-        btnNovaPasta.classList.add('hidden');
-        btnGerirAlunos.classList.add('hidden');
+        btnacessarAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
         
-        // Configurações do formulário de recados para ALUNO (não precisa mais digitar o nome)
-        inputNomeRecado.classList.add('hidden');
-        inputNomeRecado.disabled = true;
-        inputNomeRecado.required = false;
+        // Configurações do formulário de recados para ALUNO
+        inputNomeRecado.classList.remove('hidden');
+        inputNomeRecado.disabled = false;
+        inputNomeRecado.required = true;
         
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
@@ -1604,55 +1085,32 @@
       document.getElementById('modal-auth').classList.remove('hidden');
     }, 200);
 
-    // LOGIN DO PROFESSOR (Híbrido)
     document.getElementById('form-login-admin').addEventListener('submit', (e) => {
       e.preventDefault();
       const usuarioDigitado = document.getElementById('admin-usuario-input').value.trim();
       const senhaDigitada = document.getElementById('admin-senha-input').value;
       
-      // 1. Verifica se é o Admin Master (PradoDiego)
       if (usuarioDigitado === USUARIO_ADMINISTRADOR && senhaDigitada === SENHA_ADMINISTRADOR) {
         document.getElementById('modal-auth').classList.add('hidden');
-        alternarModoUI(true, null, true, USUARIO_ADMINISTRADOR);
+        alternarModoUI(true);
         e.target.reset();
-        return;
-      } 
-      
-      // 2. Verifica se é um professor aprovado na base de dados
-      const profAprovado = professoresAprovadosList.find(p => (p.email.toLowerCase() === usuarioDigitado.toLowerCase() || p.nome === usuarioDigitado) && p.senha === senhaDigitada);
-      
-      if (profAprovado) {
-        document.getElementById('modal-auth').classList.add('hidden');
-        alternarModoUI(true, null, false, profAprovado.nome);
-        e.target.reset();
-        return;
+      } else {
+        document.getElementById('admin-erro').classList.remove('hidden');
       }
-      
-      // 3. Se errar tudo
-      document.getElementById('admin-erro').classList.remove('hidden');
     });
 
-    // LOGIN DO ALUNO (Com verificação de Primeiro Acesso)
     document.getElementById('form-login-aluno').addEventListener('submit', (e) => {
       e.preventDefault();
       const emailDigitado = document.getElementById('login-email').value.trim().toLowerCase();
       
-      const alunoRecord = alunosPermitidos.find(a => a.email === emailDigitado);
+      const isApproved = alunosPermitidos.some(a => a.email === emailDigitado);
       const isPending = solicitacoesList.some(s => s.email === emailDigitado);
       
       const erroEl = document.getElementById('login-erro');
 
-      if (alunoRecord) {
-        if (!alunoRecord.nomeUsuario) {
-          // É o primeiro acesso, precisa definir o nome de usuário
-          pendingUsernameEmail = emailDigitado;
-          pendingUsernameId = alunoRecord.id;
-          mudarAuthView('criar-usuario');
-        } else {
-          // Login normal
-          document.getElementById('modal-auth').classList.add('hidden');
-          alternarModoUI(false, emailDigitado, false, "", alunoRecord.nomeUsuario);
-        }
+      if (isApproved) {
+        document.getElementById('modal-auth').classList.add('hidden');
+        alternarModoUI(false, emailDigitado);
         e.target.reset();
       } else if (isPending) {
         erroEl.textContent = "O seu acesso ainda está pendente de aprovação pelo professor.";
@@ -1663,45 +1121,6 @@
       }
     });
 
-    // GESTÃO DO NOVO NOME DE USUÁRIO (Aluno)
-    const inputNovoNome = document.getElementById('novo-nome-usuario');
-    
-    // Filtra ao vivo para aceitar apenas letras e espaços
-    inputNovoNome.addEventListener('input', function() {
-      this.value = this.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
-    });
-
-    document.getElementById('form-criar-usuario').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nomeUsuario = inputNovoNome.value.trim();
-      const erroEl = document.getElementById('criar-usuario-erro');
-
-      if (!/^[a-zA-ZÀ-ÿ\s]{1,15}$/.test(nomeUsuario)) {
-        erroEl.textContent = "Nome inválido. Use apenas letras e espaços (máx 15).";
-        erroEl.classList.remove('hidden');
-        return;
-      }
-
-      try {
-        await updateDoc(doc(db, getPath('alunos'), pendingUsernameId), {
-            nomeUsuario: nomeUsuario
-        });
-        
-        document.getElementById('modal-auth').classList.add('hidden');
-        alternarModoUI(false, pendingUsernameEmail, false, "", nomeUsuario);
-        e.target.reset();
-        erroEl.classList.add('hidden');
-        pendingUsernameEmail = null;
-        pendingUsernameId = null;
-        window.mostrarNotificacao("Nome de usuário salvo com sucesso!");
-      } catch (err) {
-         handleError(err, "Salvar Nome do Usuário");
-         erroEl.textContent = "Erro ao salvar nome. Verifique a conexão.";
-         erroEl.classList.remove('hidden');
-      }
-    });
-
-    // Cadastro de Aluno (Solicitação)
     const emailCadastroInput = document.getElementById('cadastro-email');
     const divJustificativa = document.getElementById('div-justificativa');
     const justifInput = document.getElementById('cadastro-justificativa');
@@ -1751,46 +1170,7 @@
         
         setTimeout(() => mudarAuthView('login-aluno'), 3000);
       } catch (error) {
-        handleError(error, "Cadastro de Aluno");
-        msgEl.textContent = "Erro ao enviar pedido. Tente acessar do endereço principal.";
-        msgEl.className = "text-center text-xs text-red-600 font-medium";
-      }
-    });
-
-    // Cadastro de Professor (Solicitação)
-    document.getElementById('form-cadastro-professor').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nome = document.getElementById('cadastro-prof-nome').value.trim();
-      const email = document.getElementById('cadastro-prof-email').value.trim().toLowerCase();
-      const senha = document.getElementById('cadastro-prof-senha').value;
-      
-      const msgEl = document.getElementById('cadastro-prof-msg');
-      msgEl.classList.remove('hidden');
-
-      if (professoresAprovadosList.some(p => p.email === email)) {
-        msgEl.textContent = "Professor já cadastrado. Faça login.";
-        msgEl.className = "text-center text-xs text-blue-600 font-medium";
-        return;
-      }
-
-      if (solicitacoesProfList.some(s => s.email === email)) {
-        msgEl.textContent = "A sua solicitação já está em análise.";
-        msgEl.className = "text-center text-xs text-yellow-600 font-medium";
-        return;
-      }
-
-      try {
-        const docData = { nome, email, senha, data: Date.now() };
-        await addDoc(collection(db, getPath('solicitacoes_professores')), docData);
-        
-        e.target.reset();
-        
-        msgEl.textContent = "Solicitação enviada ao Admin! Aguarde aprovação.";
-        msgEl.className = "text-center text-xs text-green-600 font-bold";
-        
-        setTimeout(() => mudarAuthView('login-admin'), 3000);
-      } catch (error) {
-        handleError(error, "Cadastro de Professor");
+        console.error("Erro no cadastro:", error);
         msgEl.textContent = "Erro ao enviar pedido.";
         msgEl.className = "text-center text-xs text-red-600 font-medium";
       }
@@ -1804,24 +1184,22 @@
       if (!email) return;
       
       if (alunosPermitidos.some(a => a.email === email)) {
-        window.mostrarNotificacao("Este e-mail já está na lista.", true);
+        alert("Este e-mail já está na lista.");
         return;
       }
 
       try {
         await addDoc(collection(db, getPath('alunos')), { email });
         e.target.reset();
-        window.mostrarNotificacao("Aluno adicionado manualmente com sucesso!");
       } catch (error) {
-        handleError(error, "aluno manual");
+        console.error("Erro aluno manual:", error);
       }
     });
 
     // --- 8. OUTROS MODAIS E FORMULÁRIOS DE CONTEÚDO ---
     const modalAula = document.getElementById('modal-aula');
-    const modalPasta = document.getElementById('modal-pasta');
     const modalArquivo = document.getElementById('modal-arquivo');
-    const modalAlunos = document.getElementById('modal-gestao');
+    const modalAlunos = document.getElementById('modal-alunos');
     const modalLinkImportante = document.getElementById('modal-link-importante');
 
     btnNovaAula.addEventListener('click', () => {
@@ -1834,19 +1212,13 @@
       modalAula.classList.remove('hidden');
     });
     
-    btnNovaPasta.addEventListener('click', () => modalPasta.classList.remove('hidden'));
-    
-    btnNovoArquivo.addEventListener('click', () => {
-      modalArquivo.classList.remove('hidden');
-    });
-    
-    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
+    btnacessarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
       btn.addEventListener('click', () => {
         modalAula.classList.add('hidden');
-        modalPasta.classList.add('hidden');
         modalArquivo.classList.add('hidden');
         modalAlunos.classList.add('hidden');
         modalLinkImportante.classList.add('hidden');
@@ -1854,7 +1226,6 @@
       });
     });
 
-    // Submissão do Recado sem precisar pedir o nome
     document.getElementById('form-recado').addEventListener('submit', async (e) => {
       e.preventDefault();
       const texto = inputRecado.value.trim();
@@ -1862,17 +1233,18 @@
 
       let autor = '';
       if (isAdminMode) {
-        autor = `👨‍🏫 Prof. ${currentAdminName}`;
+        autor = `👨‍🏫 Prof. ${USUARIO_ADMINISTRADOR}`;
       } else {
-        // Agora pega o nome salvo do usuário atual (registrado no 1º acesso)
-        autor = currentAlunoNome;
+        const nomeDigitado = inputNomeRecado.value.trim();
+        if (!nomeDigitado) return;
+        autor = nomeDigitado;
       }
 
       try {
         await addDoc(collection(db, getPath('recados')), { texto, autor, timestamp: Date.now() });
-        inputRecado.value = ''; 
+        inputRecado.value = ''; // Limpa apenas a mensagem, mantém o nome preenchido
       } catch (error) {
-        handleError(error, "recado");
+        console.error("Erro recado:", error);
       }
     });
 
@@ -1898,60 +1270,34 @@
       try {
         if (aulaEmEdicaoId) {
           await updateDoc(doc(db, getPath('aulas'), aulaEmEdicaoId), aulaData);
-          window.mostrarNotificacao("Aula atualizada com sucesso!");
         } else {
           await addDoc(collection(db, getPath('aulas')), aulaData);
-          window.mostrarNotificacao("Aula criada com sucesso!");
         }
         
         modalAula.classList.add('hidden');
         e.target.reset();
         aulaEmEdicaoId = null; 
       } catch (error) {
-        handleError(error, "salvar aula");
+        console.error("Erro aula:", error);
       }
     });
 
-    // Submit Nova Pasta
-    document.getElementById('form-pasta').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!isAdminMode) return;
-      
-      const novaPasta = {
-        nome: document.getElementById('pasta-nome-input').value.trim(),
-        timestamp: Date.now()
-      };
-      
-      try {
-        await addDoc(collection(db, getPath('pastas')), novaPasta);
-        modalPasta.classList.add('hidden');
-        e.target.reset();
-        window.mostrarNotificacao("Pasta criada!");
-      } catch (error) {
-        handleError(error, "criar pasta");
-      }
-    });
-
-    // Submit Novo Arquivo (agora referenciando a Pasta)
     document.getElementById('form-arquivo').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
-      
       const novoArquivo = {
         nome: document.getElementById('arq-nome').value,
         tipo: document.getElementById('arq-tipo').value,
         fonte: document.getElementById('arq-fonte').value,
         url: document.getElementById('arq-url').value,
         tamanho: document.getElementById('arq-tamanho').value || '',
-        pastaId: document.getElementById('arq-pasta').value // Referência à pasta escolhida
       };
       try {
         await addDoc(collection(db, getPath('arquivos')), novoArquivo);
         modalArquivo.classList.add('hidden');
         e.target.reset();
-        window.mostrarNotificacao("Arquivo adicionado!");
       } catch (error) {
-        handleError(error, "arquivo");
+        console.error("Erro arquivo:", error);
       }
     });
 
@@ -1971,9 +1317,8 @@
         await addDoc(collection(db, getPath('links_importantes')), novoLink);
         modalLinkImportante.classList.add('hidden');
         e.target.reset();
-        window.mostrarNotificacao("Link salvo com sucesso!");
       } catch (error) {
-        handleError(error, "link importante");
+        console.error("Erro ao adicionar link importante:", error);
       }
     });
 
