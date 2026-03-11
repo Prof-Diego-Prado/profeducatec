@@ -113,39 +113,63 @@
     </header>
 
     <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-      <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-        <div>
-          <h2 id="titulo-calendario" class="text-2xl font-bold text-gray-900">A Sua Semana</h2>
-          <p class="text-gray-600 mt-1">Gira as suas aulas e aceda às salas de reunião.</p>
-        </div>
+      
+      <div class="flex flex-col xl:flex-row gap-8 h-full">
         
-        <div class="flex items-center gap-4">
-          <!-- TOGGLE DE VISÃO DO CALENDÁRIO -->
-          <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
-            <button id="btn-visao-semanal" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Semanal</button>
-            <button id="btn-visao-mensal" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Mensal</button>
+        <!-- COLUNA ESQUERDA: CALENDÁRIO -->
+        <div class="flex-1 flex flex-col min-w-0">
+          <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+            <div>
+              <h2 id="titulo-calendario" class="text-2xl font-bold text-gray-900">A Sua Semana</h2>
+              <p class="text-gray-600 mt-1">Gira as suas aulas e aceda às salas de reunião.</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+              <!-- TOGGLE DE VISÃO DO CALENDÁRIO -->
+              <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
+                <button id="btn-visao-semanal" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Semanal</button>
+                <button id="btn-visao-mensal" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Mensal</button>
+              </div>
+
+              <!-- Botão visível apenas para Admin -->
+              <button id="btn-nova-aula" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+                <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Nova Aula</span>
+              </button>
+            </div>
           </div>
 
-          <!-- Botão visível apenas para Admin -->
-          <button id="btn-nova-aula" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
-            <i data-lucide="calendar-plus" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Nova Aula</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Grade do Calendário -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[400px]">
-        <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full">
-          <div class="col-span-full flex items-center justify-center p-12 text-gray-500">
-             A carregar calendário...
+          <!-- Grade do Calendário -->
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1 min-h-[400px]">
+            <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full">
+              <div class="col-span-full flex items-center justify-center p-12 text-gray-500">
+                 A carregar calendário...
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- COLUNA DIREITA: LINKS IMPORTANTES -->
+        <div class="w-full xl:w-80 shrink-0 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 p-5 min-h-[300px] xl:h-[calc(100vh-10rem)]">
+          <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+              <i data-lucide="link-2" class="w-5 h-5 text-blue-500"></i> Links Importantes
+            </h3>
+            <button id="btn-novo-link-importante" class="hidden text-blue-600 hover:text-blue-800 p-1 bg-blue-50 rounded" title="Adicionar Novo Link">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+          </div>
+          
+          <div id="links-importantes-lista" class="flex-1 overflow-y-auto space-y-3 pr-1">
+            <p class="text-sm text-gray-400 text-center mt-4 italic">A carregar links...</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
 
-  <!-- MODAIS DE CONTEÚDO (AULAS, ARQUIVOS, GERIR ALUNOS) -->
+  <!-- MODAIS DE CONTEÚDO -->
 
   <!-- MODAL: NOVA AULA -->
   <div id="modal-aula" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
@@ -279,6 +303,36 @@
     </div>
   </div>
 
+  <!-- MODAL: NOVO LINK IMPORTANTE (LATERAL DIREITA) -->
+  <div id="modal-link-importante" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+        <h3 class="font-bold text-gray-800">Adicionar Link Importante</h3>
+        <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="form-link-importante" class="p-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+          <input type="text" id="link-imp-titulo" placeholder="Ex: Grupo de WhatsApp da Turma" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Endereço (URL)</label>
+          <input type="url" id="link-imp-url" placeholder="https://" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+          <p class="text-[10px] text-gray-400 mt-1">O logótipo será gerado automaticamente através deste endereço.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Descrição Breve</label>
+          <textarea id="link-imp-descricao" rows="2" placeholder="Ex: Apenas para avisos urgentes." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+        </div>
+        <div class="pt-4 flex justify-end gap-2">
+          <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Guardar Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
   <!-- MODAL: GERIR ALUNOS E SOLICITAÇÕES (ADMIN) -->
   <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
@@ -304,7 +358,6 @@
             <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> Alunos Aprovados
           </h4>
           
-          <!-- Admin pode continuar adicionando manualmente se quiser -->
           <form id="form-aluno-manual" class="flex gap-2 mb-3">
             <input type="email" id="aluno-email-manual" placeholder="Adicionar manualmente (E-mail)" class="flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             <button type="submit" class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg whitespace-nowrap">Adicionar</button>
@@ -335,13 +388,13 @@
         
         <!-- VISTA 1: SELEÇÃO DE PERFIL -->
         <div id="auth-view-selecao" class="space-y-4">
-          <p class="text-center text-gray-600 font-medium mb-4">Como deseja Acessar?</p>
+          <p class="text-center text-gray-600 font-medium mb-4">Como deseja aceder?</p>
           <button onclick="mudarAuthView('login-aluno')" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group">
             <div class="flex items-center gap-3">
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">Acessar ao material da disciplina</p>
+                <p class="text-xs text-gray-500">Aceder ao material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -351,8 +404,8 @@
             <div class="flex items-center gap-3">
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
-                <p class="font-semibold text-gray-800">Sou Professor/ADM </p>
-                <p class="text-xs text-gray-500">Gerenciar alunos e conteúdos</p>
+                <p class="font-semibold text-gray-800">Sou Professor</p>
+                <p class="text-xs text-gray-500">Gerir alunos e conteúdos</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -385,7 +438,7 @@
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
           </button>
           <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Registre-se com o seu e-mail institucional (@uem.br).</p>
+          <p class="text-sm text-gray-500 mb-6 text-center">Registe-se com o seu e-mail institucional (@uem.br).</p>
           
           <form id="form-cadastro-aluno" class="space-y-3">
             <input type="text" id="cadastro-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
@@ -415,7 +468,7 @@
             <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Acessar ao Painel</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Aceder ao Painel</button>
           </form>
         </div>
 
@@ -456,17 +509,18 @@
     let isAdminMode = false;
     let currentAlunoEmail = null; 
     let visaoCalendario = 'semanal'; 
-    let aulaEmEdicaoId = null; // Variável para rastrear qual aula está sendo editada
+    let aulaEmEdicaoId = null; 
     
     let aulasList = [];
     let arquivosList = [];
     let recadosList = [];
     let alunosPermitidos = [];
     let solicitacoesList = [];
+    let linksImportantesList = [];
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-    // --- 3. AUTENTICAÇÃO ANÓNIMA (Base para acessar dados) ---
+    // --- 3. AUTENTICAÇÃO ANÓNIMA ---
     const initAuth = async () => {
       try {
         await signInAnonymously(auth);
@@ -498,16 +552,19 @@
         renderizarMural();
       });
 
-      // Lista de Alunos Aprovados
       onSnapshot(collection(db, pathPrefix, 'alunos'), (snapshot) => {
         alunosPermitidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarListaAlunos();
       });
 
-      // Lista de Solicitações de Cadastro
       onSnapshot(collection(db, pathPrefix, 'solicitacoes'), (snapshot) => {
         solicitacoesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarListaSolicitacoes();
+      });
+
+      onSnapshot(collection(db, pathPrefix, 'links_importantes'), (snapshot) => {
+        linksImportantesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarLinksImportantes();
       });
     });
 
@@ -518,8 +575,8 @@
     window.apagarAula = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('aulas'), id)); };
     window.apagarAluno = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('alunos'), id)); };
     window.apagarRecado = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('recados'), id)); };
+    window.apagarLinkImportante = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('links_importantes'), id)); };
 
-    // Aprovar Solicitação: Move da coleção 'solicitacoes' para 'alunos'
     window.aprovarSolicitacao = async (id, email) => {
       if (!isAdminMode) return;
       try {
@@ -528,7 +585,6 @@
       } catch (err) { console.error("Erro ao aprovar:", err); }
     };
 
-    // Rejeitar Solicitação: Apenas apaga de 'solicitacoes'
     window.rejeitarSolicitacao = async (id) => {
       if (!isAdminMode) return;
       try {
@@ -536,16 +592,14 @@
       } catch (err) { console.error("Erro ao rejeitar:", err); }
     };
 
-    // Abrir Modal para Edição de Aula
     window.editarAula = (id) => {
       if (!isAdminMode) return;
       const aula = aulasList.find(a => a.id === id);
       if (!aula) return;
 
-      aulaEmEdicaoId = id; // Marca que estamos a editar
+      aulaEmEdicaoId = id; 
       document.getElementById('titulo-modal-aula').innerText = "Editar Aula";
 
-      // Preenche os campos com os dados da aula
       document.getElementById('aula-tipo-repeticao').value = aula.tipoRepeticao || 'semanal';
       document.getElementById('aula-dia').value = aula.dia || 'Segunda';
       document.getElementById('aula-data-inicio').value = aula.dataInicio || '';
@@ -557,17 +611,49 @@
       document.getElementById('aula-link').value = aula.link || '';
       document.getElementById('aula-cor').value = aula.cor || 'bg-blue-100 border-blue-300 text-blue-800';
 
-      // Dispara o evento change para mostrar/ocultar os campos de datas corretamente
       document.getElementById('aula-tipo-repeticao').dispatchEvent(new Event('change'));
-
       document.getElementById('modal-aula').classList.remove('hidden');
     };
 
     // --- 6. RENDERIZAÇÃO DA UI ---
 
+    function renderizarLinksImportantes() {
+      const container = document.getElementById('links-importantes-lista');
+      if (linksImportantesList.length === 0) {
+        container.innerHTML = `<p class="text-sm text-gray-400 text-center mt-8 italic">Nenhum link importante adicionado.</p>`;
+        return;
+      }
+      
+      // Ordena por título alfabeticamente para organização
+      const linksOrdenados = [...linksImportantesList].sort((a,b) => a.titulo.localeCompare(b.titulo));
+
+      container.innerHTML = linksOrdenados.map(link => {
+        // Usa a API do Google Favicon para capturar o logotipo com base na URL
+        const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain_url=${encodeURIComponent(link.url)}&sz=64`;
+        
+        return `
+        <div class="relative group border border-gray-100 rounded-lg p-3 hover:bg-gray-50 transition-colors shadow-sm bg-white">
+          <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="flex gap-3 items-start">
+            <img src="${faviconUrl}" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=${link.titulo}';" alt="Ícone" class="w-8 h-8 rounded-md mt-0.5 object-cover bg-gray-100 border border-gray-200 flex-shrink-0">
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-semibold text-blue-700 truncate group-hover:text-blue-800 transition-colors">${link.titulo}</h4>
+              ${link.descricao ? `<p class="text-xs text-gray-500 mt-1 line-clamp-2 leading-snug">${link.descricao}</p>` : ''}
+            </div>
+          </a>
+          ${isAdminMode ? `
+            <button onclick="apagarLinkImportante('${link.id}')" class="absolute top-2 right-2 p-1.5 bg-red-50 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 shadow-sm" title="Excluir Link">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          ` : ''}
+        </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
     function renderizarListaSolicitacoes() {
       const container = document.getElementById('lista-solicitacoes');
-      if (!container) return; // Se modal não existir
+      if (!container) return; 
       
       if (solicitacoesList.length === 0) {
         container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhuma solicitação pendente.</li>`;
@@ -671,7 +757,7 @@
       lucide.createIcons();
     }
 
-    // --- LÓGICA DO CALENDÁRIO (Mensal e Semanal) ---
+    // --- LÓGICA DO CALENDÁRIO ---
     function atualizarCalendario() {
       if (visaoCalendario === 'semanal') renderizarCalendarioSemanal();
       else renderizarCalendarioMensal();
@@ -682,8 +768,6 @@
       container.className = "grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full";
       
       container.innerHTML = diasSemana.map(dia => {
-        // Na visão semanal, filtramos para mostrar eventos semanais que caem neste dia
-        // E eventos únicos que caem na data de "hoje" correspondente a esse dia da semana
         const aulasDoDia = aulasList.filter(aula => {
           if (aula.tipoRepeticao === 'semanal') {
             return aula.dia === dia;
@@ -706,7 +790,6 @@
               ? `<a href="${aula.link}" target="_blank" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm"><i data-lucide="video" class="w-3 h-3"></i> Acessar Aula</a>` 
               : '';
             
-            // Adiciona um selo se for evento único
             const badgeUnico = aula.tipoRepeticao === 'unico' 
               ? `<span class="bg-white/50 text-gray-700 text-[10px] px-1.5 py-0.5 rounded ml-2 border border-gray-200/50">${new Date(aula.dataUnica + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})}</span>` 
               : '';
@@ -782,49 +865,32 @@
         const diaDaSemanaNum = dataDia.getDay();
         const nomeDiaAula = mapeamentoDias[diaDaSemanaNum];
 
-        // Formata a data atual do loop para comparação (YYYY-MM-DD)
         const anoStr = dataDia.getFullYear();
         const mesStr = String(dataDia.getMonth() + 1).padStart(2, '0');
         const diaStr = String(dataDia.getDate()).padStart(2, '0');
         const dataAtualFormatada = `${anoStr}-${mesStr}-${diaStr}`;
-        
-        // Objeto Date para comparação de períodos
-        const dataAtualLoopObj = new Date(ano, mes, dia, 12, 0, 0); // Meio-dia para evitar problemas de timezone
+        const dataAtualLoopObj = new Date(ano, mes, dia, 12, 0, 0); 
 
         let aulasDoDia = [];
         
-        // Filtra as aulas para ver se ocorrem neste dia específico do mês
         aulasList.forEach(aula => {
           if (aula.tipoRepeticao === 'unico') {
-            // Se for evento único, verifica se a data exata coincide
-            if (aula.dataUnica === dataAtualFormatada) {
-              aulasDoDia.push(aula);
-            }
+            if (aula.dataUnica === dataAtualFormatada) aulasDoDia.push(aula);
           } else if (aula.tipoRepeticao === 'semanal') {
-             // Se for evento semanal, primeiro verifica o dia da semana
              if (nomeDiaAula && aula.dia === nomeDiaAula) {
-               // Verifica se está dentro do período
                let dentroDoPeriodo = true;
-               
                if (aula.dataInicio) {
                  const dataInicioObj = new Date(aula.dataInicio + 'T00:00:00');
                  if (dataAtualLoopObj < dataInicioObj) dentroDoPeriodo = false;
                }
-               
                if (aula.dataFim) {
                  const dataFimObj = new Date(aula.dataFim + 'T23:59:59');
                  if (dataAtualLoopObj > dataFimObj) dentroDoPeriodo = false;
                }
-               
-               if (dentroDoPeriodo) {
-                 aulasDoDia.push(aula);
-               }
+               if (dentroDoPeriodo) aulasDoDia.push(aula);
              }
           } else {
-            // Retrocompatibilidade para aulas cadastradas antes desta atualização
-            if (nomeDiaAula && aula.dia === nomeDiaAula) {
-              aulasDoDia.push(aula);
-            }
+            if (nomeDiaAula && aula.dia === nomeDiaAula) aulasDoDia.push(aula);
           }
         });
 
@@ -895,7 +961,6 @@
       atualizarCalendario();
     });
 
-    // Lógica para mostrar/esconder campos baseados no tipo de repetição
     const selectTipoRepeticao = document.getElementById('aula-tipo-repeticao');
     const camposSemanal = document.getElementById('campos-repeticao-semanal');
     const camposUnico = document.getElementById('campos-evento-unico');
@@ -914,7 +979,6 @@
 
     // --- 7. FLUXO DE AUTENTICAÇÃO E MODAL UNIFICADO ---
     
-    // Funções para alternar as abas no modal de login
     window.mudarAuthView = (viewName) => {
       document.getElementById('auth-view-selecao').classList.add('hidden');
       document.getElementById('auth-view-login-aluno').classList.add('hidden');
@@ -923,13 +987,11 @@
       
       document.getElementById(`auth-view-${viewName}`).classList.remove('hidden');
       
-      // Limpar erros ao navegar
       document.getElementById('login-erro').classList.add('hidden');
       document.getElementById('admin-erro').classList.add('hidden');
       document.getElementById('cadastro-msg').classList.add('hidden');
     };
 
-    // Lógica principal de mudança de modo na Interface (Header/Sidebar)
     const btnModoAluno = document.getElementById('modo-aluno');
     const btnModoAdmin = document.getElementById('modo-admin');
     const roleText = document.getElementById('user-role-text');
@@ -937,6 +999,7 @@
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
     const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
+    const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
     const inputRecado = document.getElementById('input-recado');
     const btnEnviarRecado = document.getElementById('btn-enviar-recado');
@@ -959,6 +1022,7 @@
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
         btnGerirAlunos.classList.remove('hidden');
+        btnNovoLinkImportante.classList.remove('hidden');
         
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
@@ -978,6 +1042,7 @@
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
         btnGerirAlunos.classList.add('hidden');
+        btnNovoLinkImportante.classList.add('hidden');
         
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
@@ -987,9 +1052,9 @@
       renderizarArquivos();
       atualizarCalendario();
       renderizarMural();
+      renderizarLinksImportantes();
     }
 
-    // Ações dos botões do Header
     btnModoAdmin.addEventListener('click', () => {
       if (!isAdminMode) {
         document.getElementById('modal-auth').classList.remove('hidden');
@@ -1004,14 +1069,10 @@
       }
     });
 
-    // Iniciar a aplicação abrindo o modal de seleção principal
     setTimeout(() => {
       document.getElementById('modal-auth').classList.remove('hidden');
     }, 200);
 
-    // --- FORMULÁRIOS DE LOGIN E CADASTRO ---
-
-    // Login Professor
     document.getElementById('form-login-admin').addEventListener('submit', (e) => {
       e.preventDefault();
       const usuarioDigitado = document.getElementById('admin-usuario-input').value.trim();
@@ -1026,7 +1087,6 @@
       }
     });
 
-    // Login Aluno
     document.getElementById('form-login-aluno').addEventListener('submit', (e) => {
       e.preventDefault();
       const emailDigitado = document.getElementById('login-email').value.trim().toLowerCase();
@@ -1049,7 +1109,6 @@
       }
     });
 
-    // Dinâmica do campo Justificativa no Cadastro de Aluno
     const emailCadastroInput = document.getElementById('cadastro-email');
     const divJustificativa = document.getElementById('div-justificativa');
     const justifInput = document.getElementById('cadastro-justificativa');
@@ -1065,7 +1124,6 @@
       }
     });
 
-    // Submissão do Cadastro de Aluno
     document.getElementById('form-cadastro-aluno').addEventListener('submit', async (e) => {
       e.preventDefault();
       const nome = document.getElementById('cadastro-nome').value.trim();
@@ -1106,7 +1164,6 @@
       }
     });
 
-    // Cadastro Manual de Aluno pelo Admin (no modal de Gerir Alunos)
     document.getElementById('form-aluno-manual').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
@@ -1127,14 +1184,14 @@
       }
     });
 
-
     // --- 8. OUTROS MODAIS E FORMULÁRIOS DE CONTEÚDO ---
     const modalAula = document.getElementById('modal-aula');
     const modalArquivo = document.getElementById('modal-arquivo');
     const modalAlunos = document.getElementById('modal-alunos');
+    const modalLinkImportante = document.getElementById('modal-link-importante');
 
     btnNovaAula.addEventListener('click', () => {
-      aulaEmEdicaoId = null; // Reseta variável de edição
+      aulaEmEdicaoId = null; 
       document.getElementById('titulo-modal-aula').innerText = "Adicionar Nova Aula";
       document.getElementById('form-aula').reset();
       camposSemanal.classList.remove('hidden');
@@ -1145,13 +1202,15 @@
     
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
     btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
       btn.addEventListener('click', () => {
         modalAula.classList.add('hidden');
         modalArquivo.classList.add('hidden');
         modalAlunos.classList.add('hidden');
-        aulaEmEdicaoId = null; // Reseta caso a modal seja fechada no meio da edição
+        modalLinkImportante.classList.add('hidden');
+        aulaEmEdicaoId = null; 
       });
     });
 
@@ -1177,7 +1236,7 @@
       
       const aulaData = {
         tipoRepeticao: tipoRepeticao,
-        dia: document.getElementById('aula-dia').value, // Usado para eventos semanais
+        dia: document.getElementById('aula-dia').value,
         dataInicio: document.getElementById('aula-data-inicio').value,
         dataFim: document.getElementById('aula-data-fim').value,
         dataUnica: document.getElementById('aula-data-unica').value,
@@ -1190,16 +1249,14 @@
       
       try {
         if (aulaEmEdicaoId) {
-          // Atualiza aula existente
           await updateDoc(doc(db, getPath('aulas'), aulaEmEdicaoId), aulaData);
         } else {
-          // Cria nova aula
           await addDoc(collection(db, getPath('aulas')), aulaData);
         }
         
         modalAula.classList.add('hidden');
         e.target.reset();
-        aulaEmEdicaoId = null; // Limpa o ID de edição
+        aulaEmEdicaoId = null; 
       } catch (error) {
         console.error("Erro aula:", error);
       }
@@ -1221,6 +1278,27 @@
         e.target.reset();
       } catch (error) {
         console.error("Erro arquivo:", error);
+      }
+    });
+
+    // Submit Novo Link Importante
+    document.getElementById('form-link-importante').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!isAdminMode) return;
+      
+      const novoLink = {
+        titulo: document.getElementById('link-imp-titulo').value.trim(),
+        url: document.getElementById('link-imp-url').value.trim(),
+        descricao: document.getElementById('link-imp-descricao').value.trim(),
+        timestamp: Date.now()
+      };
+      
+      try {
+        await addDoc(collection(db, getPath('links_importantes')), novoLink);
+        modalLinkImportante.classList.add('hidden');
+        e.target.reset();
+      } catch (error) {
+        console.error("Erro ao adicionar link importante:", error);
       }
     });
 
