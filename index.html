@@ -106,9 +106,9 @@
         </div>
 
         <!-- Botão visível apenas para Admin -->
-        <button id="btn-gerir-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
+        <button id="btn-gerenciar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
           <i data-lucide="users" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Gerir Alunos</span>
+          <span class="hidden sm:inline">gerenciar Alunos</span>
         </button>
 
         <div class="items-center gap-3 hidden sm:flex bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full border border-gray-100">
@@ -353,7 +353,7 @@
   </div>
 
 
-  <!-- MODAL: GERIR ALUNOS E SOLICITAÇÕES (ADMIN) -->
+  <!-- MODAL: gerenciar ALUNOS E SOLICITAÇÕES (ADMIN) -->
   <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
@@ -408,13 +408,13 @@
         
         <!-- VISTA 1: SELEÇÃO DE PERFIL -->
         <div id="auth-view-selecao" class="space-y-4">
-          <p class="text-center text-gray-600 font-medium mb-4">Como deseja aceder?</p>
+          <p class="text-center text-gray-600 font-medium mb-4">Como deseja acessar?</p>
           <button onclick="mudarAuthView('login-aluno')" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group">
             <div class="flex items-center gap-3">
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">Aceder ao material da disciplina</p>
+                <p class="text-xs text-gray-500">acessar ao material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -425,7 +425,7 @@
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Professor</p>
-                <p class="text-xs text-gray-500">Gerir alunos e conteúdos</p>
+                <p class="text-xs text-gray-500">gerenciar alunos e conteúdos</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -488,7 +488,7 @@
             <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Aceder ao Painel</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">acessar ao Painel</button>
           </form>
         </div>
 
@@ -1018,7 +1018,7 @@
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
-    const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
+    const btngerenciarAlunos = document.getElementById('btn-gerenciar-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
     const inputNomeRecado = document.getElementById('input-nome-recado');
@@ -1042,7 +1042,7 @@
         userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + USUARIO_ADMINISTRADOR;
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
-        btnGerirAlunos.classList.remove('hidden');
+        btngerenciarAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
         
         // Configurações do formulário de recados para ADMIN
@@ -1067,7 +1067,7 @@
         userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
-        btnGerirAlunos.classList.add('hidden');
+        btngerenciarAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
         
         // Configurações do formulário de recados para ALUNO
@@ -1232,7 +1232,7 @@
     });
     
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
-    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btngerenciarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
