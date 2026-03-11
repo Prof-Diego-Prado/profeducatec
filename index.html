@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,12 +52,12 @@
         <div>
           <div class="flex items-center justify-between px-3 mb-2">
             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Material Didático</h3>
-            <button id="btn-novo-arquivo" class="hidden text-blue-600 hover:text-blue-800" title="Adicionar Ficheiro">
+            <button id="btn-novo-arquivo" class="hidden text-blue-600 hover:text-blue-800" title="Adicionar Arquivo">
               <i data-lucide="plus-circle" class="w-4 h-4"></i>
             </button>
           </div>
           <div id="arquivos-lista" class="space-y-2 mt-3 text-sm text-gray-500 text-center">
-            A carregar materiais...
+            Carregando materiais...
           </div>
         </div>
       </div>
@@ -68,7 +68,7 @@
           <i data-lucide="message-square" class="w-4 h-4"></i> Mural de Recados
         </h3>
         <div id="mural-lista" class="flex-1 overflow-y-auto px-5 space-y-3 mb-2 text-sm">
-          <p class="text-gray-400 text-xs text-center mt-4">A carregar recados...</p>
+          <p class="text-gray-400 text-xs text-center mt-4">Carregando recados...</p>
         </div>
         <form id="form-recado" class="px-5 pb-4 mt-auto flex flex-col gap-2">
           <input type="text" id="input-nome-recado" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none hidden" placeholder="Seu nome" required disabled>
@@ -124,9 +124,9 @@
         </div>
 
         <!-- Botão visível apenas para Admin -->
-        <button id="btn-gerenciar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
+        <button id="btn-gerir-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
           <i data-lucide="settings" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Gestão</span>
+          <span class="hidden sm:inline">Gerenciamento</span>
         </button>
 
         <div class="items-center gap-3 hidden sm:flex bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full border border-gray-100">
@@ -144,8 +144,8 @@
         <div class="flex-1 flex flex-col min-w-0">
           <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
-              <h2 id="titulo-calendario" class="text-2xl font-bold text-gray-900">A Sua Semana</h2>
-              <p class="text-gray-600 mt-1">Gira as suas aulas e aceda às salas de reunião.</p>
+              <h2 id="titulo-calendario" class="text-2xl font-bold text-gray-900">Sua Semana</h2>
+              <p class="text-gray-600 mt-1">Gerencie suas aulas e acesse as salas de reunião.</p>
             </div>
             
             <div class="flex items-center gap-4">
@@ -167,7 +167,7 @@
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1 min-h-[400px]">
             <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full">
               <div class="col-span-full flex items-center justify-center p-12 text-gray-500">
-                 A carregar calendário...
+                 Carregando calendário...
               </div>
             </div>
           </div>
@@ -185,7 +185,7 @@
           </div>
           
           <div id="links-importantes-lista" class="flex-1 overflow-y-auto space-y-3 pr-1">
-            <p class="text-sm text-gray-400 text-center mt-4 italic">A carregar links...</p>
+            <p class="text-sm text-gray-400 text-center mt-4 italic">Carregando links...</p>
           </div>
         </div>
 
@@ -199,7 +199,7 @@
         </p>
         <p class="max-w-4xl mx-auto leading-relaxed">
           Esta plataforma <strong>não é</strong> uma plataforma oficial do programa ou da Universidade Estadual de Maringá (UEM). 
-          Foi desenvolvida por um académico exclusivamente para agrupar avisos gerais e facilitar o acesso a materiais. 
+          Foi desenvolvida por um acadêmico exclusivamente para agrupar avisos gerais e facilitar o acesso a materiais. 
           <strong>Notícias e avisos oficiais devem sempre ser observados na página oficial do programa.</strong>
         </p>
       </div>
@@ -299,7 +299,7 @@
   <div id="modal-arquivo" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
-        <h3 class="font-bold text-gray-800">Cadastrar Novo Link de Ficheiro</h3>
+        <h3 class="font-bold text-gray-800">Cadastrar Novo Link de Arquivo</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form id="form-arquivo" class="p-4 space-y-4">
@@ -356,7 +356,7 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Endereço (URL)</label>
           <input type="url" id="link-imp-url" placeholder="https://" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-          <p class="text-[10px] text-gray-400 mt-1">O logótipo será gerado automaticamente através deste endereço.</p>
+          <p class="text-[10px] text-gray-400 mt-1">O logotipo será gerado automaticamente através deste endereço.</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Descrição Breve</label>
@@ -375,7 +375,7 @@
   <div id="modal-gestao" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
-        <h3 class="font-bold text-gray-800">Gestão da Plataforma</h3>
+        <h3 class="font-bold text-gray-800">Gerenciamento da Plataforma</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="p-4 flex-1 overflow-y-auto space-y-6">
@@ -461,7 +461,7 @@
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">acessar ao material da disciplina</p>
+                <p class="text-xs text-gray-500">Acessar o material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -472,7 +472,7 @@
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Professor</p>
-                <p class="text-xs text-gray-500">gerenciar alunos e conteúdos</p>
+                <p class="text-xs text-gray-500">Gerenciar alunos e conteúdos</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -505,14 +505,14 @@
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
           </button>
           <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso (Aluno)</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Registe-se com o seu e-mail institucional (@uem.br).</p>
+          <p class="text-sm text-gray-500 mb-6 text-center">Cadastre-se com seu e-mail institucional (@uem.br).</p>
           
           <form id="form-cadastro-aluno" class="space-y-3">
             <input type="text" id="cadastro-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             <input type="email" id="cadastro-email" placeholder="nome@uem.br" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             
             <div id="div-justificativa" class="hidden">
-              <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail não institucional detetado. Justifique o pedido:</label>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail não institucional detectado. Justifique o pedido:</label>
               <textarea id="cadastro-justificativa" rows="2" placeholder="Qual o motivo do acesso?" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
             </div>
 
@@ -527,14 +527,14 @@
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
           </button>
           <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso do Professor</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Insira as suas credenciais restritas.</p>
+          <p class="text-sm text-gray-500 mb-6 text-center">Insira suas credenciais restritas.</p>
           
           <form id="form-login-admin">
-            <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="E-mail ou Utilizador" required>
-            <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
+            <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="E-mail ou Usuário" required>
+            <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Senha" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">acessar ao Painel</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Acessar o Painel</button>
           </form>
 
           <div class="mt-6 text-center text-sm border-t pt-4">
@@ -554,10 +554,25 @@
           <form id="form-cadastro-professor" class="space-y-3">
             <input type="text" id="cadastro-prof-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
             <input type="email" id="cadastro-prof-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
-            <input type="password" id="cadastro-prof-senha" placeholder="Crie uma palavra-passe" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+            <input type="password" id="cadastro-prof-senha" placeholder="Crie uma senha" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
             
             <p id="cadastro-prof-msg" class="text-center text-xs hidden"></p>
             <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors mt-2">Enviar Solicitação</button>
+          </form>
+        </div>
+
+        <!-- VISTA 6: CRIAR NOME DE USUÁRIO (ALUNO 1º ACESSO) -->
+        <div id="auth-view-criar-usuario" class="hidden">
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Bem-vindo(a)!</h3>
+          <p class="text-sm text-gray-500 mb-6 text-center">Como este é o seu primeiro acesso, crie um nome de usuário que será visível para a turma.</p>
+          
+          <form id="form-criar-usuario" class="space-y-3">
+            <div>
+               <input type="text" id="novo-nome-usuario" placeholder="Seu nome (Máx 15 letras)" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center" maxlength="15" required>
+               <p class="text-[10px] text-gray-400 mt-1 text-center">Apenas letras e espaços (máx. 15 caracteres).</p>
+            </div>
+            <p id="criar-usuario-erro" class="text-red-500 text-xs hidden text-center"></p>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors mt-2">Salvar e Entrar</button>
           </form>
         </div>
 
@@ -596,11 +611,14 @@
     // --- 2. ESTADO DA APLICAÇÃO ---
     let currentUser = null;
     let isAdminMode = false;
-    let isMasterAdmin = false; // Define se é o PradoDiego
-    let currentAdminName = ""; // Nome do professor logado
+    let isMasterAdmin = false;
+    let currentAdminName = ""; 
     let currentAlunoEmail = null; 
+    let currentAlunoNome = ""; // Nome definido no 1º acesso
     let visaoCalendario = 'semanal'; 
     let aulaEmEdicaoId = null; 
+    let pendingUsernameEmail = null; // Variável auxiliar para o fluxo do 1º acesso
+    let pendingUsernameId = null;    // Variável auxiliar para o fluxo do 1º acesso
     
     let aulasList = [];
     let arquivosList = [];
@@ -614,7 +632,7 @@
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-    // --- 3. AUTENTICAÇÃO ANÓNIMA E CONTADOR DE VISITAS ---
+    // --- 3. AUTENTICAÇÃO ANÔNIMA E CONTADOR DE VISITAS ---
     const initAuth = async () => {
       try {
         await signInAnonymously(auth);
@@ -634,7 +652,6 @@
       // Contador de Visitas Lógica
       const visitasDocRef = doc(db, pathPrefix, 'estatisticas', 'visitas');
       
-      // Incrementa a visita apenas se a pessoa não tiver visitado na sessão atual
       if (!sessionStorage.getItem('visited_profeducatec')) {
           sessionStorage.setItem('visited_profeducatec', 'true');
           try {
@@ -646,7 +663,6 @@
           }
       }
       
-      // Ouve mudanças no contador em tempo real
       onSnapshot(visitasDocRef, (docSnap) => {
           if (docSnap.exists()) {
               document.getElementById('contador-visitas').innerText = docSnap.data().count;
@@ -658,7 +674,7 @@
       onSnapshot(collection(db, pathPrefix, 'aulas'), (snapshot) => {
         aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         atualizarCalendario();
-        atualizarRelogioECompromisso(); // Atualiza também o contador
+        atualizarRelogioECompromisso();
       });
 
       onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
@@ -770,11 +786,9 @@
     function atualizarRelogioECompromisso() {
       const agora = new Date();
       
-      // Relógio Digital
       const painelRelogio = document.getElementById('relogio-digital');
       if (painelRelogio) painelRelogio.innerText = agora.toLocaleTimeString('pt-BR');
 
-      // Lógica do Próximo Compromisso
       const painelAviso = document.getElementById('proximo-compromisso');
       if (!painelAviso) return;
 
@@ -813,7 +827,6 @@
         }
       });
 
-      // Filtra aulas que começaram há menos de 1h30min (5400000ms) atrás e ordena
       const aulasFuturas = proximasAulas.filter(a => a.diffMs > -5400000).sort((a, b) => a.diffMs - b.diffMs);
 
       if (aulasFuturas.length > 0) {
@@ -866,7 +879,7 @@
       if (!container) return;
       
       if (professoresAprovadosList.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum professor aprovado além de si.</li>`;
+        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum professor aprovado além de você.</li>`;
         return;
       }
       container.innerHTML = professoresAprovadosList.map(prof => `
@@ -944,7 +957,7 @@
       if (!container) return;
       
       if (alunosPermitidos.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum aluno aprovado.</li>`;
+        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum aluno cadastrado.</li>`;
         return;
       }
       container.innerHTML = alunosPermitidos.map(aluno => `
@@ -994,7 +1007,7 @@
       if (!container) return;
       
       if (arquivosList.length === 0) {
-        container.innerHTML = `<p class="text-xs text-gray-400 mt-4 text-center">Nenhum material disponível.</p>`;
+        container.innerHTML = `<p class="text-xs text-gray-400 mt-4 text-center">Carregando materiais...</p>`;
         return;
       }
 
@@ -1213,7 +1226,7 @@
     if(btnSemanal && btnMensal) {
       btnSemanal.addEventListener('click', () => {
         visaoCalendario = 'semanal';
-        document.getElementById('titulo-calendario').innerText = "A Sua Semana";
+        document.getElementById('titulo-calendario').innerText = "Sua Semana";
         btnSemanal.classList.replace('text-gray-500', 'text-gray-800');
         btnSemanal.classList.replace('hover:text-gray-700', 'shadow-sm');
         btnSemanal.classList.add('bg-white');
@@ -1261,6 +1274,7 @@
       document.getElementById('auth-view-cadastro-aluno').classList.add('hidden');
       document.getElementById('auth-view-login-admin').classList.add('hidden');
       document.getElementById('auth-view-cadastro-professor').classList.add('hidden');
+      document.getElementById('auth-view-criar-usuario').classList.add('hidden');
       
       document.getElementById(`auth-view-${viewName}`).classList.remove('hidden');
       
@@ -1268,6 +1282,7 @@
       document.getElementById('admin-erro').classList.add('hidden');
       document.getElementById('cadastro-msg').classList.add('hidden');
       document.getElementById('cadastro-prof-msg').classList.add('hidden');
+      document.getElementById('criar-usuario-erro').classList.add('hidden');
     };
 
     const btnModoAluno = document.getElementById('modo-aluno');
@@ -1276,20 +1291,21 @@
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
-    const btngerenciarAlunos = document.getElementById('btn-gerenciar-alunos');
+    const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
     const inputNomeRecado = document.getElementById('input-nome-recado');
     const inputRecado = document.getElementById('input-recado');
     const btnEnviarRecado = document.getElementById('btn-enviar-recado');
 
-    function alternarModoUI(paraAdmin, emailAluno = null, isMaster = false, adminName = "") {
+    function alternarModoUI(paraAdmin, emailAluno = null, isMaster = false, adminName = "", alunoNome = "") {
       isAdminMode = paraAdmin;
       isMasterAdmin = isMaster;
       currentAdminName = adminName;
       
       if (paraAdmin) {
         currentAlunoEmail = null;
+        currentAlunoNome = "";
         btnModoAdmin.classList.replace('text-gray-500', 'text-gray-800');
         btnModoAdmin.classList.replace('hover:text-gray-700', 'shadow-sm');
         btnModoAdmin.classList.add('bg-white');
@@ -1302,7 +1318,7 @@
         userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + adminName;
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
-        btngerenciarAlunos.classList.remove('hidden');
+        btnGerirAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
         
         // Área master de gestão
@@ -1330,6 +1346,8 @@
         }
       } else {
         currentAlunoEmail = emailAluno;
+        currentAlunoNome = alunoNome; // Salva o nome amigável do aluno
+        
         btnModoAluno.classList.replace('text-gray-500', 'text-gray-800');
         btnModoAluno.classList.replace('hover:text-gray-700', 'shadow-sm');
         btnModoAluno.classList.add('bg-white');
@@ -1338,17 +1356,17 @@
         btnModoAdmin.classList.replace('shadow-sm', 'hover:text-gray-700');
         btnModoAdmin.classList.replace('text-gray-800', 'bg-transparent');
 
-        roleText.innerText = `Aluno: ${emailAluno.split('@')[0]}`;
-        userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
+        roleText.innerText = `Aluno: ${alunoNome}`;
+        userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${alunoNome}`;
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
-        btngerenciarAlunos.classList.add('hidden');
+        btnGerirAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
         
-        // Configurações do formulário de recados para ALUNO
-        inputNomeRecado.classList.remove('hidden');
-        inputNomeRecado.disabled = false;
-        inputNomeRecado.required = true;
+        // Configurações do formulário de recados para ALUNO (não precisa mais digitar o nome)
+        inputNomeRecado.classList.add('hidden');
+        inputNomeRecado.disabled = true;
+        inputNomeRecado.required = false;
         
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
@@ -1407,18 +1425,27 @@
       document.getElementById('admin-erro').classList.remove('hidden');
     });
 
+    // LOGIN DO ALUNO (Com verificação de Primeiro Acesso)
     document.getElementById('form-login-aluno').addEventListener('submit', (e) => {
       e.preventDefault();
       const emailDigitado = document.getElementById('login-email').value.trim().toLowerCase();
       
-      const isApproved = alunosPermitidos.some(a => a.email === emailDigitado);
+      const alunoRecord = alunosPermitidos.find(a => a.email === emailDigitado);
       const isPending = solicitacoesList.some(s => s.email === emailDigitado);
       
       const erroEl = document.getElementById('login-erro');
 
-      if (isApproved) {
-        document.getElementById('modal-auth').classList.add('hidden');
-        alternarModoUI(false, emailDigitado);
+      if (alunoRecord) {
+        if (!alunoRecord.nomeUsuario) {
+          // É o primeiro acesso, precisa definir o nome de usuário
+          pendingUsernameEmail = emailDigitado;
+          pendingUsernameId = alunoRecord.id;
+          mudarAuthView('criar-usuario');
+        } else {
+          // Login normal
+          document.getElementById('modal-auth').classList.add('hidden');
+          alternarModoUI(false, emailDigitado, false, "", alunoRecord.nomeUsuario);
+        }
         e.target.reset();
       } else if (isPending) {
         erroEl.textContent = "O seu acesso ainda está pendente de aprovação pelo professor.";
@@ -1429,7 +1456,44 @@
       }
     });
 
-    // Cadastro de Aluno
+    // GESTÃO DO NOVO NOME DE USUÁRIO (Aluno)
+    const inputNovoNome = document.getElementById('novo-nome-usuario');
+    
+    // Filtra ao vivo para aceitar apenas letras e espaços
+    inputNovoNome.addEventListener('input', function() {
+      this.value = this.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+    });
+
+    document.getElementById('form-criar-usuario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nomeUsuario = inputNovoNome.value.trim();
+      const erroEl = document.getElementById('criar-usuario-erro');
+
+      if (!/^[a-zA-ZÀ-ÿ\s]{1,15}$/.test(nomeUsuario)) {
+        erroEl.textContent = "Nome inválido. Use apenas letras e espaços (máx 15).";
+        erroEl.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        await updateDoc(doc(db, getPath('alunos'), pendingUsernameId), {
+            nomeUsuario: nomeUsuario
+        });
+        
+        document.getElementById('modal-auth').classList.add('hidden');
+        alternarModoUI(false, pendingUsernameEmail, false, "", nomeUsuario);
+        e.target.reset();
+        erroEl.classList.add('hidden');
+        pendingUsernameEmail = null;
+        pendingUsernameId = null;
+      } catch (err) {
+         console.error(err);
+         erroEl.textContent = "Erro ao salvar nome. Tente novamente.";
+         erroEl.classList.remove('hidden');
+      }
+    });
+
+    // Cadastro de Aluno (Solicitação)
     const emailCadastroInput = document.getElementById('cadastro-email');
     const divJustificativa = document.getElementById('div-justificativa');
     const justifInput = document.getElementById('cadastro-justificativa');
@@ -1485,7 +1549,7 @@
       }
     });
 
-    // Cadastro de Professor
+    // Cadastro de Professor (Solicitação)
     document.getElementById('form-cadastro-professor').addEventListener('submit', async (e) => {
       e.preventDefault();
       const nome = document.getElementById('cadastro-prof-nome').value.trim();
@@ -1561,7 +1625,7 @@
     });
     
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
-    btngerenciarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
@@ -1574,6 +1638,7 @@
       });
     });
 
+    // Submissão do Recado sem precisar pedir o nome
     document.getElementById('form-recado').addEventListener('submit', async (e) => {
       e.preventDefault();
       const texto = inputRecado.value.trim();
@@ -1583,14 +1648,13 @@
       if (isAdminMode) {
         autor = `👨‍🏫 Prof. ${currentAdminName}`;
       } else {
-        const nomeDigitado = inputNomeRecado.value.trim();
-        if (!nomeDigitado) return;
-        autor = nomeDigitado;
+        // Agora pega o nome salvo do usuário atual (registrado no 1º acesso)
+        autor = currentAlunoNome;
       }
 
       try {
         await addDoc(collection(db, getPath('recados')), { texto, autor, timestamp: Date.now() });
-        inputRecado.value = ''; // Limpa apenas a mensagem, mantém o nome preenchido
+        inputRecado.value = ''; 
       } catch (error) {
         console.error("Erro recado:", error);
       }
