@@ -23,7 +23,7 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-72 bg-white border-r border-gray-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex flex-col">
-    <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gray-900 text-white">
+    <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gray-900 text-white shrink-0">
       <div class="flex items-center gap-2">
         <i data-lucide="book-open" class="w-6 h-6 text-blue-400"></i>
         <span class="text-lg font-bold tracking-wider">EduDash</span>
@@ -33,41 +33,44 @@
       </button>
     </div>
 
-    <nav class="flex-1 px-4 py-6 space-y-8 overflow-y-auto">
-      <div>
-        <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Menu</h3>
-        <ul class="space-y-1">
-          <li>
-            <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-md">
-              <i data-lucide="calendar" class="w-5 h-5"></i>
-              Calendário de Aulas
-            </a>
-          </li>
-        </ul>
+    <nav class="flex-1 flex flex-col overflow-hidden">
+      <div class="p-4 space-y-6 overflow-y-auto flex-1">
+        <!-- Menu -->
+        <div>
+          <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Menu</h3>
+          <ul class="space-y-1">
+            <li>
+              <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-md">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                Calendário de Aulas
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Material Didático -->
+        <div>
+          <div class="flex items-center justify-between px-3 mb-2">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Material Didático</h3>
+            <button id="btn-novo-arquivo" class="hidden text-blue-600 hover:text-blue-800" title="Adicionar Ficheiro">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div id="arquivos-lista" class="space-y-2 mt-3 text-sm text-gray-500 text-center">
+            A carregar materiais...
+          </div>
+        </div>
       </div>
 
-      <div>
-        <div class="flex items-center justify-between px-3 mb-2">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Material Didático</h3>
-          <!-- Botão visível apenas para Admin -->
-          <button id="btn-novo-arquivo" class="hidden text-blue-600 hover:text-blue-800" title="Adicionar Arquivo">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-          </button>
-        </div>
-        <div id="arquivos-lista" class="space-y-2 mt-3 text-sm text-gray-500 text-center">
-          A carregar materiais...
-        </div>
-      </div>
-
-      <!-- NOVA SEÇÃO: MURAL DE RECADOS -->
-      <div class="mt-8 flex flex-col h-72 border-t border-gray-200 pt-4">
-        <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+      <!-- Mural de Recados -->
+      <div class="flex flex-col h-72 border-t border-gray-200 pt-4 shrink-0 bg-white">
+        <h3 class="px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
           <i data-lucide="message-square" class="w-4 h-4"></i> Mural de Recados
         </h3>
-        <div id="mural-lista" class="flex-1 overflow-y-auto px-3 space-y-3 mb-2 text-sm">
+        <div id="mural-lista" class="flex-1 overflow-y-auto px-5 space-y-3 mb-2 text-sm">
           <p class="text-gray-400 text-xs text-center mt-4">A carregar recados...</p>
         </div>
-        <form id="form-recado" class="px-3 mt-auto">
+        <form id="form-recado" class="px-5 pb-4 mt-auto">
           <div class="flex gap-2">
             <input type="text" id="input-recado" class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Escreva um recado..." required disabled>
             <button type="submit" id="btn-enviar-recado" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-2 py-1.5 transition-colors disabled:opacity-50" disabled>
@@ -76,7 +79,6 @@
           </div>
         </form>
       </div>
-
     </nav>
   </aside>
 
@@ -91,7 +93,7 @@
       <div class="flex-1 flex justify-between items-center lg:justify-end gap-4">
         <h1 class="text-xl font-semibold text-gray-800 lg:hidden">Dashboard</h1>
         
-        <!-- SELETOR DE MODO (Simulação de Login) -->
+        <!-- SELETOR DE MODO -->
         <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
           <button id="modo-aluno" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Aluno</button>
           <button id="modo-admin" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Admin</button>
@@ -119,13 +121,13 @@
         <!-- Botão visível apenas para Admin -->
         <button id="btn-nova-aula" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
           <i data-lucide="calendar-plus" class="w-4 h-4"></i>
-          Nova Aula
+          <span class="hidden sm:inline">Nova Aula</span>
         </button>
       </div>
 
       <!-- Grade do Calendário Semanal -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[400px]">
-        <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
+        <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full">
           <div class="col-span-full flex items-center justify-center p-12 text-gray-500">
              A carregar calendário...
           </div>
@@ -188,13 +190,13 @@
   <div id="modal-arquivo" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
-        <h3 class="font-bold text-gray-800">Cadastrar Novo Link de Arquivo</h3>
+        <h3 class="font-bold text-gray-800">Cadastrar Novo Link de Ficheiro</h3>
         <button class="fechar-modal text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form id="form-arquivo" class="p-4 space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nome de Exibição</label>
-          <input type="text" id="arq-nome" placeholder="Ex: Apostila de React" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+          <input type="text" id="arq-nome" placeholder="Ex: PDF de React" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -239,11 +241,12 @@
       </div>
       <div class="p-4 flex-1 overflow-y-auto">
         <p class="text-xs text-gray-500 mb-4">Adicione os e-mails dos alunos que podem aceder à plataforma.</p>
-        <form id="form-aluno" class="flex gap-2 mb-4">
+        <form id="form-aluno" class="flex gap-2 mb-2">
           <input type="email" id="aluno-email" placeholder="E-mail do aluno..." class="flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-          <button type="submit" class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg whitespace-nowrap">Cadastrar</button>
+          <button type="submit" class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg whitespace-nowrap">Registar</button>
         </form>
-        <div class="space-y-2">
+        <p id="erro-cadastro-aluno" class="text-red-500 text-xs mb-4 hidden">Este e-mail já está registado.</p>
+        <div class="space-y-2 mt-4">
           <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Lista de E-mails Autorizados</h4>
           <ul id="lista-alunos-cadastrados" class="space-y-2 text-sm">
             <!-- Injetado via JS -->
@@ -261,7 +264,7 @@
           <i data-lucide="user-check" class="w-6 h-6"></i>
         </div>
         <h3 class="font-bold text-gray-800 text-lg mb-1">Acesso do Aluno</h3>
-        <p class="text-sm text-gray-500 mb-6">Por favor, insira o e-mail cadastrado pelo seu professor.</p>
+        <p class="text-sm text-gray-500 mb-6">Por favor, insira o e-mail registado pelo seu professor.</p>
         
         <form id="form-login">
           <input type="email" id="login-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" required>
@@ -280,9 +283,18 @@
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // O ambiente de execução injeta estas variáveis
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'edudash-app';
+    // Configuração oficial do seu projeto
+    const firebaseConfig = {
+      apiKey: "AIzaSyAzZHRIbDFqWCOb-N_Ygob8m3lm2fZCoZk",
+      authDomain: "profeducatec-798ec.firebaseapp.com",
+      projectId: "profeducatec-798ec",
+      storageBucket: "profeducatec-798ec.firebasestorage.app",
+      messagingSenderId: "543618924682",
+      appId: "1:543618924682:web:42cd867fb9467979d4ed73",
+      measurementId: "G-72PVTJXGD1"
+    };
+    
+    const appId = 'profeducatec';
     
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -290,8 +302,8 @@
 
     // --- 2. ESTADO DA APLICAÇÃO ---
     let currentUser = null;
-    let isAdminMode = false; // Toggle para a interface
-    let currentAlunoEmail = null; // Guarda o email do aluno logado
+    let isAdminMode = false;
+    let currentAlunoEmail = null; 
     let aulasList = [];
     let arquivosList = [];
     let recadosList = [];
@@ -299,14 +311,12 @@
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-    // --- 3. AUTENTICAÇÃO (Obrigatório antes do Firestore) ---
+    // --- 3. AUTENTICAÇÃO ---
     const initAuth = async () => {
       try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
+        // Como está a usar as suas próprias credenciais do Firebase,
+        // usamos diretamente a autenticação anónima que ativou no seu projeto.
+        await signInAnonymously(auth);
       } catch (error) {
         console.error("Erro de Autenticação:", error);
       }
@@ -318,68 +328,66 @@
       currentUser = user;
       if (!user) return;
 
-      // Ouvir Coleção de Aulas (Dados Públicos)
-      const aulasRef = collection(db, 'artifacts', appId, 'public', 'data', 'aulas');
-      onSnapshot(aulasRef, (snapshot) => {
+      const pathPrefix = `artifacts/${appId}/public/data`;
+
+      // Ouvir Aulas
+      onSnapshot(collection(db, pathPrefix, 'aulas'), (snapshot) => {
         aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarCalendario();
-      }, (error) => console.error("Erro ao ler aulas:", error));
+      }, (error) => console.error("Erro aulas:", error));
 
-      // Ouvir Coleção de Arquivos (Dados Públicos)
-      const arquivosRef = collection(db, 'artifacts', appId, 'public', 'data', 'arquivos');
-      onSnapshot(arquivosRef, (snapshot) => {
+      // Ouvir Arquivos
+      onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
         arquivosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarArquivos();
-      }, (error) => console.error("Erro ao ler arquivos:", error));
+      }, (error) => console.error("Erro arquivos:", error));
 
-      // Ouvir Coleção de Recados
-      const recadosRef = collection(db, 'artifacts', appId, 'public', 'data', 'recados');
-      onSnapshot(recadosRef, (snapshot) => {
+      // Ouvir Recados
+      onSnapshot(collection(db, pathPrefix, 'recados'), (snapshot) => {
         recadosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarMural();
-      }, (error) => console.error("Erro ao ler recados:", error));
+      }, (error) => console.error("Erro recados:", error));
 
-      // Ouvir Coleção de Alunos Permitidos (Email)
-      const alunosRef = collection(db, 'artifacts', appId, 'public', 'data', 'alunos');
-      onSnapshot(alunosRef, (snapshot) => {
+      // Ouvir Alunos
+      onSnapshot(collection(db, pathPrefix, 'alunos'), (snapshot) => {
         alunosPermitidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarListaAlunos();
-      }, (error) => console.error("Erro ao ler alunos:", error));
+      }, (error) => console.error("Erro alunos:", error));
     });
 
-    // --- 5. RENDERIZAÇÃO DA UI ---
+    // --- 5. FUNÇÕES DE ELIMINAÇÃO ---
+    const getPath = (col) => `artifacts/${appId}/public/data/${col}`;
 
     window.apagarArquivo = async (id) => {
       if (!currentUser || !isAdminMode) return;
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'arquivos', id));
+      await deleteDoc(doc(db, getPath('arquivos'), id));
     };
 
     window.apagarAula = async (id) => {
       if (!currentUser || !isAdminMode) return;
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'aulas', id));
+      await deleteDoc(doc(db, getPath('aulas'), id));
     };
 
     window.apagarAluno = async (id) => {
       if (!currentUser || !isAdminMode) return;
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'alunos', id));
+      await deleteDoc(doc(db, getPath('alunos'), id));
     };
 
     window.apagarRecado = async (id) => {
       if (!currentUser || !isAdminMode) return;
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'recados', id));
+      await deleteDoc(doc(db, getPath('recados'), id));
     };
+
+    // --- 6. RENDERIZAÇÃO DA UI ---
 
     function renderizarMural() {
       const container = document.getElementById('mural-lista');
-      
       if (recadosList.length === 0) {
         container.innerHTML = `<p class="text-gray-400 text-xs text-center mt-4">Nenhum recado ainda. Seja o primeiro!</p>`;
         return;
       }
 
-      // Ordenar por data (mais antigos em cima)
       const recadosOrdenados = [...recadosList].sort((a, b) => a.timestamp - b.timestamp);
-
       container.innerHTML = recadosOrdenados.map(recado => {
         const data = new Date(recado.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         return `
@@ -397,8 +405,6 @@
           </div>
         `;
       }).join('');
-      
-      // Auto-scroll para as mensagens mais recentes
       container.scrollTop = container.scrollHeight;
       lucide.createIcons();
     }
@@ -406,10 +412,9 @@
     function renderizarListaAlunos() {
       const container = document.getElementById('lista-alunos-cadastrados');
       if (alunosPermitidos.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum aluno cadastrado.</li>`;
+        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum aluno registado.</li>`;
         return;
       }
-
       container.innerHTML = alunosPermitidos.map(aluno => `
         <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
           <span class="text-gray-700 truncate pr-2">${aluno.email}</span>
@@ -459,22 +464,17 @@
 
     function renderizarCalendario() {
       const container = document.getElementById('calendario-grid');
-      
       container.innerHTML = diasSemana.map(dia => {
-        // As queries complexas no firebase não são recomendadas aqui, por isso filtramos no JS
         const aulasDoDia = aulasList.filter(aula => aula.dia === dia);
         
         let aulasHTML = '';
         if (aulasDoDia.length > 0) {
-          // Ordena alfabeticamente pela hora apenas para estética
           aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
-
           aulasHTML = aulasDoDia.map(aula => `
             <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 ${aula.cor}">
               <p class="text-xs font-bold mb-1 opacity-80">${aula.hora}</p>
               <h4 class="font-semibold text-sm leading-tight mb-2">${aula.titulo}</h4>
               <p class="text-xs opacity-90 flex items-center gap-1">${aula.local}</p>
-              
               ${isAdminMode ? `
                 <button onclick="apagarAula('${aula.id}')" class="absolute top-2 right-2 p-1 bg-white/50 hover:bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                   <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -500,7 +500,7 @@
       lucide.createIcons();
     }
 
-    // --- 6. CONTROLOS DA INTERFACE (MUDAR DE MODO) ---
+    // --- 7. CONTROLOS DA INTERFACE (MODOS) ---
     const btnModoAluno = document.getElementById('modo-aluno');
     const btnModoAdmin = document.getElementById('modo-admin');
     const roleText = document.getElementById('user-role-text');
@@ -509,7 +509,6 @@
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
     const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
     
-    // Elementos do Mural
     const inputRecado = document.getElementById('input-recado');
     const btnEnviarRecado = document.getElementById('btn-enviar-recado');
 
@@ -581,7 +580,6 @@
     document.getElementById('form-login').addEventListener('submit', (e) => {
       e.preventDefault();
       const emailDigitado = document.getElementById('login-email').value.trim().toLowerCase();
-      
       const alunoExiste = alunosPermitidos.some(a => a.email === emailDigitado);
       
       if (alunoExiste) {
@@ -593,17 +591,20 @@
       }
     });
 
-    // Iniciar como admin para testar facilmente
+    // Iniciar como admin
     setTimeout(() => alternarModo(true), 200);
 
-    // --- 7. LÓGICA DE MODAIS E INSERÇÃO DE DADOS ---
+    // --- 8. LÓGICA DE MODAIS E FORMULÁRIOS ---
     const modalAula = document.getElementById('modal-aula');
     const modalArquivo = document.getElementById('modal-arquivo');
     const modalAlunos = document.getElementById('modal-alunos');
 
     btnNovaAula.addEventListener('click', () => modalAula.classList.remove('hidden'));
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
-    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btnGerirAlunos.addEventListener('click', () => {
+      document.getElementById('erro-cadastro-aluno').classList.add('hidden');
+      modalAlunos.classList.remove('hidden');
+    });
     
     document.querySelectorAll('.fechar-modal').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -616,21 +617,15 @@
     document.getElementById('form-recado').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentUser) return;
-      
       const texto = inputRecado.value.trim();
       if (!texto) return;
 
       const autor = isAdminMode ? '👨‍🏫 Professor' : currentAlunoEmail.split('@')[0];
-
       try {
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recados'), {
-          texto,
-          autor,
-          timestamp: Date.now()
-        });
+        await addDoc(collection(db, getPath('recados')), { texto, autor, timestamp: Date.now() });
         e.target.reset();
       } catch (error) {
-        console.error("Erro ao enviar recado:", error);
+        console.error("Erro recado:", error);
       }
     });
 
@@ -641,23 +636,24 @@
       const email = document.getElementById('aluno-email').value.trim().toLowerCase();
       if (!email) return;
       
+      const erroMsg = document.getElementById('erro-cadastro-aluno');
       if (alunosPermitidos.some(a => a.email === email)) {
-        alert("E-mail já está cadastrado.");
+        erroMsg.classList.remove('hidden');
         return;
       }
+      erroMsg.classList.add('hidden');
 
       try {
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'alunos'), { email });
+        await addDoc(collection(db, getPath('alunos')), { email });
         e.target.reset();
       } catch (error) {
-        console.error("Erro ao cadastrar aluno:", error);
+        console.error("Erro aluno:", error);
       }
     });
 
     document.getElementById('form-aula').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentUser) return;
-      
       const novaAula = {
         dia: document.getElementById('aula-dia').value,
         hora: document.getElementById('aula-hora').value,
@@ -665,20 +661,18 @@
         local: document.getElementById('aula-local').value,
         cor: document.getElementById('aula-cor').value,
       };
-
       try {
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'aulas'), novaAula);
+        await addDoc(collection(db, getPath('aulas')), novaAula);
         modalAula.classList.add('hidden');
         e.target.reset();
       } catch (error) {
-        console.error("Erro ao guardar aula:", error);
+        console.error("Erro aula:", error);
       }
     });
 
     document.getElementById('form-arquivo').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentUser) return;
-      
       const novoArquivo = {
         nome: document.getElementById('arq-nome').value,
         tipo: document.getElementById('arq-tipo').value,
@@ -686,17 +680,16 @@
         url: document.getElementById('arq-url').value,
         tamanho: document.getElementById('arq-tamanho').value || '',
       };
-
       try {
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'arquivos'), novoArquivo);
+        await addDoc(collection(db, getPath('arquivos')), novoArquivo);
         modalArquivo.classList.add('hidden');
         e.target.reset();
       } catch (error) {
-        console.error("Erro ao guardar arquivo:", error);
+        console.error("Erro arquivo:", error);
       }
     });
 
-    // --- 8. MENU MOBILE ---
+    // --- 9. MENU MOBILE ---
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
     
