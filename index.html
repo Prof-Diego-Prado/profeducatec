@@ -295,23 +295,24 @@
         <i data-lucide="lock" class="w-6 h-6"></i>
       </div>
       <h3 class="font-bold text-gray-800 text-lg mb-1">Acesso Restrito</h3>
-      <p class="text-sm text-gray-500 mb-6">Insira a senha de administrador.</p>
+      <p class="text-sm text-gray-500 mb-6">Insira as credenciais de administrador.</p>
       
-      <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" placeholder="Senha">
-      <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden">Senha incorreta!</p>
+      <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" placeholder="Utilizador (ex: PradoDiego)">
+      <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" placeholder="Palavra-passe">
+      <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden">Credenciais incorretas!</p>
       
       <div class="flex gap-2">
         <button id="btn-cancelar-admin" class="flex-1 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancelar</button>
-        <button id="btn-confirmar-admin" class="flex-1 py-2 text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 rounded-lg transition-colors">Acessar</button>
+        <button id="btn-confirmar-admin" class="flex-1 py-2 text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 rounded-lg transition-colors">Aceder</button>
       </div>
     </div>
   </div>
 
   <!-- JAVASCRIPT: LÓGICA E FIREBASE -->
   <script type="module">
-    // --- 0. CONFIGURAÇÃO DE SENHA DO ADMIN ---
-    // Você pode alterar a senha de acesso da área de professor aqui:
-    const SENHA_ADMINISTRADOR = "@Lei30242728";
+    // --- 0. CONFIGURAÇÃO DE ACESSO DO ADMIN ---
+    const USUARIO_ADMINISTRADOR = "PradoDiego";
+    const SENHA_ADMINISTRADOR = "123456";
 
     // --- 1. CONFIGURAÇÃO FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -685,8 +686,8 @@
         btnModoAluno.classList.replace('shadow-sm', 'hover:text-gray-700');
         btnModoAluno.classList.replace('text-gray-800', 'bg-transparent');
         
-        roleText.innerText = "Modo Professor / Admin";
-        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=Professor";
+        roleText.innerText = "Prof. " + USUARIO_ADMINISTRADOR;
+        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + USUARIO_ADMINISTRADOR;
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
         btnGerirAlunos.classList.remove('hidden');
@@ -725,14 +726,17 @@
       if (!isAdminMode) {
         document.getElementById('modal-login').classList.add('hidden');
         document.getElementById('modal-admin-auth').classList.remove('hidden');
+        document.getElementById('admin-usuario-input').value = '';
         document.getElementById('admin-senha-input').value = '';
         document.getElementById('admin-erro').classList.add('hidden');
       }
     });
 
     document.getElementById('btn-confirmar-admin').addEventListener('click', () => {
+      const usuarioDigitado = document.getElementById('admin-usuario-input').value.trim();
       const senhaDigitada = document.getElementById('admin-senha-input').value;
-      if (senhaDigitada === SENHA_ADMINISTRADOR) {
+      
+      if (usuarioDigitado === USUARIO_ADMINISTRADOR && senhaDigitada === SENHA_ADMINISTRADOR) {
         document.getElementById('modal-admin-auth').classList.add('hidden');
         alternarModo(true);
       } else {
@@ -796,7 +800,7 @@
       const texto = inputRecado.value.trim();
       if (!texto) return;
 
-      const autor = isAdminMode ? '👨‍🏫 Professor' : currentAlunoEmail.split('@')[0];
+      const autor = isAdminMode ? `👨‍🏫 Prof. ${USUARIO_ADMINISTRADOR}` : currentAlunoEmail.split('@')[0];
       try {
         await addDoc(collection(db, getPath('recados')), { texto, autor, timestamp: Date.now() });
         e.target.reset();
