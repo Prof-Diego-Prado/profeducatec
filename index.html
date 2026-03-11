@@ -86,36 +86,42 @@
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
     
-    <header class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 shadow-sm shrink-0">
-      <button id="btn-open-sidebar" class="lg:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none">
+    <header class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 shadow-sm shrink-0 relative">
+      <button id="btn-open-sidebar" class="lg:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none relative z-10">
         <i data-lucide="menu" class="w-6 h-6"></i>
       </button>
       
-      <div class="flex-1 flex justify-between items-center lg:justify-end gap-4">
-        <h1 class="text-xl font-semibold text-gray-800 lg:hidden">Dashboard</h1>
+      <!-- LOGÓTIPO CENTRALIZADO NO HEADER -->
+      <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+        <!-- O link original do Google Drive modificado para exportação direta de imagem -->
+        <img src="https://drive.google.com/uc?export=view&id=1UujVFZpJovnbBQlbYaExnZRJYvUWa1NX" class="h-8 md:h-12 opacity-30 lg:opacity-100 object-contain" alt="Logo">
+      </div>
+
+      <div class="flex-1 flex justify-between items-center lg:justify-end gap-4 relative z-10">
+        <h1 class="text-xl font-semibold text-gray-800 lg:hidden invisible">Dashboard</h1> <!-- Invisível apenas para manter alinhamento -->
         
         <!-- SELETOR DE MODO -->
-        <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
+        <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200 shadow-sm bg-white/80 backdrop-blur-sm">
           <button id="modo-aluno" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Aluno</button>
           <button id="modo-admin" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Admin</button>
         </div>
 
         <!-- Botão visível apenas para Admin -->
-        <button id="btn-acessar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
+        <button id="btn-gerir-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
           <i data-lucide="users" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">acessar Alunos</span>
+          <span class="hidden sm:inline">Gerir Alunos</span>
         </button>
 
-        <div class="items-center gap-3 hidden sm:flex">
-          <span id="user-role-text" class="text-sm font-medium text-gray-600">Visão do Aluno</span>
+        <div class="items-center gap-3 hidden sm:flex bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full border border-gray-100">
+          <span id="user-role-text" class="text-sm font-medium text-gray-600 pl-2">Visão do Aluno</span>
           <img class="w-8 h-8 rounded-full bg-gray-300 border border-gray-200" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Student" id="user-avatar" alt="Avatar" />
         </div>
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col">
       
-      <div class="flex flex-col xl:flex-row gap-8 h-full">
+      <div class="flex flex-col xl:flex-row gap-8 flex-1">
         
         <!-- COLUNA ESQUERDA: CALENDÁRIO -->
         <div class="flex-1 flex flex-col min-w-0">
@@ -167,6 +173,20 @@
         </div>
 
       </div>
+
+      <!-- AVISO DE ISENÇÃO DE RESPONSABILIDADE (DISCLAIMER) -->
+      <div class="mt-8 p-4 bg-gray-100 border border-gray-200 rounded-xl text-xs text-gray-500 text-center shrink-0 shadow-sm">
+        <p class="flex items-center justify-center gap-2 mb-1">
+          <i data-lucide="info" class="w-4 h-4 text-blue-500"></i>
+          <strong class="text-gray-700">Aviso Importante</strong>
+        </p>
+        <p class="max-w-4xl mx-auto leading-relaxed">
+          Esta plataforma <strong>não é</strong> uma plataforma oficial do programa ou da Universidade Estadual de Maringá (UEM). 
+          Foi desenvolvida por um acadêmico exclusivamente para agrupar avisos gerais e facilitar o acesso a materiais. 
+          <strong>Notícias e avisos oficiais devem sempre ser observados na página oficial do programa.</strong>
+        </p>
+      </div>
+
     </div>
   </main>
 
@@ -334,7 +354,7 @@
   </div>
 
 
-  <!-- MODAL: acessar ALUNOS E SOLICITAÇÕES (ADMIN) -->
+  <!-- MODAL: GERIR ALUNOS E SOLICITAÇÕES (ADMIN) -->
   <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
@@ -389,13 +409,13 @@
         
         <!-- VISTA 1: SELEÇÃO DE PERFIL -->
         <div id="auth-view-selecao" class="space-y-4">
-          <p class="text-center text-gray-600 font-medium mb-4">Como deseja acessar?</p>
+          <p class="text-center text-gray-600 font-medium mb-4">Como deseja aceder?</p>
           <button onclick="mudarAuthView('login-aluno')" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group">
             <div class="flex items-center gap-3">
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">acessar ao material da disciplina</p>
+                <p class="text-xs text-gray-500">Aceder ao material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -406,7 +426,7 @@
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Professor</p>
-                <p class="text-xs text-gray-500">acessar alunos e conteúdos</p>
+                <p class="text-xs text-gray-500">Gerir alunos e conteúdos</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -469,7 +489,7 @@
             <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">acessar ao Painel</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Aceder ao Painel</button>
           </form>
         </div>
 
@@ -999,7 +1019,7 @@
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
-    const btnacessarAlunos = document.getElementById('btn-acessar-alunos');
+    const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
     const inputNomeRecado = document.getElementById('input-nome-recado');
@@ -1023,7 +1043,7 @@
         userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + USUARIO_ADMINISTRADOR;
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
-        btnacessarAlunos.classList.remove('hidden');
+        btnGerirAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
         
         // Configurações do formulário de recados para ADMIN
@@ -1048,7 +1068,7 @@
         userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
-        btnacessarAlunos.classList.add('hidden');
+        btnGerirAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
         
         // Configurações do formulário de recados para ALUNO
@@ -1213,7 +1233,7 @@
     });
     
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
-    btnacessarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
