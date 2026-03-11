@@ -70,7 +70,8 @@
         <div id="mural-lista" class="flex-1 overflow-y-auto px-5 space-y-3 mb-2 text-sm">
           <p class="text-gray-400 text-xs text-center mt-4">A carregar recados...</p>
         </div>
-        <form id="form-recado" class="px-5 pb-4 mt-auto">
+        <form id="form-recado" class="px-5 pb-4 mt-auto flex flex-col gap-2">
+          <input type="text" id="input-nome-recado" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none hidden" placeholder="Seu nome" required disabled>
           <div class="flex gap-2">
             <input type="text" id="input-recado" class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Escreva um recado..." required disabled>
             <button type="submit" id="btn-enviar-recado" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-2 py-1.5 transition-colors disabled:opacity-50" disabled>
@@ -100,9 +101,9 @@
         </div>
 
         <!-- Botão visível apenas para Admin -->
-        <button id="btn-gerir-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
+        <button id="btn-acessar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
           <i data-lucide="users" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Gerir Alunos</span>
+          <span class="hidden sm:inline">acessar Alunos</span>
         </button>
 
         <div class="items-center gap-3 hidden sm:flex">
@@ -333,7 +334,7 @@
   </div>
 
 
-  <!-- MODAL: GERIR ALUNOS E SOLICITAÇÕES (ADMIN) -->
+  <!-- MODAL: acessar ALUNOS E SOLICITAÇÕES (ADMIN) -->
   <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
@@ -388,13 +389,13 @@
         
         <!-- VISTA 1: SELEÇÃO DE PERFIL -->
         <div id="auth-view-selecao" class="space-y-4">
-          <p class="text-center text-gray-600 font-medium mb-4">Como deseja Acessar?</p>
+          <p class="text-center text-gray-600 font-medium mb-4">Como deseja acessar?</p>
           <button onclick="mudarAuthView('login-aluno')" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group">
             <div class="flex items-center gap-3">
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">Acessar ao material da disciplina</p>
+                <p class="text-xs text-gray-500">acessar ao material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -405,7 +406,7 @@
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Professor</p>
-                <p class="text-xs text-gray-500">Gerir alunos e conteúdos</p>
+                <p class="text-xs text-gray-500">acessar alunos e conteúdos</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -468,7 +469,7 @@
             <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Acessar ao Painel</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">acessar ao Painel</button>
           </form>
         </div>
 
@@ -998,9 +999,10 @@
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
-    const btnGerirAlunos = document.getElementById('btn-gerir-alunos');
+    const btnacessarAlunos = document.getElementById('btn-acessar-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
+    const inputNomeRecado = document.getElementById('input-nome-recado');
     const inputRecado = document.getElementById('input-recado');
     const btnEnviarRecado = document.getElementById('btn-enviar-recado');
 
@@ -1021,8 +1023,13 @@
         userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + USUARIO_ADMINISTRADOR;
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
-        btnGerirAlunos.classList.remove('hidden');
+        btnacessarAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
+        
+        // Configurações do formulário de recados para ADMIN
+        inputNomeRecado.classList.add('hidden');
+        inputNomeRecado.disabled = true;
+        inputNomeRecado.required = false;
         
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
@@ -1041,8 +1048,13 @@
         userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
-        btnGerirAlunos.classList.add('hidden');
+        btnacessarAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
+        
+        // Configurações do formulário de recados para ALUNO
+        inputNomeRecado.classList.remove('hidden');
+        inputNomeRecado.disabled = false;
+        inputNomeRecado.required = true;
         
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
@@ -1201,7 +1213,7 @@
     });
     
     btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
-    btnGerirAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
+    btnacessarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
@@ -1219,10 +1231,18 @@
       const texto = inputRecado.value.trim();
       if (!texto) return;
 
-      const autor = isAdminMode ? `👨‍🏫 Prof. ${USUARIO_ADMINISTRADOR}` : currentAlunoEmail.split('@')[0];
+      let autor = '';
+      if (isAdminMode) {
+        autor = `👨‍🏫 Prof. ${USUARIO_ADMINISTRADOR}`;
+      } else {
+        const nomeDigitado = inputNomeRecado.value.trim();
+        if (!nomeDigitado) return;
+        autor = nomeDigitado;
+      }
+
       try {
         await addDoc(collection(db, getPath('recados')), { texto, autor, timestamp: Date.now() });
-        e.target.reset();
+        inputRecado.value = ''; // Limpa apenas a mensagem, mantém o nome preenchido
       } catch (error) {
         console.error("Erro recado:", error);
       }
