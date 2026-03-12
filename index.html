@@ -14,6 +14,10 @@
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    /* Estilo para remover a seta padrão do details no Safari/Chrome mais antigos */
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
   </style>
 </head>
 <body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
@@ -56,7 +60,7 @@
               <i data-lucide="plus-circle" class="w-4 h-4"></i>
             </button>
           </div>
-          <div id="arquivos-lista" class="space-y-2 mt-3 text-sm text-gray-500 text-center">
+          <div id="arquivos-lista" class="mt-3 text-sm text-gray-500 text-center">
             A carregar materiais...
           </div>
         </div>
@@ -260,47 +264,53 @@
 
   <!-- MODAL: NOVO ARQUIVO -->
   <div id="modal-arquivo" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
-        <h3 class="font-bold text-gray-800">Cadastrar Novo Link de Ficheiro</h3>
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
+        <h3 id="titulo-modal-arquivo" class="font-bold text-gray-800">Cadastrar Link de Ficheiro</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <form id="form-arquivo" class="p-4 space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nome de Exibição</label>
-          <input type="text" id="arq-nome" placeholder="Ex: PDF de React" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
+      <div class="p-4 flex-1 overflow-y-auto">
+        <form id="form-arquivo" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-            <select id="arq-tipo" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="pdf">PDF / Documento</option>
-              <option value="video">Vídeo</option>
-              <option value="code">Código (ZIP)</option>
-            </select>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nome de Exibição</label>
+            <input type="text" id="arq-nome" placeholder="Ex: PDF de React" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Hospedagem</label>
-            <select id="arq-fonte" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="drive">Google Drive</option>
-              <option value="github">GitHub</option>
-              <option value="link">Outro Link</option>
-            </select>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Pasta / Categoria</label>
+            <input type="text" id="arq-pasta" placeholder="Ex: Semana 1, Provas (Deixe vazio para Geral)" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">URL (Link de Partilha)</label>
-          <input type="url" id="arq-url" placeholder="https://" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Tamanho (Opcional, Ex: 2MB)</label>
-          <input type="text" id="arq-tamanho" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="pt-4 flex justify-end gap-2">
-          <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Adicionar Link</button>
-        </div>
-      </form>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+              <select id="arq-tipo" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="pdf">PDF / Documento</option>
+                <option value="video">Vídeo</option>
+                <option value="code">Código (ZIP)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Hospedagem</label>
+              <select id="arq-fonte" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="drive">Google Drive</option>
+                <option value="github">GitHub</option>
+                <option value="link">Outro Link</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">URL (Link de Partilha)</label>
+            <input type="url" id="arq-url" placeholder="https://" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tamanho (Opcional, Ex: 2MB)</label>
+            <input type="text" id="arq-tamanho" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div class="pt-4 flex justify-end gap-2 border-t border-gray-100 mt-2">
+            <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Guardar Ficheiro</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -511,6 +521,7 @@
     let currentAlunoEmail = null; 
     let visaoCalendario = 'semanal'; 
     let aulaEmEdicaoId = null; 
+    let arquivoEmEdicaoId = null; // Variável para controlar edição de arquivo
     
     let aulasList = [];
     let arquivosList = [];
@@ -614,6 +625,24 @@
 
       document.getElementById('aula-tipo-repeticao').dispatchEvent(new Event('change'));
       document.getElementById('modal-aula').classList.remove('hidden');
+    };
+
+    window.editarArquivo = (id) => {
+      if (!isAdminMode) return;
+      const arq = arquivosList.find(a => a.id === id);
+      if (!arq) return;
+
+      arquivoEmEdicaoId = id;
+      document.getElementById('titulo-modal-arquivo').innerText = "Editar Ficheiro";
+      
+      document.getElementById('arq-nome').value = arq.nome || '';
+      document.getElementById('arq-pasta').value = arq.pasta || '';
+      document.getElementById('arq-tipo').value = arq.tipo || 'pdf';
+      document.getElementById('arq-fonte').value = arq.fonte || 'drive';
+      document.getElementById('arq-url').value = arq.url || '';
+      document.getElementById('arq-tamanho').value = arq.tamanho || '';
+
+      document.getElementById('modal-arquivo').classList.remove('hidden');
     };
 
     // --- 6. RENDERIZAÇÃO DA UI ---
@@ -729,32 +758,74 @@
         return;
       }
 
-      container.innerHTML = arquivosList.map(arquivo => {
-        let iconeFonte = arquivo.fonte === 'github' ? 'github' : (arquivo.fonte === 'drive' ? 'hard-drive' : 'link');
-        let iconeTipo = (arquivo.tipo === 'pdf' || arquivo.tipo === 'doc') ? 'file-text' : (arquivo.tipo === 'video' ? 'video' : 'book-open');
-        let corTipo = arquivo.tipo === 'pdf' ? 'text-red-500' : (arquivo.tipo === 'video' ? 'text-purple-500' : 'text-gray-700');
+      // Agrupar arquivos por pasta
+      const pastas = {};
+      arquivosList.forEach(arquivo => {
+        const pastaNome = arquivo.pasta && arquivo.pasta.trim() !== '' ? arquivo.pasta.trim() : 'Geral';
+        if (!pastas[pastaNome]) pastas[pastaNome] = [];
+        pastas[pastaNome].push(arquivo);
+      });
 
-        return `
-        <div class="relative group">
-          <a href="${arquivo.url}" target="_blank" rel="noopener noreferrer" class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
-            <div class="mt-0.5"><i data-lucide="${iconeTipo}" class="w-5 h-5 ${corTipo}"></i></div>
-            <div class="flex-1 min-w-0 text-left">
-              <p class="text-sm font-medium text-gray-700 truncate group-hover:text-blue-600">${arquivo.nome}</p>
-              <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                <i data-lucide="${iconeFonte}" class="w-3 h-3"></i>
-                <span class="capitalize">${arquivo.fonte}</span>
-                ${arquivo.tamanho ? `<span>•</span><span>${arquivo.tamanho}</span>` : ''}
+      // Ordenar o nome das pastas (Deixar "Geral" por último)
+      const nomesPastas = Object.keys(pastas).sort((a, b) => {
+        if (a === 'Geral') return 1;
+        if (b === 'Geral') return -1;
+        return a.localeCompare(b);
+      });
+
+      let html = '';
+
+      nomesPastas.forEach(pastaNome => {
+        const arquivosHtml = pastas[pastaNome].map(arquivo => {
+          let iconeFonte = arquivo.fonte === 'github' ? 'github' : (arquivo.fonte === 'drive' ? 'hard-drive' : 'link');
+          let iconeTipo = (arquivo.tipo === 'pdf' || arquivo.tipo === 'doc') ? 'file-text' : (arquivo.tipo === 'video' ? 'video' : 'book-open');
+          let corTipo = arquivo.tipo === 'pdf' ? 'text-red-500' : (arquivo.tipo === 'video' ? 'text-purple-500' : 'text-gray-700');
+
+          return `
+          <div class="relative group mt-1">
+            <a href="${arquivo.url}" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
+              <div class="mt-0.5"><i data-lucide="${iconeTipo}" class="w-4 h-4 ${corTipo}"></i></div>
+              <div class="flex-1 min-w-0 text-left">
+                <p class="text-xs font-medium text-gray-700 truncate group-hover:text-blue-600">${arquivo.nome}</p>
+                <div class="flex items-center gap-1.5 mt-0.5 text-[10px] text-gray-500">
+                  <i data-lucide="${iconeFonte}" class="w-3 h-3"></i>
+                  <span class="capitalize">${arquivo.fonte}</span>
+                  ${arquivo.tamanho ? `<span>•</span><span>${arquivo.tamanho}</span>` : ''}
+                </div>
               </div>
+            </a>
+            ${isAdminMode ? `
+              <div class="absolute right-1 top-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onclick="editarArquivo('${arquivo.id}')" class="p-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded" title="Mover/Editar">
+                  <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="apagarArquivo('${arquivo.id}')" class="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded" title="Excluir">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            ` : ''}
+          </div>
+          `;
+        }).join('');
+
+        // Modelo de Sanfona (Accordion) via HTML <details>
+        html += `
+        <details class="group bg-white border border-gray-200 rounded-lg overflow-hidden mb-2 text-left" open>
+          <summary class="flex items-center justify-between p-2.5 bg-gray-50 cursor-pointer select-none hover:bg-gray-100 transition-colors outline-none">
+            <div class="flex items-center gap-2">
+              <i data-lucide="folder" class="w-4 h-4 text-yellow-500 fill-yellow-100"></i>
+              <span class="font-semibold text-gray-700 text-xs tracking-wide">${pastaNome}</span>
             </div>
-          </a>
-          ${isAdminMode ? `
-            <button onclick="apagarArquivo('${arquivo.id}')" class="absolute right-2 top-2 p-1.5 bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
-          ` : ''}
-        </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500 transition-transform group-open:rotate-180"></i>
+          </summary>
+          <div class="p-1.5 space-y-0.5 bg-white border-t border-gray-100">
+            ${arquivosHtml}
+          </div>
+        </details>
         `;
-      }).join('');
+      });
+
+      container.innerHTML = html;
       lucide.createIcons();
     }
 
@@ -1212,7 +1283,13 @@
       modalAula.classList.remove('hidden');
     });
     
-    btnNovoArquivo.addEventListener('click', () => modalArquivo.classList.remove('hidden'));
+    btnNovoArquivo.addEventListener('click', () => {
+      arquivoEmEdicaoId = null;
+      document.getElementById('titulo-modal-arquivo').innerText = "Cadastrar Link de Ficheiro";
+      document.getElementById('form-arquivo').reset();
+      modalArquivo.classList.remove('hidden');
+    });
+
     btnacessarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
@@ -1223,6 +1300,7 @@
         modalAlunos.classList.add('hidden');
         modalLinkImportante.classList.add('hidden');
         aulaEmEdicaoId = null; 
+        arquivoEmEdicaoId = null;
       });
     });
 
@@ -1285,17 +1363,28 @@
     document.getElementById('form-arquivo').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
+      
       const novoArquivo = {
-        nome: document.getElementById('arq-nome').value,
+        nome: document.getElementById('arq-nome').value.trim(),
+        pasta: document.getElementById('arq-pasta').value.trim(),
         tipo: document.getElementById('arq-tipo').value,
         fonte: document.getElementById('arq-fonte').value,
-        url: document.getElementById('arq-url').value,
-        tamanho: document.getElementById('arq-tamanho').value || '',
+        url: document.getElementById('arq-url').value.trim(),
+        tamanho: document.getElementById('arq-tamanho').value.trim(),
       };
+      
       try {
-        await addDoc(collection(db, getPath('arquivos')), novoArquivo);
+        if (arquivoEmEdicaoId) {
+          // Edita o arquivo existente
+          await updateDoc(doc(db, getPath('arquivos'), arquivoEmEdicaoId), novoArquivo);
+        } else {
+          // Cria novo arquivo
+          await addDoc(collection(db, getPath('arquivos')), novoArquivo);
+        }
+        
         modalArquivo.classList.add('hidden');
         e.target.reset();
+        arquivoEmEdicaoId = null;
       } catch (error) {
         console.error("Erro arquivo:", error);
       }
