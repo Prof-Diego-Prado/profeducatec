@@ -174,20 +174,41 @@
           </div>
         </div>
 
-        <!-- COLUNA DIREITA: LINKS IMPORTANTES -->
-        <div class="w-full xl:w-80 shrink-0 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 p-5 min-h-[300px] xl:h-[calc(100vh-10rem)]">
-          <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
-            <h3 class="font-bold text-gray-800 flex items-center gap-2">
-              <i data-lucide="link-2" class="w-5 h-5 text-blue-500"></i> Links Importantes
-            </h3>
-            <button id="btn-novo-link-importante" class="hidden text-blue-600 hover:text-blue-800 p-1 bg-blue-50 rounded" title="Adicionar Novo Link">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-            </button>
-          </div>
+        <!-- COLUNA DIREITA: LINKS E BIBLIOTECA -->
+        <div class="w-full xl:w-80 shrink-0 flex flex-col gap-6 xl:h-[calc(100vh-10rem)]">
           
-          <div id="links-importantes-lista" class="flex-1 overflow-y-auto space-y-3 pr-1">
-            <p class="text-sm text-gray-400 text-center mt-4 italic">Carregando links...</p>
+          <!-- Seção Superior: Links Importantes -->
+          <div class="flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex-1 min-h-[250px] overflow-hidden">
+            <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+              <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="link-2" class="w-5 h-5 text-blue-500"></i> Links Importantes
+              </h3>
+              <button id="btn-novo-link-importante" class="hidden text-blue-600 hover:text-blue-800 p-1 bg-blue-50 rounded" title="Adicionar Novo Link">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+            </div>
+            
+            <div id="links-importantes-lista" class="flex-1 overflow-y-auto space-y-3 pr-1">
+              <p class="text-sm text-gray-400 text-center mt-4 italic">Carregando links...</p>
+            </div>
           </div>
+
+          <!-- Seção Inferior: Biblioteca (Repositório) -->
+          <div class="flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex-1 min-h-[250px] overflow-hidden relative">
+            <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+              <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="library" class="w-5 h-5 text-indigo-600"></i> Biblioteca
+              </h3>
+              <button id="btn-novo-livro" class="hidden text-indigo-600 hover:text-indigo-800 p-1 bg-indigo-50 rounded" title="Adicionar Obra">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+            </div>
+            
+            <div id="biblioteca-lista" class="flex-1 overflow-y-auto space-y-3 pr-1">
+              <p class="text-sm text-gray-400 text-center mt-4 italic">Carregando biblioteca...</p>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -344,7 +365,7 @@
     </div>
   </div>
 
-  <!-- MODAL: NOVO LINK IMPORTANTE (LATERAL DIREITA) -->
+  <!-- MODAL: NOVO LINK IMPORTANTE -->
   <div id="modal-link-importante" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
@@ -368,6 +389,34 @@
         <div class="pt-4 flex justify-end gap-2">
           <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
           <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Salvar Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVO LIVRO (BIBLIOTECA) -->
+  <div id="modal-livro" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+        <h3 class="font-bold text-gray-800">Adicionar Obra à Biblioteca</h3>
+        <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="form-livro" class="p-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Título da Obra</label>
+          <input type="text" id="livro-titulo" placeholder="Ex: Metodologia da Pesquisa Científica" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Autor(es)</label>
+          <input type="text" id="livro-autor" placeholder="Ex: Antônio Carlos Gil" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Link do PDF (Google Drive / Web)</label>
+          <input type="url" id="livro-url" placeholder="https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+        </div>
+        <div class="pt-4 flex justify-end gap-2">
+          <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg">Salvar Obra</button>
         </div>
       </form>
     </div>
@@ -436,7 +485,7 @@
             <div class="flex items-center gap-3">
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
-                <p class="font-semibold text-gray-800">Sou Professor </p>
+                <p class="font-semibold text-gray-800">Sou Professor (Master)</p>
                 <p class="text-xs text-gray-500">Acesso via senha</p>
               </div>
             </div>
@@ -541,6 +590,7 @@
     
     let aulasList = [];
     let arquivosList = [];
+    let bibliotecaList = []; // Nova lista para as obras do Drive
     let recadosList = [];
     let alunosPermitidos = [];
     let linksImportantesList = [];
@@ -572,6 +622,12 @@
       onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
         arquivosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarArquivos();
+      });
+
+      // Ouvinte da nova coleção Biblioteca
+      onSnapshot(collection(db, pathPrefix, 'biblioteca'), (snapshot) => {
+        bibliotecaList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarBiblioteca();
       });
 
       onSnapshot(collection(db, pathPrefix, 'recados'), (snapshot) => {
@@ -611,6 +667,7 @@
     const getPath = (col) => `artifacts/${appId}/public/data/${col}`;
 
     window.apagarArquivo = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('arquivos'), id)); };
+    window.apagarLivro = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('biblioteca'), id)); };
     window.apagarAula = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('aulas'), id)); };
     window.apagarAluno = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('alunos'), id)); };
     window.apagarRecado = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('recados'), id)); };
@@ -676,6 +733,36 @@
     };
 
     // --- 6. RENDERIZAÇÃO DA UI ---
+
+    function renderizarBiblioteca() {
+      const container = document.getElementById('biblioteca-lista');
+      if (bibliotecaList.length === 0) {
+        container.innerHTML = `<p class="text-sm text-gray-400 text-center mt-8 italic">Nenhuma obra cadastrada.</p>`;
+        return;
+      }
+      
+      const livrosOrdenados = [...bibliotecaList].sort((a,b) => a.titulo.localeCompare(b.titulo));
+
+      container.innerHTML = livrosOrdenados.map(livro => `
+        <div class="relative group border border-gray-100 rounded-lg p-3 hover:bg-indigo-50 transition-colors shadow-sm bg-white">
+          <a href="${livro.url}" target="_blank" rel="noopener noreferrer" class="flex gap-3 items-start">
+            <div class="bg-red-50 text-red-500 p-2 rounded-md flex-shrink-0 mt-0.5 border border-red-100">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-semibold text-indigo-700 truncate group-hover:text-indigo-800 transition-colors">${livro.titulo}</h4>
+              ${livro.autor ? `<p class="text-xs text-gray-500 mt-1 line-clamp-1"><i data-lucide="user" class="w-3 h-3 inline mr-1"></i>${livro.autor}</p>` : ''}
+            </div>
+          </a>
+          ${isAdminMode ? `
+            <button onclick="apagarLivro('${livro.id}')" class="absolute top-2 right-2 p-1.5 bg-red-50 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 shadow-sm" title="Excluir Obra">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          ` : ''}
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
 
     function renderizarLinksImportantes() {
       const container = document.getElementById('links-importantes-lista');
@@ -892,10 +979,17 @@
       if (proximoEventoGlobal) {
         const diff = proximoEventoGlobal.date - now;
         if (diff > 0) {
-          const h = Math.floor(diff / (1000 * 60 * 60));
+          // Cálculo de Dias, Horas e Minutos Faltantes
+          const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          const s = Math.floor((diff % (1000 * 60)) / 1000);
-          document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> Próx: ${proximoEventoGlobal.titulo} em ${h}h ${m}m ${s}s`;
+          
+          let tempoTexto = "";
+          if (d > 0) tempoTexto += `${d}d `;
+          if (h > 0 || d > 0) tempoTexto += `${h}h `;
+          tempoTexto += `${m}m`;
+
+          document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> Próx: ${proximoEventoGlobal.titulo} em ${tempoTexto}`;
         } else {
           document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="play-circle" class="w-3 h-3 text-red-500"></i> Evento Acontecendo Agora!`;
           calcularProximoEvento(); // Recalcula quando atinge zero
@@ -1153,6 +1247,7 @@
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
+    const btnNovoLivro = document.getElementById('btn-novo-livro');
     const btnacessarAlunos = document.getElementById('btn-acessar-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
     
@@ -1176,6 +1271,7 @@
 
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
+        btnNovoLivro.classList.remove('hidden');
         btnacessarAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
         
@@ -1198,6 +1294,7 @@
 
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
+        btnNovoLivro.classList.add('hidden');
         btnacessarAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
         
@@ -1217,6 +1314,7 @@
       atualizarCalendario();
       renderizarMural();
       renderizarLinksImportantes();
+      renderizarBiblioteca();
     }
 
     setTimeout(() => {
@@ -1320,6 +1418,7 @@
     // --- 8. OUTROS MODAIS E FORMULÁRIOS DE CONTEÚDO ---
     const modalAula = document.getElementById('modal-aula');
     const modalArquivo = document.getElementById('modal-arquivo');
+    const modalLivro = document.getElementById('modal-livro');
     const modalAlunos = document.getElementById('modal-alunos');
     const modalLinkImportante = document.getElementById('modal-link-importante');
 
@@ -1340,6 +1439,11 @@
       modalArquivo.classList.remove('hidden');
     });
 
+    btnNovoLivro.addEventListener('click', () => {
+      document.getElementById('form-livro').reset();
+      modalLivro.classList.remove('hidden');
+    });
+
     btnacessarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
     
@@ -1347,6 +1451,7 @@
       btn.addEventListener('click', () => {
         modalAula.classList.add('hidden');
         modalArquivo.classList.add('hidden');
+        modalLivro.classList.add('hidden');
         modalAlunos.classList.add('hidden');
         modalLinkImportante.classList.add('hidden');
         aulaEmEdicaoId = null; 
@@ -1435,6 +1540,27 @@
         arquivoEmEdicaoId = null;
       } catch (error) {
         console.error("Erro arquivo:", error);
+      }
+    });
+
+    // Submit Novo Livro na Biblioteca
+    document.getElementById('form-livro').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!isAdminMode) return;
+      
+      const novoLivro = {
+        titulo: document.getElementById('livro-titulo').value.trim(),
+        autor: document.getElementById('livro-autor').value.trim(),
+        url: document.getElementById('livro-url').value.trim(),
+        timestamp: Date.now()
+      };
+      
+      try {
+        await addDoc(collection(db, getPath('biblioteca')), novoLivro);
+        modalLivro.classList.add('hidden');
+        e.target.reset();
+      } catch (error) {
+        console.error("Erro ao adicionar livro:", error);
       }
     });
 
