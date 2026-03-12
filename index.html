@@ -18,9 +18,26 @@
     /* Estilo para remover a seta padrão do details no Safari/Chrome mais antigos */
     details > summary { list-style: none; }
     details > summary::-webkit-details-marker { display: none; }
+
+    /* Animação de Glow para o próximo evento */
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); border-color: transparent; }
+      50% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.8), 0 0 5px rgba(59, 130, 246, 0.4); border-color: #3b82f6; }
+      100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); border-color: transparent; }
+    }
+    .evento-destaque {
+      animation: glow 2s infinite alternate;
+      border: 2px solid #3b82f6 !important;
+      z-index: 10;
+      transform: scale(1.02);
+    }
+    
+    /* Estilização para Ocultar Scrollbar mantendo funcionalidade */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
+<body class="bg-gray-50 font-sans flex h-screen overflow-hidden relative">
 
   <!-- SIDEBAR MOBILE OVERLAY -->
   <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
@@ -98,29 +115,32 @@
       <div class="flex-1 flex justify-between items-center lg:justify-end gap-4">
         <h1 class="text-xl font-semibold text-gray-800 lg:hidden">Dashboard</h1>
         
-        <!-- SELETOR DE MODO -->
-        <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
-          <button id="modo-aluno" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Aluno</button>
-          <button id="modo-admin" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Admin</button>
+        <!-- RELÓGIO E PRÓXIMO EVENTO -->
+        <div class="hidden sm:flex flex-col items-end mr-auto lg:mr-4 text-right">
+          <div id="relogio-atual" class="text-sm font-bold text-gray-800 tracking-wider">--:--:--</div>
+          <div id="proximo-evento-timer" class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full mt-0.5 shadow-sm border border-blue-100 flex items-center gap-1">
+            <i data-lucide="clock" class="w-3 h-3"></i> <span>Calculando próximo evento...</span>
+          </div>
         </div>
 
         <!-- Botão visível apenas para Admin -->
         <button id="btn-acessar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
           <i data-lucide="users" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">acessar Alunos</span>
+          <span class="hidden sm:inline">Gestão de Utilizadores</span>
         </button>
 
-        <div class="items-center gap-3 hidden sm:flex">
-          <span id="user-role-text" class="text-sm font-medium text-gray-600">Visão do Aluno</span>
-          <img class="w-8 h-8 rounded-full bg-gray-300 border border-gray-200" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Student" id="user-avatar" alt="Avatar" />
+        <div class="items-center gap-3 hidden sm:flex border-l border-gray-200 pl-4 ml-2">
+          <div class="text-right">
+            <span id="user-role-text" class="block text-sm font-bold text-gray-800 leading-tight">Visitante</span>
+            <span id="user-role-badge" class="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Modo Leitura</span>
+          </div>
+          <img class="w-9 h-9 rounded-full bg-gray-300 border-2 border-white shadow-sm" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Student" id="user-avatar" alt="Avatar" />
         </div>
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-      
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
       <div class="flex flex-col xl:flex-row gap-8 h-full">
-        
         <!-- COLUNA ESQUERDA: CALENDÁRIO -->
         <div class="flex-1 flex flex-col min-w-0">
           <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
@@ -174,6 +194,18 @@
     </div>
   </main>
 
+  <!-- CONTADOR DE ACESSOS (Canto Inferior Direito) -->
+  <div id="contador-acessos" class="fixed bottom-4 right-4 bg-white p-4 rounded-xl shadow-2xl border border-gray-200 z-40 text-xs hidden flex-col gap-2 w-56 transition-all hover:scale-105">
+    <div class="flex justify-between items-center border-b border-gray-100 pb-2 mb-1">
+      <span class="font-bold text-gray-700 flex items-center gap-1.5"><i data-lucide="bar-chart-2" class="w-4 h-4 text-blue-500"></i> Acessos</span>
+      <span id="total-acessos" class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold shadow-inner">0</span>
+    </div>
+    <div class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Últimos Visitantes:</div>
+    <ul id="ultimos-acessos" class="text-gray-600 truncate space-y-1.5 font-medium">
+      <!-- Injetado -->
+    </ul>
+  </div>
+
   <!-- MODAIS DE CONTEÚDO -->
 
   <!-- MODAL: NOVA AULA -->
@@ -193,7 +225,6 @@
             </select>
           </div>
 
-          <!-- Campos para Evento Semanal -->
           <div id="campos-repeticao-semanal" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Dia da Semana</label>
@@ -217,7 +248,6 @@
             </div>
           </div>
 
-          <!-- Campos para Evento Único -->
           <div id="campos-evento-unico" class="hidden space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Data do Evento</label>
@@ -344,33 +374,24 @@
   </div>
 
 
-  <!-- MODAL: acessar ALUNOS E SOLICITAÇÕES (ADMIN) -->
+  <!-- MODAL: GESTÃO DE UTILIZADORES (ADMIN) -->
   <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shrink-0">
-        <h3 class="font-bold text-gray-800">Gestão de Alunos</h3>
+        <h3 class="font-bold text-gray-800">Gestão de Utilizadores</h3>
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="p-4 flex-1 overflow-y-auto space-y-6">
         
-        <!-- Bloco de Solicitações Pendentes -->
+        <!-- Bloco de Alunos Cadastrados -->
         <div>
           <h4 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
-            <i data-lucide="bell" class="w-4 h-4 text-yellow-500"></i> Solicitações Pendentes
-          </h4>
-          <ul id="lista-solicitacoes" class="space-y-3">
-            <!-- Injetado via JS -->
-          </ul>
-        </div>
-
-        <!-- Bloco de Alunos Aprovados -->
-        <div>
-          <h4 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> Alunos Aprovados
+            <i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Utilizadores Cadastrados
           </h4>
           
           <form id="form-aluno-manual" class="flex gap-2 mb-3">
-            <input type="email" id="aluno-email-manual" placeholder="Adicionar manualmente (E-mail)" class="flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            <input type="text" id="aluno-nome-manual" placeholder="Nome" class="w-1/3 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+            <input type="email" id="aluno-email-manual" placeholder="E-mail" class="flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
             <button type="submit" class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg whitespace-nowrap">Adicionar</button>
           </form>
 
@@ -384,7 +405,7 @@
   </div>
 
 
-  <!-- NOVO MODAL UNIFICADO DE AUTENTICAÇÃO -->
+  <!-- MODAL UNIFICADO DE AUTENTICAÇÃO -->
   <div id="modal-auth" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative">
       
@@ -399,13 +420,13 @@
         
         <!-- VISTA 1: SELEÇÃO DE PERFIL -->
         <div id="auth-view-selecao" class="space-y-4">
-          <p class="text-center text-gray-600 font-medium mb-4">Como deseja acessar?</p>
+          <p class="text-center text-gray-600 font-medium mb-4">Como deseja aceder?</p>
           <button onclick="mudarAuthView('login-aluno')" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group">
             <div class="flex items-center gap-3">
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
                 <p class="font-semibold text-gray-800">Sou Aluno</p>
-                <p class="text-xs text-gray-500">acessar ao material da disciplina</p>
+                <p class="text-xs text-gray-500">Aceder ao material da disciplina</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500"></i>
@@ -415,8 +436,8 @@
             <div class="flex items-center gap-3">
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
-                <p class="font-semibold text-gray-800">Sou Professor</p>
-                <p class="text-xs text-gray-500">acessar alunos e conteúdos</p>
+                <p class="font-semibold text-gray-800">Sou Professor (Master)</p>
+                <p class="text-xs text-gray-500">Acesso via palavra-passe</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 group-hover:text-indigo-500"></i>
@@ -428,8 +449,8 @@
           <button onclick="mudarAuthView('selecao')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
           </button>
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso do Aluno</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Insira o seu e-mail previamente aprovado.</p>
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso do Aluno/Admin</h3>
+          <p class="text-sm text-gray-500 mb-6 text-center">Insira o e-mail que usou para se registar.</p>
           
           <form id="form-login-aluno">
             <input type="email" id="login-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" required>
@@ -437,9 +458,9 @@
             <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">Entrar</button>
           </form>
           
-          <div class="mt-6 text-center text-sm border-t pt-4">
-            <span class="text-gray-600">Primeira vez aqui?</span>
-            <button onclick="mudarAuthView('cadastro-aluno')" class="text-blue-600 font-semibold hover:underline ml-1">Solicite acesso</button>
+          <div class="mt-6 text-center text-sm border-t border-gray-100 pt-4">
+            <span class="text-gray-600">Ainda não tem conta?</span>
+            <button onclick="mudarAuthView('cadastro-aluno')" class="text-blue-600 font-semibold hover:underline ml-1">Criar o seu acesso</button>
           </div>
         </div>
 
@@ -448,21 +469,15 @@
           <button onclick="mudarAuthView('login-aluno')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
           </button>
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Solicitar Acesso</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Registe-se com o seu e-mail institucional (@uem.br).</p>
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Criar Acesso</h3>
+          <p class="text-sm text-gray-500 mb-6 text-center">Preencha os dados para obter acesso imediato à plataforma.</p>
           
           <form id="form-cadastro-aluno" class="space-y-3">
             <input type="text" id="cadastro-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-            <input type="email" id="cadastro-email" placeholder="nome@uem.br" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            <input type="email" id="cadastro-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             
-            <!-- Campo de Justificativa (Oculto por padrão, exigido se não for @uem.br) -->
-            <div id="div-justificativa" class="hidden">
-              <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail não institucional detetado. Justifique o pedido:</label>
-              <textarea id="cadastro-justificativa" rows="2" placeholder="Qual o motivo do acesso?" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-            </div>
-
             <p id="cadastro-msg" class="text-center text-xs hidden"></p>
-            <button type="submit" id="btn-submit-cadastro" class="w-full py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors mt-2">Enviar Solicitação</button>
+            <button type="submit" id="btn-submit-cadastro" class="w-full py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors mt-2">Criar Conta e Aceder</button>
           </form>
         </div>
 
@@ -471,15 +486,15 @@
           <button onclick="mudarAuthView('selecao')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
           </button>
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso do Professor</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Insira as suas credenciais restritas.</p>
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso Master</h3>
+          <p class="text-sm text-gray-500 mb-6 text-center">Apenas para os detentores da palavra-passe mestre.</p>
           
           <form id="form-login-admin">
             <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Utilizador" required>
             <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Palavra-passe" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
             
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">acessar ao Painel</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Aceder ao Painel</button>
           </form>
         </div>
 
@@ -490,7 +505,7 @@
 
   <!-- JAVASCRIPT: LÓGICA E FIREBASE -->
   <script type="module">
-    // --- 0. CONFIGURAÇÃO DE ACESSO DO ADMIN ---
+    // --- 0. CONFIGURAÇÃO DE ACESSO DO ADMIN MASTER ---
     const USUARIO_ADMINISTRADOR = "PradoDiego";
     const SENHA_ADMINISTRADOR = "@Lei30242728";
 
@@ -518,16 +533,16 @@
     // --- 2. ESTADO DA APLICAÇÃO ---
     let currentUser = null;
     let isAdminMode = false;
-    let currentAlunoEmail = null; 
+    let currentAlunoObj = null; 
     let visaoCalendario = 'semanal'; 
     let aulaEmEdicaoId = null; 
-    let arquivoEmEdicaoId = null; // Variável para controlar edição de arquivo
+    let arquivoEmEdicaoId = null; 
+    let proximoEventoGlobal = null;
     
     let aulasList = [];
     let arquivosList = [];
     let recadosList = [];
     let alunosPermitidos = [];
-    let solicitacoesList = [];
     let linksImportantesList = [];
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
@@ -551,7 +566,7 @@
 
       onSnapshot(collection(db, pathPrefix, 'aulas'), (snapshot) => {
         aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        atualizarCalendario();
+        calcularProximoEvento(); // Calcula e dps atualiza o calendário para o efeito Glow
       });
 
       onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
@@ -569,14 +584,26 @@
         renderizarListaAlunos();
       });
 
-      onSnapshot(collection(db, pathPrefix, 'solicitacoes'), (snapshot) => {
-        solicitacoesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderizarListaSolicitacoes();
-      });
-
       onSnapshot(collection(db, pathPrefix, 'links_importantes'), (snapshot) => {
         linksImportantesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarLinksImportantes();
+      });
+
+      // Ouvinte para os Acessos (Contador)
+      onSnapshot(collection(db, pathPrefix, 'acessos'), (snapshot) => {
+        const acessosList = snapshot.docs.map(doc => doc.data()).sort((a,b) => b.timestamp - a.timestamp);
+        const total = acessosList.length;
+        const ultimos = acessosList.slice(0, 3).map(a => a.nome);
+        
+        document.getElementById('total-acessos').innerText = total;
+        const ultimosHtml = ultimos.map(n => `<li class="flex items-center gap-2"><i data-lucide="user-check" class="w-3 h-3 text-green-500"></i>${n}</li>`).join('');
+        document.getElementById('ultimos-acessos').innerHTML = ultimosHtml || '<li>Nenhum acesso ainda.</li>';
+        
+        if(total > 0) {
+          document.getElementById('contador-acessos').classList.remove('hidden');
+          document.getElementById('contador-acessos').classList.add('flex');
+        }
+        lucide.createIcons();
       });
     });
 
@@ -589,19 +616,22 @@
     window.apagarRecado = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('recados'), id)); };
     window.apagarLinkImportante = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('links_importantes'), id)); };
 
-    window.aprovarSolicitacao = async (id, email) => {
+    window.alterarRoleAluno = async (id, isChecked) => {
       if (!isAdminMode) return;
       try {
-        await addDoc(collection(db, getPath('alunos')), { email: email.toLowerCase() });
-        await deleteDoc(doc(db, getPath('solicitacoes'), id));
-      } catch (err) { console.error("Erro ao aprovar:", err); }
+        await updateDoc(doc(db, getPath('alunos'), id), {
+          role: isChecked ? 'admin' : 'aluno'
+        });
+      } catch (err) { console.error("Erro ao alterar permissão:", err); }
     };
 
-    window.rejeitarSolicitacao = async (id) => {
-      if (!isAdminMode) return;
+    window.registrarAcesso = async (nome) => {
       try {
-        await deleteDoc(doc(db, getPath('solicitacoes'), id));
-      } catch (err) { console.error("Erro ao rejeitar:", err); }
+        await addDoc(collection(db, getPath('acessos')), {
+          nome: nome,
+          timestamp: Date.now()
+        });
+      } catch (err) { console.error("Erro ao registar acesso:", err); }
     };
 
     window.editarAula = (id) => {
@@ -654,13 +684,10 @@
         return;
       }
       
-      // Ordena por título alfabeticamente para organização
       const linksOrdenados = [...linksImportantesList].sort((a,b) => a.titulo.localeCompare(b.titulo));
 
       container.innerHTML = linksOrdenados.map(link => {
-        // Usa a API do Google Favicon para capturar o logotipo com base na URL
         const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain_url=${encodeURIComponent(link.url)}&sz=64`;
-        
         return `
         <div class="relative group border border-gray-100 rounded-lg p-3 hover:bg-gray-50 transition-colors shadow-sm bg-white">
           <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="flex gap-3 items-start">
@@ -681,40 +708,29 @@
       lucide.createIcons();
     }
 
-    function renderizarListaSolicitacoes() {
-      const container = document.getElementById('lista-solicitacoes');
-      if (!container) return; 
-      
-      if (solicitacoesList.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhuma solicitação pendente.</li>`;
-        return;
-      }
-
-      container.innerHTML = solicitacoesList.map(sol => `
-        <li class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 text-sm">
-          <div class="font-bold text-gray-800">${sol.nome}</div>
-          <div class="text-xs text-gray-500 mb-1">${sol.email}</div>
-          ${sol.justificativa ? `<div class="text-xs text-gray-700 bg-white p-2 rounded border border-yellow-100 mt-1 mb-2"><strong>Motivo:</strong> ${sol.justificativa}</div>` : ''}
-          <div class="flex gap-2 mt-2">
-            <button onclick="aprovarSolicitacao('${sol.id}', '${sol.email}')" class="flex-1 bg-green-600 text-white px-2 py-1.5 rounded text-xs font-medium hover:bg-green-700 transition-colors">Aprovar</button>
-            <button onclick="rejeitarSolicitacao('${sol.id}')" class="flex-1 bg-red-100 text-red-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-red-200 transition-colors">Rejeitar</button>
-          </div>
-        </li>
-      `).join('');
-    }
-
     function renderizarListaAlunos() {
       const container = document.getElementById('lista-alunos-cadastrados');
       if (!container) return;
       
       if (alunosPermitidos.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum aluno aprovado.</li>`;
+        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum utilizador encontrado.</li>`;
         return;
       }
       container.innerHTML = alunosPermitidos.map(aluno => `
-        <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
-          <span class="text-gray-700 truncate pr-2">${aluno.email}</span>
-          <button onclick="apagarAluno('${aluno.id}')" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50" title="Remover acesso">
+        <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200 gap-3">
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-gray-800 truncate">${aluno.nome || 'Sem Nome'}</p>
+            <p class="text-[10px] text-gray-500 truncate">${aluno.email}</p>
+          </div>
+          
+          <!-- Botão Deslizante (Toggle) -->
+          <label class="relative inline-flex items-center cursor-pointer ml-auto shrink-0" title="Definir permissão">
+            <input type="checkbox" class="sr-only peer" ${aluno.role === 'admin' ? 'checked' : ''} onchange="alterarRoleAluno('${aluno.id}', this.checked)">
+            <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-600 shadow-inner"></div>
+            <span class="ml-1.5 text-[9px] font-bold uppercase ${aluno.role === 'admin' ? 'text-indigo-600' : 'text-gray-400'} w-8 text-center">${aluno.role === 'admin' ? 'Admin' : 'Aluno'}</span>
+          </label>
+
+          <button onclick="apagarAluno('${aluno.id}')" class="text-red-400 hover:text-red-600 p-1 rounded hover:bg-red-50 shrink-0" title="Apagar Utilizador">
             <i data-lucide="trash-2" class="w-4 h-4"></i>
           </button>
         </li>
@@ -758,7 +774,6 @@
         return;
       }
 
-      // Agrupar arquivos por pasta
       const pastas = {};
       arquivosList.forEach(arquivo => {
         const pastaNome = arquivo.pasta && arquivo.pasta.trim() !== '' ? arquivo.pasta.trim() : 'Geral';
@@ -766,7 +781,6 @@
         pastas[pastaNome].push(arquivo);
       });
 
-      // Ordenar o nome das pastas (Deixar "Geral" por último)
       const nomesPastas = Object.keys(pastas).sort((a, b) => {
         if (a === 'Geral') return 1;
         if (b === 'Geral') return -1;
@@ -808,7 +822,6 @@
           `;
         }).join('');
 
-        // Modelo de Sanfona (Accordion) via HTML <details>
         html += `
         <details class="group bg-white border border-gray-200 rounded-lg overflow-hidden mb-2 text-left" open>
           <summary class="flex items-center justify-between p-2.5 bg-gray-50 cursor-pointer select-none hover:bg-gray-100 transition-colors outline-none">
@@ -828,6 +841,71 @@
       container.innerHTML = html;
       lucide.createIcons();
     }
+
+    // --- LÓGICA DO RELÓGIO E PRÓXIMO EVENTO ---
+    function calcularProximoEvento() {
+      const now = new Date();
+      let eventoMaisProximo = null;
+      const diasMap = { 'Domingo':0, 'Segunda':1, 'Terça':2, 'Quarta':3, 'Quinta':4, 'Sexta':5, 'Sábado':6 };
+
+      aulasList.forEach(aula => {
+        let eventDate = null;
+        if(!aula.hora) return;
+        const [hr, min] = aula.hora.split(':').map(Number);
+
+        if (aula.tipoRepeticao === 'unico' && aula.dataUnica) {
+          const [ano, mes, dia] = aula.dataUnica.split('-').map(Number);
+          eventDate = new Date(ano, mes - 1, dia, hr, min, 0);
+        } else if (aula.tipoRepeticao === 'semanal' && aula.dia) {
+          const targetDay = diasMap[aula.dia];
+          eventDate = new Date(now);
+          eventDate.setHours(hr, min, 0, 0);
+          
+          if (now.getDay() === targetDay && now > eventDate) {
+            eventDate.setDate(eventDate.getDate() + 7);
+          } else {
+            eventDate.setDate(eventDate.getDate() + (targetDay + 7 - now.getDay()) % 7);
+          }
+
+          if (aula.dataFim) {
+            const [anoF, mesF, diaF] = aula.dataFim.split('-').map(Number);
+            const endBoundary = new Date(anoF, mesF - 1, diaF, 23, 59, 59);
+            if (eventDate > endBoundary) eventDate = null;
+          }
+        }
+
+        if (eventDate && eventDate > now) {
+          if (!eventoMaisProximo || eventDate < eventoMaisProximo.date) {
+            eventoMaisProximo = { id: aula.id, date: eventDate, titulo: aula.titulo };
+          }
+        }
+      });
+
+      proximoEventoGlobal = eventoMaisProximo;
+      atualizarCalendario(); 
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('relogio-atual').innerText = now.toLocaleTimeString('pt-BR');
+      
+      if (proximoEventoGlobal) {
+        const diff = proximoEventoGlobal.date - now;
+        if (diff > 0) {
+          const h = Math.floor(diff / (1000 * 60 * 60));
+          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const s = Math.floor((diff % (1000 * 60)) / 1000);
+          document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> Próx: ${proximoEventoGlobal.titulo} em ${h}h ${m}m ${s}s`;
+        } else {
+          document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="play-circle" class="w-3 h-3 text-red-500"></i> Evento Acontecendo Agora!`;
+          calcularProximoEvento(); // Recalcula quando atinge zero
+        }
+      } else {
+        document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="calendar" class="w-3 h-3"></i> Nenhum evento agendado`;
+      }
+      lucide.createIcons();
+    }, 1000);
+
 
     // --- LÓGICA DO CALENDÁRIO ---
     function atualizarCalendario() {
@@ -858,6 +936,9 @@
         if (aulasDoDia.length > 0) {
           aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
           aulasHTML = aulasDoDia.map(aula => {
+            const isDestaque = proximoEventoGlobal && proximoEventoGlobal.id === aula.id;
+            const classDestaque = isDestaque ? 'evento-destaque' : '';
+
             const btnLink = aula.link 
               ? `<a href="${aula.link}" target="_blank" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm"><i data-lucide="video" class="w-3 h-3"></i> Acessar Aula</a>` 
               : '';
@@ -867,7 +948,7 @@
               : '';
 
             return `
-            <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 flex flex-col ${aula.cor}">
+            <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 flex flex-col ${aula.cor} ${classDestaque}">
               <div class="flex-1">
                 <p class="text-xs font-bold mb-1 opacity-80 flex items-center">${aula.hora} ${badgeUnico}</p>
                 <h4 class="font-semibold text-sm leading-tight mb-2 pr-12">${aula.titulo}</h4>
@@ -978,8 +1059,11 @@
         html += `  <div class="space-y-1 flex-1 overflow-y-auto no-scrollbar">`;
         
         aulasDoDia.forEach(aula => {
+          const isDestaque = proximoEventoGlobal && proximoEventoGlobal.id === aula.id;
+          const classDestaque = isDestaque ? 'evento-destaque' : '';
+
           html += `
-            <div class="text-[9px] md:text-[10px] p-1 md:p-1.5 rounded leading-tight ${aula.cor} opacity-90 relative group" title="${aula.titulo}">
+            <div class="text-[9px] md:text-[10px] p-1 md:p-1.5 rounded leading-tight ${aula.cor} ${classDestaque} opacity-90 relative group" title="${aula.titulo}">
               <div class="font-bold truncate mb-0.5 pr-4">${aula.hora.split(' ')[0]} - ${aula.titulo}</div>
               ${aula.link ? `<a href="${aula.link}" target="_blank" class="hidden md:flex items-center gap-1 text-blue-700 hover:text-blue-900 mt-1" title="Entrar no Meet/Zoom"><i data-lucide="video" class="w-3 h-3"></i> Chamada</a>` : `<span class="hidden md:inline text-gray-600 truncate"><i data-lucide="map-pin" class="w-2.5 h-2.5 inline mr-0.5"></i>${aula.local}</span>`}
               
@@ -1064,9 +1148,8 @@
       document.getElementById('cadastro-msg').classList.add('hidden');
     };
 
-    const btnModoAluno = document.getElementById('modo-aluno');
-    const btnModoAdmin = document.getElementById('modo-admin');
     const roleText = document.getElementById('user-role-text');
+    const roleBadge = document.getElementById('user-role-badge');
     const userAvatar = document.getElementById('user-avatar');
     const btnNovaAula = document.getElementById('btn-nova-aula');
     const btnNovoArquivo = document.getElementById('btn-novo-arquivo');
@@ -1077,27 +1160,25 @@
     const inputRecado = document.getElementById('input-recado');
     const btnEnviarRecado = document.getElementById('btn-enviar-recado');
 
-    function alternarModoUI(paraAdmin, emailAluno = null) {
+    function alternarModoUI(paraAdmin, userObj = null) {
       isAdminMode = paraAdmin;
+      currentAlunoObj = userObj;
       
       if (paraAdmin) {
-        currentAlunoEmail = null;
-        btnModoAdmin.classList.replace('text-gray-500', 'text-gray-800');
-        btnModoAdmin.classList.replace('hover:text-gray-700', 'shadow-sm');
-        btnModoAdmin.classList.add('bg-white');
+        const nomeAdmin = userObj ? userObj.nome : ("Prof. " + USUARIO_ADMINISTRADOR);
+        roleText.innerText = nomeAdmin;
+        roleText.classList.replace('text-gray-800', 'text-indigo-700');
+        roleBadge.innerText = "Modo Edição (Admin)";
+        roleBadge.classList.replace('text-gray-500', 'text-indigo-500');
         
-        btnModoAluno.classList.replace('bg-white', 'text-gray-500');
-        btnModoAluno.classList.replace('shadow-sm', 'hover:text-gray-700');
-        btnModoAluno.classList.replace('text-gray-800', 'bg-transparent');
-        
-        roleText.innerText = "Prof. " + USUARIO_ADMINISTRADOR;
-        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + USUARIO_ADMINISTRADOR;
+        userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + nomeAdmin;
+        userAvatar.classList.replace('border-white', 'border-indigo-500');
+
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
         btnacessarAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
         
-        // Configurações do formulário de recados para ADMIN
         inputNomeRecado.classList.add('hidden');
         inputNomeRecado.disabled = true;
         inputNomeRecado.required = false;
@@ -1106,26 +1187,26 @@
         btnEnviarRecado.disabled = false;
         inputRecado.placeholder = "Avisar turma...";
       } else {
-        currentAlunoEmail = emailAluno;
-        btnModoAluno.classList.replace('text-gray-500', 'text-gray-800');
-        btnModoAluno.classList.replace('hover:text-gray-700', 'shadow-sm');
-        btnModoAluno.classList.add('bg-white');
+        const nomeAluno = userObj.nome || userObj.email.split('@')[0];
+        roleText.innerText = nomeAluno;
+        roleText.classList.replace('text-indigo-700', 'text-gray-800');
+        roleBadge.innerText = "Modo Leitura (Aluno)";
+        roleBadge.classList.replace('text-indigo-500', 'text-gray-500');
         
-        btnModoAdmin.classList.replace('bg-white', 'text-gray-500');
-        btnModoAdmin.classList.replace('shadow-sm', 'hover:text-gray-700');
-        btnModoAdmin.classList.replace('text-gray-800', 'bg-transparent');
+        userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userObj.email}`;
+        userAvatar.classList.replace('border-indigo-500', 'border-white');
 
-        roleText.innerText = `Aluno: ${emailAluno.split('@')[0]}`;
-        userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${emailAluno}`;
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
         btnacessarAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
         
-        // Configurações do formulário de recados para ALUNO
         inputNomeRecado.classList.remove('hidden');
         inputNomeRecado.disabled = false;
         inputNomeRecado.required = true;
+        if(userObj.nome) {
+          inputNomeRecado.value = userObj.nome; // Preenche auto
+        }
         
         inputRecado.disabled = false;
         btnEnviarRecado.disabled = false;
@@ -1138,24 +1219,11 @@
       renderizarLinksImportantes();
     }
 
-    btnModoAdmin.addEventListener('click', () => {
-      if (!isAdminMode) {
-        document.getElementById('modal-auth').classList.remove('hidden');
-        mudarAuthView('login-admin');
-      }
-    });
-
-    btnModoAluno.addEventListener('click', () => {
-      if (isAdminMode) {
-        document.getElementById('modal-auth').classList.remove('hidden');
-        mudarAuthView('login-aluno');
-      }
-    });
-
     setTimeout(() => {
       document.getElementById('modal-auth').classList.remove('hidden');
     }, 200);
 
+    // Login Master (Antigo)
     document.getElementById('form-login-admin').addEventListener('submit', (e) => {
       e.preventDefault();
       const usuarioDigitado = document.getElementById('admin-usuario-input').value.trim();
@@ -1164,95 +1232,77 @@
       if (usuarioDigitado === USUARIO_ADMINISTRADOR && senhaDigitada === SENHA_ADMINISTRADOR) {
         document.getElementById('modal-auth').classList.add('hidden');
         alternarModoUI(true);
+        registrarAcesso("Prof. " + USUARIO_ADMINISTRADOR);
         e.target.reset();
       } else {
         document.getElementById('admin-erro').classList.remove('hidden');
       }
     });
 
+    // Login Flexível (Aluno ou Admin Cadastrado)
     document.getElementById('form-login-aluno').addEventListener('submit', (e) => {
       e.preventDefault();
       const emailDigitado = document.getElementById('login-email').value.trim().toLowerCase();
       
-      const isApproved = alunosPermitidos.some(a => a.email === emailDigitado);
-      const isPending = solicitacoesList.some(s => s.email === emailDigitado);
-      
+      const alunoEncontrado = alunosPermitidos.find(a => a.email === emailDigitado);
       const erroEl = document.getElementById('login-erro');
 
-      if (isApproved) {
+      if (alunoEncontrado) {
         document.getElementById('modal-auth').classList.add('hidden');
-        alternarModoUI(false, emailDigitado);
+        
+        // Se a permissão no Firebase for admin, dá as funções totais
+        if(alunoEncontrado.role === 'admin') {
+          alternarModoUI(true, alunoEncontrado);
+        } else {
+          alternarModoUI(false, alunoEncontrado);
+        }
+        
+        registrarAcesso(alunoEncontrado.nome || emailDigitado.split('@')[0]);
         e.target.reset();
-      } else if (isPending) {
-        erroEl.textContent = "O seu acesso ainda está pendente de aprovação pelo professor.";
-        erroEl.classList.remove('hidden');
       } else {
-        erroEl.textContent = "E-mail não encontrado. Por favor, solicite acesso.";
+        erroEl.textContent = "E-mail não encontrado. Por favor, crie o seu acesso.";
         erroEl.classList.remove('hidden');
       }
     });
 
-    const emailCadastroInput = document.getElementById('cadastro-email');
-    const divJustificativa = document.getElementById('div-justificativa');
-    const justifInput = document.getElementById('cadastro-justificativa');
-
-    emailCadastroInput.addEventListener('input', (e) => {
-      const email = e.target.value.toLowerCase();
-      if (email && !email.includes('@uem.br')) {
-        divJustificativa.classList.remove('hidden');
-        justifInput.required = true;
-      } else {
-        divJustificativa.classList.add('hidden');
-        justifInput.required = false;
-      }
-    });
-
+    // Registo Direto (Sem Espera de Aprovação)
     document.getElementById('form-cadastro-aluno').addEventListener('submit', async (e) => {
       e.preventDefault();
       const nome = document.getElementById('cadastro-nome').value.trim();
-      const email = emailCadastroInput.value.trim().toLowerCase();
-      const justificativa = justifInput.value.trim();
+      const email = document.getElementById('cadastro-email').value.trim().toLowerCase();
       
       const msgEl = document.getElementById('cadastro-msg');
       msgEl.classList.remove('hidden');
 
       if (alunosPermitidos.some(a => a.email === email)) {
-        msgEl.textContent = "Este e-mail já possui acesso. Faça login.";
+        msgEl.textContent = "Este e-mail já possui conta. Faça login.";
         msgEl.className = "text-center text-xs text-blue-600 font-medium";
         return;
       }
 
-      if (solicitacoesList.some(s => s.email === email)) {
-        msgEl.textContent = "A sua solicitação já está em análise.";
-        msgEl.className = "text-center text-xs text-yellow-600 font-medium";
-        return;
-      }
-
       try {
-        const docData = { nome, email, justificativa: email.includes('@uem.br') ? '' : justificativa, data: Date.now() };
-        await addDoc(collection(db, getPath('solicitacoes')), docData);
+        const docData = { nome: nome, email: email, role: 'aluno', dataCadastro: Date.now() };
+        await addDoc(collection(db, getPath('alunos')), docData);
         
         e.target.reset();
-        divJustificativa.classList.add('hidden');
-        justifInput.required = false;
-        
-        msgEl.textContent = "Solicitação enviada com sucesso! Aguarde aprovação.";
+        msgEl.textContent = "Conta criada com sucesso! Faça Login para aceder.";
         msgEl.className = "text-center text-xs text-green-600 font-bold";
         
-        setTimeout(() => mudarAuthView('login-aluno'), 3000);
+        setTimeout(() => mudarAuthView('login-aluno'), 2500);
       } catch (error) {
         console.error("Erro no cadastro:", error);
-        msgEl.textContent = "Erro ao enviar pedido.";
+        msgEl.textContent = "Erro ao criar conta.";
         msgEl.className = "text-center text-xs text-red-600 font-medium";
       }
     });
 
+    // Adição Manual de Alunos (Pelo Admin)
     document.getElementById('form-aluno-manual').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
       
+      const nome = document.getElementById('aluno-nome-manual').value.trim();
       const email = document.getElementById('aluno-email-manual').value.trim().toLowerCase();
-      if (!email) return;
       
       if (alunosPermitidos.some(a => a.email === email)) {
         alert("Este e-mail já está na lista.");
@@ -1260,7 +1310,7 @@
       }
 
       try {
-        await addDoc(collection(db, getPath('alunos')), { email });
+        await addDoc(collection(db, getPath('alunos')), { nome, email, role: 'aluno' });
         e.target.reset();
       } catch (error) {
         console.error("Erro aluno manual:", error);
@@ -1311,7 +1361,7 @@
 
       let autor = '';
       if (isAdminMode) {
-        autor = `👨‍🏫 Prof. ${USUARIO_ADMINISTRADOR}`;
+        autor = currentAlunoObj ? currentAlunoObj.nome : `👨‍🏫 Prof. ${USUARIO_ADMINISTRADOR}`;
       } else {
         const nomeDigitado = inputNomeRecado.value.trim();
         if (!nomeDigitado) return;
@@ -1320,7 +1370,7 @@
 
       try {
         await addDoc(collection(db, getPath('recados')), { texto, autor, timestamp: Date.now() });
-        inputRecado.value = ''; // Limpa apenas a mensagem, mantém o nome preenchido
+        inputRecado.value = ''; 
       } catch (error) {
         console.error("Erro recado:", error);
       }
@@ -1375,10 +1425,8 @@
       
       try {
         if (arquivoEmEdicaoId) {
-          // Edita o arquivo existente
           await updateDoc(doc(db, getPath('arquivos'), arquivoEmEdicaoId), novoArquivo);
         } else {
-          // Cria novo arquivo
           await addDoc(collection(db, getPath('arquivos')), novoArquivo);
         }
         
