@@ -35,9 +35,24 @@
     /* Estilização para Ocultar Scrollbar mantendo funcionalidade */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Animação do Modal de Novidades */
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-animate {
+      animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
 <body class="bg-gray-50 font-sans flex h-screen overflow-hidden relative">
+
+  <!-- AVISO TOAST FLUTUANTE (COPIAR TEXTO) -->
+  <div id="toast-msg" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-5 py-3 rounded-lg shadow-xl transition-all duration-300 opacity-0 -translate-y-4 pointer-events-none z-[100] flex items-center gap-3 font-medium text-sm">
+    <i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>
+    <span id="toast-texto">Mensagem copiada!</span>
+  </div>
 
   <!-- SIDEBAR MOBILE OVERLAY -->
   <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
@@ -234,6 +249,26 @@
     </div>
   </div>
 
+  <!-- MODAL: NOVIDADES APÓS LOGIN -->
+  <div id="modal-novidades" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden modal-animate">
+      <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-5 text-white flex items-center gap-3">
+        <div class="bg-white/20 p-2 rounded-lg"><i data-lucide="bell-ring" class="w-6 h-6"></i></div>
+        <div>
+          <h3 class="font-bold text-lg leading-tight">Últimas Atualizações</h3>
+          <p class="text-blue-100 text-xs">Veja o que há de novo no portal</p>
+        </div>
+      </div>
+      <div class="p-5 max-h-[60vh] overflow-y-auto bg-gray-50" id="lista-novidades">
+        <!-- Injetado via JS -->
+        <p class="text-center text-gray-400 text-sm italic">Buscando atualizações...</p>
+      </div>
+      <div class="p-4 border-t border-gray-200 bg-white flex justify-end">
+        <button id="btn-fechar-novidades" class="px-5 py-2 text-sm font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors w-full sm:w-auto">Entendi, acessar mural</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAIS DE CONTEÚDO -->
 
   <!-- MODAL: NOVA AULA -->
@@ -331,7 +366,7 @@
         <form id="form-arquivo" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nome de Exibição</label>
-            <input type="text" id="arq-nome" placeholder="Ex: PDF de React" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            <input type="text" id="arq-nome" placeholder="Ex: Aula 1 - Slides" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Pasta / Categoria</label>
@@ -343,7 +378,7 @@
               <select id="arq-tipo" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                 <option value="pdf">PDF / Documento</option>
                 <option value="video">Vídeo</option>
-                <option value="code">Código (ZIP)</option>
+                <option value="code">Código / Outros</option>
               </select>
             </div>
             <div>
@@ -356,13 +391,18 @@
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">URL (Link de Partilha)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">URL (Link de Compartilhamento)</label>
             <input type="url" id="arq-url" placeholder="https://" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tamanho (Opcional, Ex: 2MB)</label>
-            <input type="text" id="arq-tamanho" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          
+          <div class="bg-green-50 border border-green-200 p-3 rounded-lg flex items-start gap-3 mt-2 cursor-pointer select-none" onclick="document.getElementById('arq-notificar').click()">
+            <input type="checkbox" id="arq-notificar" class="mt-1 w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-green-500 cursor-pointer" checked onclick="event.stopPropagation()">
+            <div class="text-xs text-green-800">
+              <span class="font-bold block">Notificar no WhatsApp</span>
+              Copia a mensagem e abre o grupo da turma no WhatsApp para colar.
+            </div>
           </div>
+
           <div class="pt-4 flex justify-end gap-2 border-t border-gray-100 mt-2">
             <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
             <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Salvar Arquivo</button>
@@ -421,6 +461,15 @@
           <label class="block text-sm font-medium text-gray-700 mb-1">Link do PDF (Google Drive / Web)</label>
           <input type="url" id="livro-url" placeholder="https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
         </div>
+        
+        <div class="bg-green-50 border border-green-200 p-3 rounded-lg flex items-start gap-3 mt-2 cursor-pointer select-none" onclick="document.getElementById('livro-notificar').click()">
+            <input type="checkbox" id="livro-notificar" class="mt-1 w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-green-500 cursor-pointer" checked onclick="event.stopPropagation()">
+            <div class="text-xs text-green-800">
+              <span class="font-bold block">Notificar no WhatsApp</span>
+              Copia a mensagem e abre o grupo da turma no WhatsApp para colar.
+            </div>
+        </div>
+
         <div class="pt-4 flex justify-end gap-2">
           <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
           <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg">Salvar Obra</button>
@@ -446,7 +495,8 @@
           </h4>
           
           <form id="form-aluno-manual" class="flex gap-2 mb-3">
-            <input type="text" id="aluno-nome-manual" placeholder="Nome" class="w-1/3 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+            <input type="text" id="aluno-nome-manual" placeholder="Nome" class="w-1/4 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+            <input type="text" id="aluno-usuario-manual" placeholder="Username (1 palavra)" pattern="[A-Za-zÀ-ÿ]+" title="Apenas letras, sem espaços" class="w-1/4 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
             <input type="email" id="aluno-email-manual" placeholder="E-mail" class="flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
             <button type="submit" class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg whitespace-nowrap">Adicionar</button>
           </form>
@@ -481,7 +531,7 @@
             <div class="flex items-center gap-3">
               <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="user" class="w-5 h-5"></i></div>
               <div class="text-left">
-                <p class="font-semibold text-gray-800">Sou Aluno</p>
+                <p class="font-semibold text-gray-800">Sou Aluno / Visitante</p>
                 <p class="text-xs text-gray-500">Acessar o material da disciplina</p>
               </div>
             </div>
@@ -492,7 +542,7 @@
             <div class="flex items-center gap-3">
               <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i data-lucide="shield" class="w-5 h-5"></i></div>
               <div class="text-left">
-                <p class="font-semibold text-gray-800">Sou Professor (Master)</p>
+                <p class="font-semibold text-gray-800">Sou Professor</p>
                 <p class="text-xs text-gray-500">Acesso via senha</p>
               </div>
             </div>
@@ -505,18 +555,18 @@
           <button onclick="mudarAuthView('selecao')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
           </button>
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso do Aluno/Admin</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Insira o e-mail que usou para se cadastrar.</p>
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso Pessoal</h3>
+          <p class="text-sm text-gray-500 mb-6 text-center">Insira o seu <strong class="text-gray-700">E-mail</strong> ou <strong class="text-gray-700">Nome de Usuário</strong>.</p>
           
           <form id="form-login-aluno">
-            <input type="email" id="login-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" required>
+            <input type="text" id="login-identificador" placeholder="E-mail ou Usuário..." class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3 text-center" required>
             <p id="login-erro" class="text-red-500 text-xs mb-3 hidden text-center"></p>
-            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">Entrar</button>
+            <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">Entrar no Mural</button>
           </form>
           
           <div class="mt-6 text-center text-sm border-t border-gray-100 pt-4">
             <span class="text-gray-600">Ainda não tem conta?</span>
-            <button onclick="mudarAuthView('cadastro-aluno')" class="text-blue-600 font-semibold hover:underline ml-1">Criar seu acesso</button>
+            <button onclick="mudarAuthView('cadastro-aluno')" class="text-blue-600 font-semibold hover:underline ml-1">Criar acesso</button>
           </div>
         </div>
 
@@ -526,10 +576,16 @@
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
           </button>
           <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Criar Acesso</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Preencha os dados para obter acesso imediato à plataforma.</p>
+          <p class="text-sm text-gray-500 mb-4 text-center">Preencha os dados. O <strong>Usuário</strong> deve ter apenas 1 palavra e servirá para login rápido.</p>
           
           <form id="form-cadastro-aluno" class="space-y-3">
             <input type="text" id="cadastro-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            
+            <div class="relative">
+                <i data-lucide="at-sign" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i>
+                <input type="text" id="cadastro-usuario" placeholder="Nome de Usuário (Ex: prado)" pattern="[A-Za-zÀ-ÿ]+" title="Apenas letras, sem espaços" class="w-full border border-gray-300 rounded-lg pl-9 p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+            </div>
+
             <input type="email" id="cadastro-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             
             <p id="cadastro-msg" class="text-center text-xs hidden"></p>
@@ -542,8 +598,8 @@
           <button onclick="mudarAuthView('selecao')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
           </button>
-          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso Master</h3>
-          <p class="text-sm text-gray-500 mb-6 text-center">Apenas para os detentores da senha mestre.</p>
+          <h3 class="font-bold text-gray-800 text-lg mb-1 text-center">Acesso do Professor</h3>
+          <p class="text-sm text-gray-500 mb-6 text-center">Apenas para os detentores da senha do professor.</p>
           
           <form id="form-login-admin">
             <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Usuário" required>
@@ -597,12 +653,48 @@
     
     let aulasList = [];
     let arquivosList = [];
-    let bibliotecaList = []; // Nova lista para as obras do Drive
+    let bibliotecaList = []; 
     let recadosList = [];
     let alunosPermitidos = [];
     let linksImportantesList = [];
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+
+    // --- FUNÇÕES UTILITÁRIAS ---
+    function mostrarToast(mensagem) {
+        const toast = document.getElementById('toast-msg');
+        document.getElementById('toast-texto').innerText = mensagem;
+        
+        toast.classList.remove('opacity-0', '-translate-y-4');
+        toast.classList.add('opacity-100', 'translate-y-0');
+        
+        setTimeout(() => {
+            toast.classList.remove('opacity-100', 'translate-y-0');
+            toast.classList.add('opacity-0', '-translate-y-4');
+        }, 3500);
+    }
+
+    function copiarParaAreaDeTransferenciaEObrirWhatsApp(texto) {
+        const textarea = document.createElement("textarea");
+        textarea.value = texto;
+        textarea.style.top = "0";
+        textarea.style.left = "0";
+        textarea.style.position = "fixed";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            mostrarToast("Texto copiado! Cole a mensagem no grupo.");
+        } catch (err) {
+            console.error('Erro ao copiar', err);
+        }
+        document.body.removeChild(textarea);
+        
+        setTimeout(() => {
+            window.open('https://chat.whatsapp.com/EOxa8O4x2iL95c8PyzaMTb?mode=gi_t', '_blank');
+        }, 1200);
+    }
 
     // --- 3. AUTENTICAÇÃO ANÔNIMA ---
     const initAuth = async () => {
@@ -623,7 +715,7 @@
 
       onSnapshot(collection(db, pathPrefix, 'aulas'), (snapshot) => {
         aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        calcularProximoEvento(); // Calcula e depois atualiza o calendário para o efeito Glow
+        calcularProximoEvento(); 
       });
 
       onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
@@ -631,7 +723,6 @@
         renderizarArquivos();
       });
 
-      // Ouvinte da nova coleção Biblioteca
       onSnapshot(collection(db, pathPrefix, 'biblioteca'), (snapshot) => {
         bibliotecaList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarBiblioteca();
@@ -652,7 +743,6 @@
         renderizarLinksImportantes();
       });
 
-      // Ouvinte para os Acessos (Contador)
       onSnapshot(collection(db, pathPrefix, 'acessos'), (snapshot) => {
         const acessosList = snapshot.docs.map(doc => doc.data()).sort((a,b) => b.timestamp - a.timestamp);
         const total = acessosList.length;
@@ -679,7 +769,7 @@
     btnToggleContador.addEventListener('click', () => {
         contadorExpandido = !contadorExpandido;
         if (contadorExpandido) {
-            conteudoContador.style.maxHeight = '150px'; // Espaço suficiente para o conteúdo
+            conteudoContador.style.maxHeight = '150px'; 
             iconeToggle.style.transform = 'rotate(0deg)';
         } else {
             conteudoContador.style.maxHeight = '0px';
@@ -687,15 +777,63 @@
         }
     });
 
-    // Estado inicial: Minimizando com animação ao carregar
     setTimeout(() => {
         if(contadorExpandido) {
              conteudoContador.style.maxHeight = '0px';
              iconeToggle.style.transform = 'rotate(180deg)';
              contadorExpandido = false;
         }
-    }, 3000); // Recolhe após 3 segundos
+    }, 3000); 
 
+    // --- MURAL DE NOVIDADES APÓS LOGIN ---
+    function mostrarNovidades() {
+        const modal = document.getElementById('modal-novidades');
+        const lista = document.getElementById('lista-novidades');
+        
+        let todosItens = [];
+        arquivosList.forEach(a => {
+           if(a.timestamp) todosItens.push({ tipoLabel: 'Material Didático', titulo: a.nome, autor: a.pasta || 'Geral', tempo: a.timestamp, icone: 'file' });
+        });
+        bibliotecaList.forEach(b => {
+           if(b.timestamp) todosItens.push({ tipoLabel: 'Biblioteca', titulo: b.titulo, autor: b.autor || 'Drive', tempo: b.timestamp, icone: 'library' });
+        });
+
+        todosItens.sort((a,b) => b.tempo - a.tempo); 
+        const ultimosItens = todosItens.slice(0, 4);
+
+        if(ultimosItens.length === 0) {
+            lista.innerHTML = `<div class="p-6 text-center text-gray-500">
+                <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                Nenhuma novidade recente.
+            </div>`;
+        } else {
+            lista.innerHTML = ultimosItens.map(item => {
+                const dataFormatada = new Date(item.tempo).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'});
+                return `
+                <div class="bg-white p-3 rounded-xl border border-gray-200 mb-2 flex items-start gap-3 shadow-sm">
+                    <div class="bg-blue-50 p-2 rounded-lg text-blue-500 shrink-0">
+                        <i data-lucide="${item.icone}" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-[10px] font-bold uppercase text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded">${item.tipoLabel}</span>
+                            <span class="text-[10px] text-gray-400">${dataFormatada}</span>
+                        </div>
+                        <h4 class="text-sm font-semibold text-gray-800 leading-tight">${item.titulo}</h4>
+                        <p class="text-xs text-gray-500 mt-1">${item.autor}</p>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        
+        lucide.createIcons();
+        modal.classList.remove('hidden');
+    }
+
+    document.getElementById('btn-fechar-novidades').addEventListener('click', () => {
+        document.getElementById('modal-novidades').classList.add('hidden');
+    });
 
     // --- 5. FUNÇÕES DE GESTÃO DO BANCO DE DADOS ---
     const getPath = (col) => `artifacts/${appId}/public/data/${col}`;
@@ -769,7 +907,6 @@
     // --- 6. RENDERIZAÇÃO DA UI ---
 
     function getDriveFileId(url) {
-        // Função para extrair o ID do arquivo do Google Drive a partir da URL
         try {
             const regex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|drive\.google\.com\/.*\/d\/)([-\w]{25,})/;
             const match = url.match(regex);
@@ -790,10 +927,6 @@
 
       container.innerHTML = livrosOrdenados.map(livro => {
         const fileId = getDriveFileId(livro.url);
-        
-        // Se for link do Drive, tenta pegar a Thumbnail nativa do Drive. Se não for, usa um ícone de PDF genérico.
-        // O Google Drive tem uma URL pública secreta para Thumbnails que as vezes funciona se o arquivo for público:
-        // https://drive.google.com/thumbnail?id=FILE_ID&sz=w200-h300
         
         let iconeHtml = '';
         if(fileId) {
@@ -863,11 +996,10 @@
       container.innerHTML = alunosPermitidos.map(aluno => `
         <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200 gap-3">
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-gray-800 truncate">${aluno.nome || 'Sem Nome'}</p>
+            <p class="text-sm font-semibold text-gray-800 truncate">${aluno.nome || 'Sem Nome'} <span class="text-[10px] text-blue-500 font-mono bg-blue-50 px-1 rounded ml-1">@${aluno.usuario || 'user'}</span></p>
             <p class="text-[10px] text-gray-500 truncate">${aluno.email}</p>
           </div>
           
-          <!-- Botão Deslizante (Toggle) -->
           <label class="relative inline-flex items-center cursor-pointer ml-auto shrink-0" title="Definir permissão">
             <input type="checkbox" class="sr-only peer" ${aluno.role === 'admin' ? 'checked' : ''} onchange="alterarRoleAluno('${aluno.id}', this.checked)">
             <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-600 shadow-inner"></div>
@@ -891,7 +1023,7 @@
 
       const recadosOrdenados = [...recadosList].sort((a, b) => a.timestamp - b.timestamp);
       container.innerHTML = recadosOrdenados.map(recado => {
-        const data = new Date(recado.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const data = new Date(recado.timestamp).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
         return `
           <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 relative group">
             <div class="flex justify-between items-start mb-1">
@@ -1036,7 +1168,6 @@
       if (proximoEventoGlobal) {
         const diff = proximoEventoGlobal.date - now;
         if (diff > 0) {
-          // Cálculo de Dias, Horas e Minutos Faltantes
           const d = Math.floor(diff / (1000 * 60 * 60 * 24));
           const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -1049,7 +1180,7 @@
           document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> Próx: ${proximoEventoGlobal.titulo} em ${tempoTexto}`;
         } else {
           document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="play-circle" class="w-3 h-3 text-red-500"></i> Evento Acontecendo Agora!`;
-          calcularProximoEvento(); // Recalcula quando atinge zero
+          calcularProximoEvento(); 
         }
       } else {
         document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="calendar" class="w-3 h-3"></i> Nenhum evento agendado`;
@@ -1359,7 +1490,7 @@
         inputNomeRecado.disabled = false;
         inputNomeRecado.required = true;
         if(userObj.nome) {
-          inputNomeRecado.value = userObj.nome; // Preenche auto
+          inputNomeRecado.value = userObj.nome; 
         }
         
         inputRecado.disabled = false;
@@ -1388,42 +1519,49 @@
         document.getElementById('modal-auth').classList.add('hidden');
         alternarModoUI(true);
         registrarAcesso("Prof. " + USUARIO_ADMINISTRADOR);
+        mostrarNovidades();
         e.target.reset();
       } else {
         document.getElementById('admin-erro').classList.remove('hidden');
       }
     });
 
-    // Login Flexível (Aluno ou Admin Cadastrado)
+    // Login Flexível (Aluno ou Admin Cadastrado) usando Email OU Usuário
     document.getElementById('form-login-aluno').addEventListener('submit', (e) => {
       e.preventDefault();
-      const emailDigitado = document.getElementById('login-email').value.trim().toLowerCase();
+      const inputIdentificador = document.getElementById('login-identificador').value.trim().toLowerCase();
       
-      const alunoEncontrado = alunosPermitidos.find(a => a.email === emailDigitado);
+      // Busca aluno que o e-mail ou o username (se existir) seja igual ao digitado
+      const alunoEncontrado = alunosPermitidos.find(a => 
+        a.email === inputIdentificador || 
+        (a.usuario && a.usuario.toLowerCase() === inputIdentificador)
+      );
+      
       const erroEl = document.getElementById('login-erro');
 
       if (alunoEncontrado) {
         document.getElementById('modal-auth').classList.add('hidden');
         
-        // Se a permissão no Firebase for admin, dá as funções totais
         if(alunoEncontrado.role === 'admin') {
           alternarModoUI(true, alunoEncontrado);
         } else {
           alternarModoUI(false, alunoEncontrado);
         }
         
-        registrarAcesso(alunoEncontrado.nome || emailDigitado.split('@')[0]);
+        registrarAcesso(alunoEncontrado.nome || alunoEncontrado.email.split('@')[0]);
+        mostrarNovidades(); // Dispara o modal flutuante de novidades
         e.target.reset();
       } else {
-        erroEl.textContent = "E-mail não encontrado. Por favor, crie seu acesso.";
+        erroEl.textContent = "Cadastro não encontrado. Por favor, crie seu acesso.";
         erroEl.classList.remove('hidden');
       }
     });
 
-    // Registo Direto (Sem Espera de Aprovação)
+    // Cadastro de Aluno com Nome de Usuário (1 Palavra)
     document.getElementById('form-cadastro-aluno').addEventListener('submit', async (e) => {
       e.preventDefault();
       const nome = document.getElementById('cadastro-nome').value.trim();
+      const usuario = document.getElementById('cadastro-usuario').value.trim();
       const email = document.getElementById('cadastro-email').value.trim().toLowerCase();
       
       const msgEl = document.getElementById('cadastro-msg');
@@ -1434,9 +1572,21 @@
         msgEl.className = "text-center text-xs text-blue-600 font-medium";
         return;
       }
+      
+      if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === usuario.toLowerCase())) {
+        msgEl.textContent = "Este usuário já está em uso. Escolha outro.";
+        msgEl.className = "text-center text-xs text-yellow-600 font-medium";
+        return;
+      }
 
       try {
-        const docData = { nome: nome, email: email, role: 'aluno', dataCadastro: Date.now() };
+        const docData = { 
+            nome: nome, 
+            usuario: usuario, 
+            email: email, 
+            role: 'aluno', 
+            dataCadastro: Date.now() 
+        };
         await addDoc(collection(db, getPath('alunos')), docData);
         
         e.target.reset();
@@ -1451,21 +1601,27 @@
       }
     });
 
-    // Adição Manual de Alunos (Pelo Admin)
+    // Adição Manual de Alunos (Pelo Admin) - Adicionado campo Usuario
     document.getElementById('form-aluno-manual').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
       
       const nome = document.getElementById('aluno-nome-manual').value.trim();
+      const usuario = document.getElementById('aluno-usuario-manual').value.trim();
       const email = document.getElementById('aluno-email-manual').value.trim().toLowerCase();
       
       if (alunosPermitidos.some(a => a.email === email)) {
         alert("Este e-mail já está na lista.");
         return;
       }
+      
+      if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === usuario.toLowerCase())) {
+        alert("Este Nome de Usuário já está sendo utilizado.");
+        return;
+      }
 
       try {
-        await addDoc(collection(db, getPath('alunos')), { nome, email, role: 'aluno' });
+        await addDoc(collection(db, getPath('alunos')), { nome, usuario, email, role: 'aluno' });
         e.target.reset();
       } catch (error) {
         console.error("Erro aluno manual:", error);
@@ -1583,6 +1739,7 @@
         fonte: document.getElementById('arq-fonte').value,
         url: document.getElementById('arq-url').value.trim(),
         tamanho: document.getElementById('arq-tamanho').value.trim(),
+        timestamp: Date.now() 
       };
       
       try {
@@ -1590,6 +1747,14 @@
           await updateDoc(doc(db, getPath('arquivos'), arquivoEmEdicaoId), novoArquivo);
         } else {
           await addDoc(collection(db, getPath('arquivos')), novoArquivo);
+          
+          if (document.getElementById('arq-notificar').checked) {
+              const tipoTexto = novoArquivo.tipo === 'pdf' ? 'PDF/Documento' : (novoArquivo.tipo === 'video' ? 'Vídeo' : 'Código/Outro');
+              const nomeAutor = currentAlunoObj ? currentAlunoObj.nome : `Prof. ${USUARIO_ADMINISTRADOR}`;
+              
+              const msg = `🚨 *Atenção!* \n\n*Novo Material Adicionado:*\n\n📁 *Tipo:* ${tipoTexto}\n📄 *Nome:* ${novoArquivo.nome}\n👤 *Autor:* ${nomeAutor}\n\nAcesse o portal para conferir!`;
+              copiarParaAreaDeTransferenciaEObrirWhatsApp(msg);
+          }
         }
         
         modalArquivo.classList.add('hidden');
@@ -1614,6 +1779,13 @@
       
       try {
         await addDoc(collection(db, getPath('biblioteca')), novoLivro);
+        
+        if (document.getElementById('livro-notificar').checked) {
+              const nomeAutorPost = currentAlunoObj ? currentAlunoObj.nome : `Prof. ${USUARIO_ADMINISTRADOR}`;
+              const msg = `📚 *Atenção!* \n\n*Nova Obra na Biblioteca:*\n\n📖 *Título:* ${novoLivro.titulo}\n✍️ *Autor da Obra:* ${novoLivro.autor || 'Desconhecido'}\n👤 *Adicionado por:* ${nomeAutorPost}\n\nAcesse o portal para fazer a leitura!`;
+              copiarParaAreaDeTransferenciaEObrirWhatsApp(msg);
+        }
+
         modalLivro.classList.add('hidden');
         e.target.reset();
       } catch (error) {
