@@ -570,6 +570,24 @@
           </div>
         </div>
 
+        <!-- VISTA 2.5: ATUALIZAÇÃO OBRIGATÓRIA DE USUÁRIO -->
+        <div id="auth-view-atualizar-usuario" class="hidden">
+            <h3 class="font-bold text-gray-800 text-lg mb-1 text-center text-orange-600"><i data-lucide="alert-circle" class="w-6 h-6 mx-auto mb-2"></i> Atualização Obrigatória</h3>
+            <p class="text-sm text-gray-600 mb-4 text-center">Para continuar, você precisa criar um <strong>Nome de Usuário</strong> curto e sem espaços para facilitar seus próximos acessos.</p>
+            
+            <form id="form-atualizar-usuario" class="space-y-3">
+              <input type="hidden" id="atualizar-usuario-id">
+              
+              <div class="relative">
+                  <i data-lucide="at-sign" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i>
+                  <input type="text" id="input-novo-usuario" placeholder="Ex: prado" pattern="[A-Za-zÀ-ÿ]+" title="Apenas letras, sem espaços" class="w-full border border-gray-300 rounded-lg pl-9 p-3 text-sm focus:ring-2 focus:ring-orange-500 outline-none" required>
+              </div>
+              
+              <p id="atualizar-msg" class="text-center text-xs hidden"></p>
+              <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors mt-2">Salvar e Entrar</button>
+            </form>
+        </div>
+
         <!-- VISTA 3: CADASTRO DO ALUNO -->
         <div id="auth-view-cadastro-aluno" class="hidden">
           <button onclick="mudarAuthView('login-aluno')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
@@ -1422,12 +1440,14 @@
       document.getElementById('auth-view-login-aluno').classList.add('hidden');
       document.getElementById('auth-view-cadastro-aluno').classList.add('hidden');
       document.getElementById('auth-view-login-admin').classList.add('hidden');
+      document.getElementById('auth-view-atualizar-usuario').classList.add('hidden');
       
       document.getElementById(`auth-view-${viewName}`).classList.remove('hidden');
       
       document.getElementById('login-erro').classList.add('hidden');
       document.getElementById('admin-erro').classList.add('hidden');
       document.getElementById('cadastro-msg').classList.add('hidden');
+      document.getElementById('atualizar-msg').classList.add('hidden');
     };
 
     const roleText = document.getElementById('user-role-text');
@@ -1540,6 +1560,13 @@
       const erroEl = document.getElementById('login-erro');
 
       if (alunoEncontrado) {
+          // VERIFICA SE O ALUNO JÁ TEM UM USUÁRIO CADASTRADO (Para alunos antigos que só usavam e-mail)
+          if (!alunoEncontrado.usuario) {
+             document.getElementById('atualizar-usuario-id').value = alunoEncontrado.id;
+             mudarAuthView('atualizar-usuario');
+             return;
+          }
+
         document.getElementById('modal-auth').classList.add('hidden');
         
         if(alunoEncontrado.role === 'admin') {
@@ -1555,6 +1582,43 @@
         erroEl.textContent = "Cadastro não encontrado. Por favor, crie seu acesso.";
         erroEl.classList.remove('hidden');
       }
+    });
+
+    // Submissão da tela de Atualização Obrigatória de Usuário
+    document.getElementById('form-atualizar-usuario').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('atualizar-usuario-id').value;
+        const novoUsuario = document.getElementById('input-novo-usuario').value.trim();
+        const msgEl = document.getElementById('atualizar-msg');
+        msgEl.classList.remove('hidden');
+
+        if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === novoUsuario.toLowerCase())) {
+            msgEl.textContent = "Este usuário já está em uso. Escolha outro.";
+            msgEl.className = "text-center text-xs text-red-600 font-medium";
+            return;
+        }
+
+        try {
+            await updateDoc(doc(db, getPath('alunos'), id), { usuario: novoUsuario });
+            
+            const alunoAtualizado = alunosPermitidos.find(a => a.id === id);
+            alunoAtualizado.usuario = novoUsuario; // Atualiza no front para uso imediato
+
+            document.getElementById('modal-auth').classList.add('hidden');
+            if(alunoAtualizado.role === 'admin') {
+              alternarModoUI(true, alunoAtualizado);
+            } else {
+              alternarModoUI(false, alunoAtualizado);
+            }
+            registrarAcesso(alunoAtualizado.nome || alunoAtualizado.email.split('@')[0]);
+            mostrarNovidades();
+            e.target.reset();
+
+        } catch (error) {
+            console.error("Erro ao atualizar usuário:", error);
+            msgEl.textContent = "Erro ao salvar. Tente novamente.";
+            msgEl.className = "text-center text-xs text-red-600 font-medium";
+        }
     });
 
     // Cadastro de Aluno com Nome de Usuário (1 Palavra)
