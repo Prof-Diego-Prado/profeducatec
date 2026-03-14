@@ -168,7 +168,8 @@
               <!-- TOGGLE DE VISÃO DO CALENDÁRIO -->
               <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
                 <button id="btn-visao-semanal" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Semanal</button>
-                <button id="btn-visao-mensal" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Mensal</button>
+                <button id="btn-visao-mensal" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all bg-transparent">Mensal</button>
+                <button id="btn-visao-anual" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all bg-transparent">Anual</button>
               </div>
 
               <!-- Botão visível apenas para Admin -->
@@ -1271,7 +1272,111 @@
     // --- LÓGICA DO CALENDÁRIO ---
     function atualizarCalendario() {
       if (visaoCalendario === 'semanal') renderizarCalendarioSemanal();
-      else renderizarCalendarioMensal();
+      else if (visaoCalendario === 'mensal') renderizarCalendarioMensal();
+      else renderizarCalendarioAnual();
+    }
+
+    function renderizarCalendarioAnual() {
+      const container = document.getElementById('calendario-grid');
+      container.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 bg-gray-50 h-full content-start overflow-y-auto no-scrollbar";
+
+      const dataAtual = new Date();
+      const ano = dataAtual.getFullYear();
+      document.getElementById('titulo-calendario').innerText = `Visão Anual / ${ano}`;
+
+      const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+      const headerDias = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+      const mapeamentoDias = { 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta' };
+
+      let html = '';
+
+      for (let mes = 0; mes < 12; mes++) {
+        const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+        const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
+
+        html += `<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">`;
+        html += `<div class="bg-blue-50 border-b border-blue-100 px-3 py-2 text-center font-bold text-blue-800 text-sm uppercase tracking-wider">${nomesMeses[mes]}</div>`;
+        html += `<div class="p-3 flex-1">`;
+        html += `<div class="grid grid-cols-7 gap-1 text-center mb-2">`;
+        headerDias.forEach(dia => {
+          html += `<div class="text-[10px] font-bold text-gray-400">${dia}</div>`;
+        });
+        html += `</div>`;
+        html += `<div class="grid grid-cols-7 gap-1 text-center">`;
+
+        for (let i = 0; i < primeiroDiaSemana; i++) {
+          html += `<div></div>`;
+        }
+
+        for (let dia = 1; dia <= diasNoMes; dia++) {
+          const dataDia = new Date(ano, mes, dia);
+          const diaDaSemanaNum = dataDia.getDay();
+          const nomeDiaAula = mapeamentoDias[diaDaSemanaNum];
+
+          const mesStr = String(mes + 1).padStart(2, '0');
+          const diaStr = String(dia).padStart(2, '0');
+          const dataAtualFormatada = `${ano}-${mesStr}-${diaStr}`;
+          const dataAtualLoopObj = new Date(ano, mes, dia, 12, 0, 0);
+
+          let temAula = false;
+          aulasList.forEach(aula => {
+            if (aula.tipoRepeticao === 'unico') {
+              if (aula.dataUnica === dataAtualFormatada) temAula = true;
+            } else if (aula.tipoRepeticao === 'semanal') {
+               if (nomeDiaAula && aula.dia === nomeDiaAula) {
+                 let dentroDoPeriodo = true;
+                 if (aula.dataInicio) {
+                   const dataInicioObj = new Date(aula.dataInicio + 'T00:00:00');
+                   if (dataAtualLoopObj < dataInicioObj) dentroDoPeriodo = false;
+                 }
+                 if (aula.dataFim) {
+                   const dataFimObj = new Date(aula.dataFim + 'T23:59:59');
+                   if (dataAtualLoopObj > dataFimObj) dentroDoPeriodo = false;
+                 }
+                 if (dentroDoPeriodo) temAula = true;
+               }
+            }
+          });
+
+          const temAniversario = alunosPermitidos.some(a => {
+              if(!a.aniversario) return false;
+              const parts = a.aniversario.split('-');
+              return parts[1] === mesStr && parts[2] === diaStr;
+          });
+
+          const isHoje = dataAtual.getDate() === dia && dataAtual.getMonth() === mes && dataAtual.getFullYear() === ano;
+          
+          let classesDia = "w-6 h-6 mx-auto flex items-center justify-center rounded-full text-[10px] sm:text-xs transition-colors ";
+          let titleAtributo = "";
+          
+          if (isHoje) {
+              classesDia += "bg-blue-600 text-white font-bold shadow-md ring-2 ring-blue-200 ring-offset-1";
+              titleAtributo = "Hoje";
+          } else if (temAniversario) {
+              classesDia += "bg-gradient-to-br from-pink-400 to-red-400 text-white font-bold shadow-sm cursor-help";
+              titleAtributo = "Aniversário!";
+          } else if (temAula) {
+              classesDia += "bg-indigo-100 text-indigo-700 font-semibold border border-indigo-200";
+              titleAtributo = "Aula agendada";
+          } else {
+              classesDia += "text-gray-500 hover:bg-gray-100 cursor-default";
+          }
+
+          html += `<div><div class="${classesDia}" title="${titleAtributo}">${dia}</div></div>`;
+        }
+        html += `</div></div></div>`;
+      }
+      
+      // Adicionar legenda
+      html += `
+        <div class="col-span-full mt-2 p-3 bg-white border border-gray-200 rounded-lg flex flex-wrap justify-center gap-4 text-xs text-gray-600">
+          <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-blue-600 rounded-full"></div> Hoje</div>
+          <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-gradient-to-br from-pink-400 to-red-400 rounded-full"></div> Aniversário</div>
+          <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-indigo-100 border border-indigo-200 rounded-full"></div> Aula/Evento</div>
+        </div>
+      `;
+      
+      container.innerHTML = html;
     }
 
     function renderizarCalendarioSemanal() {
@@ -1501,27 +1606,31 @@
 
     const btnSemanal = document.getElementById('btn-visao-semanal');
     const btnMensal = document.getElementById('btn-visao-mensal');
+    const btnAnual = document.getElementById('btn-visao-anual');
+
+    function setActiveBtn(ativo, ...inativos) {
+        ativo.className = "px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all";
+        inativos.forEach(btn => {
+            btn.className = "px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all bg-transparent";
+        });
+    }
 
     btnSemanal.addEventListener('click', () => {
       visaoCalendario = 'semanal';
       document.getElementById('titulo-calendario').innerText = "A Sua Semana";
-      btnSemanal.classList.replace('text-gray-500', 'text-gray-800');
-      btnSemanal.classList.replace('hover:text-gray-700', 'shadow-sm');
-      btnSemanal.classList.add('bg-white');
-      btnMensal.classList.replace('bg-white', 'text-gray-500');
-      btnMensal.classList.replace('shadow-sm', 'hover:text-gray-700');
-      btnMensal.classList.replace('text-gray-800', 'bg-transparent');
+      setActiveBtn(btnSemanal, btnMensal, btnAnual);
       atualizarCalendario();
     });
 
     btnMensal.addEventListener('click', () => {
       visaoCalendario = 'mensal';
-      btnMensal.classList.replace('text-gray-500', 'text-gray-800');
-      btnMensal.classList.replace('hover:text-gray-700', 'shadow-sm');
-      btnMensal.classList.add('bg-white');
-      btnSemanal.classList.replace('bg-white', 'text-gray-500');
-      btnSemanal.classList.replace('shadow-sm', 'hover:text-gray-700');
-      btnSemanal.classList.replace('text-gray-800', 'bg-transparent');
+      setActiveBtn(btnMensal, btnSemanal, btnAnual);
+      atualizarCalendario();
+    });
+
+    btnAnual.addEventListener('click', () => {
+      visaoCalendario = 'anual';
+      setActiveBtn(btnAnual, btnSemanal, btnMensal);
       atualizarCalendario();
     });
 
