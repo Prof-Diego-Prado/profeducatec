@@ -9,17 +9,14 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
-    /* Ocultar scrollbars para um visual mais limpo */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     
-    /* Estilo para remover a seta padrão do details no Safari/Chrome mais antigos */
     details > summary { list-style: none; }
     details > summary::-webkit-details-marker { display: none; }
 
-    /* Animação de Glow para o próximo evento */
     @keyframes glow {
       0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); border-color: transparent; }
       50% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.8), 0 0 5px rgba(59, 130, 246, 0.4); border-color: #3b82f6; }
@@ -32,11 +29,9 @@
       transform: scale(1.02);
     }
     
-    /* Estilização para Ocultar Scrollbar mantendo funcionalidade */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Animação do Modal de Novidades */
     @keyframes slideUpFade {
       from { opacity: 0; transform: translateY(20px) scale(0.95); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -44,11 +39,35 @@
     .modal-animate {
       animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+
+    /* Professor accordion styles */
+    .prof-bar {
+      transition: all 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .prof-bar:hover {
+      filter: brightness(1.08);
+    }
+    .prof-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .prof-content.open {
+      max-height: 500px;
+    }
+    .prof-chevron {
+      transition: transform 0.3s ease;
+    }
+    .prof-chevron.open {
+      transform: rotate(180deg);
+    }
   </style>
 </head>
 <body class="bg-gray-50 font-sans flex h-screen overflow-hidden relative">
 
-  <!-- AVISO TOAST FLUTUANTE (COPIAR TEXTO) -->
+  <!-- AVISO TOAST FLUTUANTE -->
   <div id="toast-msg" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-5 py-3 rounded-lg shadow-xl transition-all duration-300 opacity-0 -translate-y-4 pointer-events-none z-[100] flex items-center gap-3 font-medium text-sm">
     <i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>
     <span id="toast-texto">Mensagem copiada!</span>
@@ -96,25 +115,23 @@
             Carregando materiais...
           </div>
         </div>
-      </div>
 
-      <!-- Mural de Recados -->
-      <div class="flex flex-col h-72 border-t border-gray-200 pt-4 shrink-0 bg-white">
-        <h3 class="px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-          <i data-lucide="message-square" class="w-4 h-4"></i> Mural de Recados
-        </h3>
-        <div id="mural-lista" class="flex-1 overflow-y-auto px-5 space-y-3 mb-2 text-sm">
-          <p class="text-gray-400 text-xs text-center mt-4">Carregando recados...</p>
-        </div>
-        <form id="form-recado" class="px-5 pb-4 mt-auto flex flex-col gap-2">
-          <input type="text" id="input-nome-recado" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none hidden" placeholder="Seu nome" required disabled>
-          <div class="flex gap-2">
-            <input type="text" id="input-recado" class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Escreva um recado..." required disabled>
-            <button type="submit" id="btn-enviar-recado" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-2 py-1.5 transition-colors disabled:opacity-50" disabled>
-              <i data-lucide="send" class="w-4 h-4"></i>
+        <!-- ===== SEÇÃO PROFESSORES ===== -->
+        <div>
+          <div class="flex items-center justify-between px-3 mb-3">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i> Professores
+            </h3>
+            <button id="btn-novo-professor" class="hidden text-purple-600 hover:text-purple-800 transition-colors" title="Adicionar Professor">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
             </button>
           </div>
-        </form>
+          <div id="professores-lista" class="space-y-2 text-sm text-gray-500 text-center">
+            <p class="text-xs text-gray-400 italic mt-2">Carregando professores...</p>
+          </div>
+        </div>
+        <!-- ===== FIM SEÇÃO PROFESSORES ===== -->
+
       </div>
     </nav>
   </aside>
@@ -130,7 +147,6 @@
       <div class="flex-1 flex justify-between items-center lg:justify-end gap-4">
         <h1 class="text-xl font-semibold text-gray-800 lg:hidden">Dashboard</h1>
         
-        <!-- RELÓGIO E PRÓXIMO EVENTO -->
         <div class="hidden sm:flex flex-col items-end mr-auto lg:mr-4 text-right">
           <div id="relogio-atual" class="text-sm font-bold text-gray-800 tracking-wider">--:--:--</div>
           <div id="proximo-evento-timer" class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full mt-0.5 shadow-sm border border-blue-100 flex items-center gap-1">
@@ -138,7 +154,6 @@
           </div>
         </div>
 
-        <!-- Botão visível apenas para Admin -->
         <button id="btn-acessar-alunos" class="hidden bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-indigo-200">
           <i data-lucide="users" class="w-4 h-4"></i>
           <span class="hidden sm:inline">Gestão de Usuários</span>
@@ -165,14 +180,12 @@
             </div>
             
             <div class="flex items-center gap-4">
-              <!-- TOGGLE DE VISÃO DO CALENDÁRIO -->
               <div class="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
                 <button id="btn-visao-semanal" class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all">Semanal</button>
                 <button id="btn-visao-mensal" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all bg-transparent">Mensal</button>
                 <button id="btn-visao-anual" class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all bg-transparent">Anual</button>
               </div>
 
-              <!-- Botão visível apenas para Admin -->
               <button id="btn-nova-aula" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
                 <i data-lucide="calendar-plus" class="w-4 h-4"></i>
                 <span class="hidden sm:inline">Nova Aula</span>
@@ -180,7 +193,6 @@
             </div>
           </div>
 
-          <!-- Grade do Calendário -->
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1 min-h-[400px]">
             <div id="calendario-grid" class="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full">
               <div class="col-span-full flex items-center justify-center p-12 text-gray-500">
@@ -193,7 +205,6 @@
         <!-- COLUNA DIREITA: LINKS E BIBLIOTECA -->
         <div class="w-full xl:w-80 shrink-0 flex flex-col gap-6 xl:h-[calc(100vh-10rem)]">
           
-          <!-- Seção Superior: Links Importantes -->
           <div class="flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex-1 min-h-[250px] overflow-hidden">
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
               <h3 class="font-bold text-gray-800 flex items-center gap-2">
@@ -209,7 +220,6 @@
             </div>
           </div>
 
-          <!-- Seção Inferior: Biblioteca (Repositório) -->
           <div class="flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex-1 min-h-[250px] overflow-hidden relative">
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
               <h3 class="font-bold text-gray-800 flex items-center gap-2">
@@ -231,7 +241,7 @@
     </div>
   </main>
 
-  <!-- CONTADOR DE ACESSOS (Canto Inferior Direito) -->
+  <!-- CONTADOR DE ACESSOS -->
   <div id="contador-acessos" class="fixed bottom-4 right-4 bg-white p-4 rounded-xl shadow-2xl border border-gray-200 z-40 text-xs hidden flex-col gap-2 w-56 transition-all shadow-md">
     <div class="flex justify-between items-center border-b border-gray-100 pb-2 mb-1 cursor-pointer select-none" id="btn-toggle-contador">
       <span class="font-bold text-gray-700 flex items-center gap-1.5">
@@ -244,9 +254,7 @@
     </div>
     <div id="conteudo-contador-acessos" class="flex flex-col gap-2 overflow-hidden transition-all duration-300">
         <div class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Últimos Visitantes:</div>
-        <ul id="ultimos-acessos" class="text-gray-600 truncate space-y-1.5 font-medium">
-          <!-- Injetado -->
-        </ul>
+        <ul id="ultimos-acessos" class="text-gray-600 truncate space-y-1.5 font-medium"></ul>
     </div>
   </div>
 
@@ -261,7 +269,6 @@
         </div>
       </div>
       <div class="p-5 max-h-[60vh] overflow-y-auto bg-gray-50" id="lista-novidades">
-        <!-- Injetado via JS -->
         <p class="text-center text-gray-400 text-sm italic">Buscando atualizações...</p>
       </div>
       <div class="p-4 border-t border-gray-200 bg-white flex justify-end">
@@ -269,8 +276,6 @@
       </div>
     </div>
   </div>
-
-  <!-- MODAIS DE CONTEÚDO -->
 
   <!-- MODAL: NOVA AULA -->
   <div id="modal-aula" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
@@ -479,6 +484,45 @@
     </div>
   </div>
 
+  <!-- ===== MODAL: NOVO PROFESSOR ===== -->
+  <div id="modal-professor" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+        <h3 id="titulo-modal-professor" class="font-bold text-gray-800 flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5 text-purple-600"></i> Adicionar Professor
+        </h3>
+        <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="form-professor" class="p-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Professor</label>
+          <input type="text" id="prof-nome" placeholder="Ex: Prof. João Silva" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Disciplina</label>
+          <input type="text" id="prof-disciplina" placeholder="Ex: Matemática Aplicada" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+            <i data-lucide="hard-drive" class="w-4 h-4 text-purple-500"></i> Endereço do Drive (pasta da disciplina)
+          </label>
+          <input type="url" id="prof-drive" placeholder="https://drive.google.com/drive/folders/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Cor de Destaque da Barra</label>
+          <div class="grid grid-cols-6 gap-2" id="color-picker-grid">
+            <!-- cores injetadas via JS -->
+          </div>
+          <input type="hidden" id="prof-cor" value="#6366f1">
+        </div>
+        <div class="pt-4 flex justify-end gap-2 border-t border-gray-100">
+          <button type="button" class="fechar-modal-content px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg">Salvar Professor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- ===== FIM MODAL PROFESSOR ===== -->
 
   <!-- MODAL: GESTÃO DE USUÁRIOS (ADMIN) -->
   <div id="modal-alunos" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
@@ -488,8 +532,6 @@
         <button class="fechar-modal-content text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="p-4 flex-1 overflow-y-auto space-y-6">
-        
-        <!-- Bloco de Usuários Cadastrados -->
         <div>
           <h4 class="text-sm font-semibold text-gray-700 border-b pb-1 mb-3 flex items-center gap-2">
             <i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Usuários Cadastrados
@@ -502,21 +544,16 @@
             <button type="submit" class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg whitespace-nowrap">Adicionar</button>
           </form>
 
-          <ul id="lista-alunos-cadastrados" class="space-y-2 text-sm">
-            <!-- Injetado via JS -->
-          </ul>
+          <ul id="lista-alunos-cadastrados" class="space-y-2 text-sm"></ul>
         </div>
-
       </div>
     </div>
   </div>
-
 
   <!-- MODAL UNIFICADO DE AUTENTICAÇÃO -->
   <div id="modal-auth" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative">
       
-      <!-- HEADER DO MODAL -->
       <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-center text-white">
         <i data-lucide="graduation-cap" class="w-12 h-12 mx-auto mb-2 opacity-90"></i>
         <h2 class="text-2xl font-bold tracking-tight">Profeducatec</h2>
@@ -525,7 +562,6 @@
 
       <div class="p-6">
         
-        <!-- VISTA 1: SELEÇÃO DE PERFIL -->
         <div id="auth-view-selecao" class="space-y-4">
           <p class="text-center text-gray-600 font-medium mb-4">Como deseja acessar?</p>
           <button onclick="mudarAuthView('login-aluno')" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group">
@@ -551,7 +587,6 @@
           </button>
         </div>
 
-        <!-- VISTA 2: LOGIN DO ALUNO -->
         <div id="auth-view-login-aluno" class="hidden">
           <button onclick="mudarAuthView('selecao')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
@@ -571,43 +606,34 @@
           </div>
         </div>
 
-        <!-- VISTA 2.5: ATUALIZAÇÃO OBRIGATÓRIA DE USUÁRIO -->
         <div id="auth-view-atualizar-usuario" class="hidden">
             <h3 class="font-bold text-gray-800 text-lg mb-1 text-center text-orange-600"><i data-lucide="alert-circle" class="w-6 h-6 mx-auto mb-2"></i> Atualização Obrigatória</h3>
             <p class="text-sm text-gray-600 mb-4 text-center">Para continuar, você precisa criar um <strong>Nome de Usuário</strong> curto e sem espaços para facilitar seus próximos acessos.</p>
-            
             <form id="form-atualizar-usuario" class="space-y-3">
               <input type="hidden" id="atualizar-usuario-id">
-              
               <div class="relative">
                   <i data-lucide="at-sign" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i>
                   <input type="text" id="input-novo-usuario" placeholder="Ex: prado" pattern="[A-Za-zÀ-ÿ]+" title="Apenas letras, sem espaços" class="w-full border border-gray-300 rounded-lg pl-9 p-3 text-sm focus:ring-2 focus:ring-orange-500 outline-none" required>
               </div>
-              
               <p id="atualizar-msg" class="text-center text-xs hidden"></p>
               <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors mt-2">Salvar e Entrar</button>
             </form>
         </div>
 
-        <!-- VISTA 2.6: ATUALIZAÇÃO OBRIGATÓRIA DE ANIVERSÁRIO -->
         <div id="auth-view-atualizar-aniversario" class="hidden">
             <h3 class="font-bold text-gray-800 text-lg mb-1 text-center text-pink-600"><i data-lucide="cake" class="w-6 h-6 mx-auto mb-2"></i> Falta pouco!</h3>
             <p class="text-sm text-gray-600 mb-4 text-center">Para comemorarmos juntos, informe sua <strong>Data de Nascimento</strong>.</p>
-            
             <form id="form-atualizar-aniversario" class="space-y-3">
               <input type="hidden" id="atualizar-aniversario-id">
-              
               <div class="relative">
                   <i data-lucide="calendar" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i>
                   <input type="date" id="input-novo-aniversario" class="w-full border border-gray-300 rounded-lg pl-9 p-3 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-gray-500" required>
               </div>
-              
               <p id="atualizar-aniversario-msg" class="text-center text-xs hidden"></p>
               <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-pink-500 hover:bg-pink-600 rounded-lg transition-colors mt-2">Salvar e Entrar</button>
             </form>
         </div>
 
-        <!-- VISTA 3: CADASTRO DO ALUNO -->
         <div id="auth-view-cadastro-aluno" class="hidden">
           <button onclick="mudarAuthView('login-aluno')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Login
@@ -617,25 +643,20 @@
           
           <form id="form-cadastro-aluno" class="space-y-3">
             <input type="text" id="cadastro-nome" placeholder="Seu Nome Completo" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-            
             <div class="relative">
                 <i data-lucide="at-sign" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i>
                 <input type="text" id="cadastro-usuario" placeholder="Nome de Usuário (Ex: prado)" pattern="[A-Za-zÀ-ÿ]+" title="Apenas letras, sem espaços" class="w-full border border-gray-300 rounded-lg pl-9 p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
             </div>
-
             <input type="email" id="cadastro-email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
-            
             <div class="relative">
                 <i data-lucide="calendar" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i>
                 <input type="date" id="cadastro-aniversario" class="w-full border border-gray-300 rounded-lg pl-9 p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-gray-500" required title="Data de Nascimento">
             </div>
-
             <p id="cadastro-msg" class="text-center text-xs hidden"></p>
             <button type="submit" id="btn-submit-cadastro" class="w-full py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors mt-2">Criar Conta e Acessar</button>
           </form>
         </div>
 
-        <!-- VISTA 4: LOGIN DO ADMIN -->
         <div id="auth-view-login-admin" class="hidden">
           <button onclick="mudarAuthView('selecao')" class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1 mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
@@ -647,7 +668,6 @@
             <input type="text" id="admin-usuario-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Usuário" required>
             <input type="password" id="admin-senha-input" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-3 text-center" placeholder="Senha" required>
             <p id="admin-erro" class="text-red-500 text-xs mb-3 hidden text-center">Credenciais incorretas!</p>
-            
             <button type="submit" class="w-full py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">Acessar o Painel</button>
           </form>
         </div>
@@ -659,11 +679,9 @@
 
   <!-- JAVASCRIPT: LÓGICA E FIREBASE -->
   <script type="module">
-    // --- 0. CONFIGURAÇÃO DE ACESSO DO ADMIN MASTER ---
     const USUARIO_ADMINISTRADOR = "PradoDiego";
     const SENHA_ADMINISTRADOR = "@Lei30242728";
 
-    // --- 1. CONFIGURAÇÃO FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -679,240 +697,204 @@
     };
     
     const appId = 'profeducatec';
-    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- 2. ESTADO DA APLICAÇÃO ---
+    // --- ESTADO ---
     let currentUser = null;
     let isAdminMode = false;
     let currentAlunoObj = null; 
     let visaoCalendario = 'semanal'; 
     let aulaEmEdicaoId = null; 
     let arquivoEmEdicaoId = null; 
+    let professorEmEdicaoId = null;
     let proximoEventoGlobal = null;
     
     let aulasList = [];
     let arquivosList = [];
     let bibliotecaList = []; 
-    let recadosList = [];
     let alunosPermitidos = [];
     let linksImportantesList = [];
+    let professoresList = [];
 
     const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-    // --- FUNÇÕES UTILITÁRIAS ---
+    // ===== CORES DISPONÍVEIS PARA PROFESSORES =====
+    const PROF_COLORS = [
+      { hex: '#6366f1', name: 'Índigo' },
+      { hex: '#3b82f6', name: 'Azul' },
+      { hex: '#10b981', name: 'Verde' },
+      { hex: '#f59e0b', name: 'Âmbar' },
+      { hex: '#ef4444', name: 'Vermelho' },
+      { hex: '#8b5cf6', name: 'Violeta' },
+      { hex: '#06b6d4', name: 'Ciano' },
+      { hex: '#f97316', name: 'Laranja' },
+      { hex: '#ec4899', name: 'Rosa' },
+      { hex: '#84cc16', name: 'Lima' },
+      { hex: '#14b8a6', name: 'Teal' },
+      { hex: '#a855f7', name: 'Roxo' },
+    ];
+
+    // Render color picker
+    function renderColorPicker(selectedColor) {
+      const grid = document.getElementById('color-picker-grid');
+      grid.innerHTML = PROF_COLORS.map(c => `
+        <button type="button" 
+          onclick="selecionarCorProfessor('${c.hex}')"
+          id="color-btn-${c.hex.replace('#','')}"
+          title="${c.name}"
+          class="w-8 h-8 rounded-full border-2 transition-all ${selectedColor === c.hex ? 'border-gray-800 scale-110 shadow-lg' : 'border-transparent hover:scale-105'}"
+          style="background-color: ${c.hex}">
+        </button>
+      `).join('');
+    }
+
+    window.selecionarCorProfessor = (hex) => {
+      document.getElementById('prof-cor').value = hex;
+      renderColorPicker(hex);
+    };
+
+    // --- UTILIDADES ---
     function mostrarToast(mensagem) {
-        const toast = document.getElementById('toast-msg');
-        document.getElementById('toast-texto').innerText = mensagem;
-        
-        toast.classList.remove('opacity-0', '-translate-y-4');
-        toast.classList.add('opacity-100', 'translate-y-0');
-        
-        setTimeout(() => {
-            toast.classList.remove('opacity-100', 'translate-y-0');
-            toast.classList.add('opacity-0', '-translate-y-4');
-        }, 3500);
+      const toast = document.getElementById('toast-msg');
+      document.getElementById('toast-texto').innerText = mensagem;
+      toast.classList.remove('opacity-0', '-translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-4');
+      }, 3500);
     }
 
     function copiarParaAreaDeTransferenciaEObrirWhatsApp(texto) {
-        const textarea = document.createElement("textarea");
-        textarea.value = texto;
-        textarea.style.top = "0";
-        textarea.style.left = "0";
-        textarea.style.position = "fixed";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        try {
-            document.execCommand('copy');
-            mostrarToast("Texto copiado! Cole a mensagem no grupo.");
-        } catch (err) {
-            console.error('Erro ao copiar', err);
-        }
-        document.body.removeChild(textarea);
-        
-        setTimeout(() => {
-            window.open('https://chat.whatsapp.com/EOxa8O4x2iL95c8PyzaMTb?mode=gi_t', '_blank');
-        }, 1200);
+      const textarea = document.createElement("textarea");
+      textarea.value = texto;
+      textarea.style.top = "0"; textarea.style.left = "0"; textarea.style.position = "fixed";
+      document.body.appendChild(textarea);
+      textarea.focus(); textarea.select();
+      try { document.execCommand('copy'); mostrarToast("Texto copiado! Cole a mensagem no grupo."); } catch (err) { console.error('Erro ao copiar', err); }
+      document.body.removeChild(textarea);
+      setTimeout(() => { window.open('https://chat.whatsapp.com/EOxa8O4x2iL95c8PyzaMTb?mode=gi_t', '_blank'); }, 1200);
     }
 
-    // --- 3. AUTENTICAÇÃO ANÔNIMA ---
+    // --- AUTH ---
     const initAuth = async () => {
-      try {
-        await signInAnonymously(auth);
-      } catch (error) {
-        console.error("Erro de Autenticação:", error);
-      }
+      try { await signInAnonymously(auth); } catch (error) { console.error("Erro de Autenticação:", error); }
     };
     initAuth();
 
-    // --- 4. OUVINTES DO FIRESTORE ---
+    // --- FIRESTORE ---
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       if (!user) return;
-
       const pathPrefix = `artifacts/${appId}/public/data`;
 
       onSnapshot(collection(db, pathPrefix, 'aulas'), (snapshot) => {
         aulasList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         calcularProximoEvento(); 
       });
-
       onSnapshot(collection(db, pathPrefix, 'arquivos'), (snapshot) => {
         arquivosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarArquivos();
       });
-
       onSnapshot(collection(db, pathPrefix, 'biblioteca'), (snapshot) => {
         bibliotecaList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarBiblioteca();
       });
-
-      onSnapshot(collection(db, pathPrefix, 'recados'), (snapshot) => {
-        recadosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderizarMural();
-      });
-
       onSnapshot(collection(db, pathPrefix, 'alunos'), (snapshot) => {
         alunosPermitidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarListaAlunos();
       });
-
       onSnapshot(collection(db, pathPrefix, 'links_importantes'), (snapshot) => {
         linksImportantesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderizarLinksImportantes();
       });
-
+      // ===== OUVINTE PROFESSORES =====
+      onSnapshot(collection(db, pathPrefix, 'professores'), (snapshot) => {
+        professoresList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderizarProfessores();
+      });
       onSnapshot(collection(db, pathPrefix, 'acessos'), (snapshot) => {
         const acessosList = snapshot.docs.map(doc => doc.data()).sort((a,b) => b.timestamp - a.timestamp);
         const total = acessosList.length;
         const ultimos = acessosList.slice(0, 3).map(a => a.nome);
-        
         document.getElementById('total-acessos').innerText = total;
         const ultimosHtml = ultimos.map(n => `<li class="flex items-center gap-2"><i data-lucide="user-check" class="w-3 h-3 text-green-500"></i>${n}</li>`).join('');
         document.getElementById('ultimos-acessos').innerHTML = ultimosHtml || '<li>Nenhum acesso ainda.</li>';
-        
-        if(total > 0) {
-          document.getElementById('contador-acessos').classList.remove('hidden');
-          document.getElementById('contador-acessos').classList.add('flex');
-        }
+        if(total > 0) { document.getElementById('contador-acessos').classList.remove('hidden'); document.getElementById('contador-acessos').classList.add('flex'); }
         lucide.createIcons();
       });
     });
 
-    // --- LÓGICA DO CONTADOR MINIMIZÁVEL ---
+    // Contador minimizável
     const btnToggleContador = document.getElementById('btn-toggle-contador');
     const conteudoContador = document.getElementById('conteudo-contador-acessos');
     const iconeToggle = document.getElementById('icone-toggle-contador');
     let contadorExpandido = true;
-
     btnToggleContador.addEventListener('click', () => {
-        contadorExpandido = !contadorExpandido;
-        if (contadorExpandido) {
-            conteudoContador.style.maxHeight = '150px'; 
-            iconeToggle.style.transform = 'rotate(0deg)';
-        } else {
-            conteudoContador.style.maxHeight = '0px';
-            iconeToggle.style.transform = 'rotate(180deg)';
-        }
+      contadorExpandido = !contadorExpandido;
+      conteudoContador.style.maxHeight = contadorExpandido ? '150px' : '0px';
+      iconeToggle.style.transform = contadorExpandido ? 'rotate(0deg)' : 'rotate(180deg)';
     });
-
     setTimeout(() => {
-        if(contadorExpandido) {
-             conteudoContador.style.maxHeight = '0px';
-             iconeToggle.style.transform = 'rotate(180deg)';
-             contadorExpandido = false;
-        }
-    }, 3000); 
+      if(contadorExpandido) { conteudoContador.style.maxHeight = '0px'; iconeToggle.style.transform = 'rotate(180deg)'; contadorExpandido = false; }
+    }, 3000);
 
-    // --- MURAL DE NOVIDADES APÓS LOGIN ---
+    // Novidades
     function mostrarNovidades() {
-        const modal = document.getElementById('modal-novidades');
-        const lista = document.getElementById('lista-novidades');
-        
-        let todosItens = [];
-        arquivosList.forEach(a => {
-           if(a.timestamp) todosItens.push({ tipoLabel: 'Material Didático', titulo: a.nome, autor: a.pasta || 'Geral', tempo: a.timestamp, icone: 'file' });
-        });
-        bibliotecaList.forEach(b => {
-           if(b.timestamp) todosItens.push({ tipoLabel: 'Biblioteca', titulo: b.titulo, autor: b.autor || 'Drive', tempo: b.timestamp, icone: 'library' });
-        });
-
-        todosItens.sort((a,b) => b.tempo - a.tempo); 
-        const ultimosItens = todosItens.slice(0, 4);
-
-        if(ultimosItens.length === 0) {
-            lista.innerHTML = `<div class="p-6 text-center text-gray-500">
-                <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                Nenhuma novidade recente.
-            </div>`;
-        } else {
-            lista.innerHTML = ultimosItens.map(item => {
-                const dataFormatada = new Date(item.tempo).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'});
-                return `
-                <div class="bg-white p-3 rounded-xl border border-gray-200 mb-2 flex items-start gap-3 shadow-sm">
-                    <div class="bg-blue-50 p-2 rounded-lg text-blue-500 shrink-0">
-                        <i data-lucide="${item.icone}" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="text-[10px] font-bold uppercase text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded">${item.tipoLabel}</span>
-                            <span class="text-[10px] text-gray-400">${dataFormatada}</span>
-                        </div>
-                        <h4 class="text-sm font-semibold text-gray-800 leading-tight">${item.titulo}</h4>
-                        <p class="text-xs text-gray-500 mt-1">${item.autor}</p>
-                    </div>
-                </div>
-                `;
-            }).join('');
-        }
-        
-        lucide.createIcons();
-        modal.classList.remove('hidden');
+      const modal = document.getElementById('modal-novidades');
+      const lista = document.getElementById('lista-novidades');
+      let todosItens = [];
+      arquivosList.forEach(a => { if(a.timestamp) todosItens.push({ tipoLabel: 'Material Didático', titulo: a.nome, autor: a.pasta || 'Geral', tempo: a.timestamp, icone: 'file' }); });
+      bibliotecaList.forEach(b => { if(b.timestamp) todosItens.push({ tipoLabel: 'Biblioteca', titulo: b.titulo, autor: b.autor || 'Drive', tempo: b.timestamp, icone: 'library' }); });
+      todosItens.sort((a,b) => b.tempo - a.tempo);
+      const ultimosItens = todosItens.slice(0, 4);
+      if(ultimosItens.length === 0) {
+        lista.innerHTML = `<div class="p-6 text-center text-gray-500"><i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>Nenhuma novidade recente.</div>`;
+      } else {
+        lista.innerHTML = ultimosItens.map(item => {
+          const dataFormatada = new Date(item.tempo).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'});
+          return `<div class="bg-white p-3 rounded-xl border border-gray-200 mb-2 flex items-start gap-3 shadow-sm">
+            <div class="bg-blue-50 p-2 rounded-lg text-blue-500 shrink-0"><i data-lucide="${item.icone}" class="w-5 h-5"></i></div>
+            <div>
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-[10px] font-bold uppercase text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded">${item.tipoLabel}</span>
+                <span class="text-[10px] text-gray-400">${dataFormatada}</span>
+              </div>
+              <h4 class="text-sm font-semibold text-gray-800 leading-tight">${item.titulo}</h4>
+              <p class="text-xs text-gray-500 mt-1">${item.autor}</p>
+            </div>
+          </div>`;
+        }).join('');
+      }
+      lucide.createIcons();
+      modal.classList.remove('hidden');
     }
+    document.getElementById('btn-fechar-novidades').addEventListener('click', () => { document.getElementById('modal-novidades').classList.add('hidden'); });
 
-    document.getElementById('btn-fechar-novidades').addEventListener('click', () => {
-        document.getElementById('modal-novidades').classList.add('hidden');
-    });
-
-    // --- 5. FUNÇÕES DE GESTÃO DO BANCO DE DADOS ---
+    // --- DB HELPERS ---
     const getPath = (col) => `artifacts/${appId}/public/data/${col}`;
-
     window.apagarArquivo = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('arquivos'), id)); };
     window.apagarLivro = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('biblioteca'), id)); };
     window.apagarAula = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('aulas'), id)); };
     window.apagarAluno = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('alunos'), id)); };
-    window.apagarRecado = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('recados'), id)); };
     window.apagarLinkImportante = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('links_importantes'), id)); };
+    window.apagarProfessor = async (id) => { if (isAdminMode) await deleteDoc(doc(db, getPath('professores'), id)); };
 
     window.alterarRoleAluno = async (id, isChecked) => {
       if (!isAdminMode) return;
-      try {
-        await updateDoc(doc(db, getPath('alunos'), id), {
-          role: isChecked ? 'admin' : 'aluno'
-        });
-      } catch (err) { console.error("Erro ao alterar permissão:", err); }
+      try { await updateDoc(doc(db, getPath('alunos'), id), { role: isChecked ? 'admin' : 'aluno' }); } catch (err) { console.error("Erro ao alterar permissão:", err); }
     };
-
     window.registrarAcesso = async (nome) => {
-      try {
-        await addDoc(collection(db, getPath('acessos')), {
-          nome: nome,
-          timestamp: Date.now()
-        });
-      } catch (err) { console.error("Erro ao registrar acesso:", err); }
+      try { await addDoc(collection(db, getPath('acessos')), { nome, timestamp: Date.now() }); } catch (err) { console.error("Erro ao registrar acesso:", err); }
     };
-
     window.editarAula = (id) => {
       if (!isAdminMode) return;
       const aula = aulasList.find(a => a.id === id);
       if (!aula) return;
-
-      aulaEmEdicaoId = id; 
+      aulaEmEdicaoId = id;
       document.getElementById('titulo-modal-aula').innerText = "Editar Aula";
-
       document.getElementById('aula-tipo-repeticao').value = aula.tipoRepeticao || 'semanal';
       document.getElementById('aula-dia').value = aula.dia || 'Segunda';
       document.getElementById('aula-data-inicio').value = aula.dataInicio || '';
@@ -923,60 +905,148 @@
       document.getElementById('aula-titulo').value = aula.titulo || '';
       document.getElementById('aula-link').value = aula.link || '';
       document.getElementById('aula-cor').value = aula.cor || 'bg-blue-100 border-blue-300 text-blue-800';
-
       document.getElementById('aula-tipo-repeticao').dispatchEvent(new Event('change'));
       document.getElementById('modal-aula').classList.remove('hidden');
     };
-
     window.editarArquivo = (id) => {
       if (!isAdminMode) return;
       const arq = arquivosList.find(a => a.id === id);
       if (!arq) return;
-
       arquivoEmEdicaoId = id;
       document.getElementById('titulo-modal-arquivo').innerText = "Editar Arquivo";
-      
       document.getElementById('arq-nome').value = arq.nome || '';
       document.getElementById('arq-pasta').value = arq.pasta || '';
       document.getElementById('arq-tipo').value = arq.tipo || 'pdf';
       document.getElementById('arq-fonte').value = arq.fonte || 'drive';
       document.getElementById('arq-url').value = arq.url || '';
-      document.getElementById('arq-tamanho').value = arq.tamanho || '';
-
       document.getElementById('modal-arquivo').classList.remove('hidden');
     };
 
-    // --- 6. RENDERIZAÇÃO DA UI ---
+    // ===== EDITAR PROFESSOR =====
+    window.editarProfessor = (id) => {
+      if (!isAdminMode) return;
+      const prof = professoresList.find(p => p.id === id);
+      if (!prof) return;
+      professorEmEdicaoId = id;
+      document.getElementById('titulo-modal-professor').innerHTML = `<i data-lucide="edit" class="w-5 h-5 text-purple-600"></i> Editar Professor`;
+      document.getElementById('prof-nome').value = prof.nome || '';
+      document.getElementById('prof-disciplina').value = prof.disciplina || '';
+      document.getElementById('prof-drive').value = prof.drive || '';
+      document.getElementById('prof-cor').value = prof.cor || '#6366f1';
+      renderColorPicker(prof.cor || '#6366f1');
+      document.getElementById('modal-professor').classList.remove('hidden');
+      lucide.createIcons();
+    };
 
+    // ===== TOGGLE ACCORDION PROFESSOR =====
+    window.toggleProfessor = (id) => {
+      const content = document.getElementById(`prof-content-${id}`);
+      const chevron = document.getElementById(`prof-chevron-${id}`);
+      if (!content || !chevron) return;
+      const isOpen = content.classList.contains('open');
+      // fechar todos
+      document.querySelectorAll('.prof-content').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.prof-chevron').forEach(el => el.classList.remove('open'));
+      if (!isOpen) {
+        content.classList.add('open');
+        chevron.classList.add('open');
+      }
+    };
+
+    // --- RENDERIZAÇÃO ---
     function getDriveFileId(url) {
-        try {
-            const regex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|drive\.google\.com\/.*\/d\/)([-\w]{25,})/;
-            const match = url.match(regex);
-            return match ? match[1] : null;
-        } catch (e) {
-            return null;
-        }
+      try {
+        const regex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|drive\.google\.com\/.*\/d\/)([-\w]{25,})/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+      } catch (e) { return null; }
+    }
+
+    // ===== RENDERIZAR PROFESSORES =====
+    function renderizarProfessores() {
+      const container = document.getElementById('professores-lista');
+      if (!container) return;
+
+      if (professoresList.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic text-center mt-2 px-3">Nenhum professor cadastrado.</p>`;
+        return;
+      }
+
+      const profsOrdenados = [...professoresList].sort((a, b) => a.nome.localeCompare(b.nome));
+
+      container.innerHTML = profsOrdenados.map(prof => {
+        const cor = prof.cor || '#6366f1';
+
+        // Gera cor de fundo mais suave (10% opacity via hex alpha)
+        const corBg = cor + '1a'; // ~10% opacity
+
+        // Pega as iniciais do professor para o avatar
+        const iniciais = prof.nome.split(' ').slice(0,2).map(p => p[0]).join('').toUpperCase();
+
+        return `
+        <div class="rounded-lg overflow-hidden border border-gray-200 shadow-sm mb-2">
+          <!-- BARRA DO PROFESSOR -->
+          <div class="prof-bar flex items-center gap-2.5 px-3 py-2.5"
+               style="background: linear-gradient(90deg, ${cor}22 0%, ${cor}08 100%); border-left: 4px solid ${cor};"
+               onclick="toggleProfessor('${prof.id}')">
+            <!-- Avatar colorido -->
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0 shadow-sm"
+                 style="background-color: ${cor};">
+              ${iniciais}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-bold text-gray-800 truncate leading-tight">${prof.nome}</p>
+              <p class="text-[10px] text-gray-500 truncate leading-tight">${prof.disciplina}</p>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              ${isAdminMode ? `
+                <button onclick="event.stopPropagation(); editarProfessor('${prof.id}')" 
+                        class="p-1 rounded hover:bg-white/70 text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
+                  <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="event.stopPropagation(); apagarProfessor('${prof.id}')" 
+                        class="p-1 rounded hover:bg-white/70 text-gray-400 hover:text-red-600 transition-colors" title="Excluir">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              ` : ''}
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 prof-chevron" id="prof-chevron-${prof.id}"></i>
+            </div>
+          </div>
+
+          <!-- CONTEÚDO EXPANDÍVEL -->
+          <div class="prof-content bg-white" id="prof-content-${prof.id}">
+            <div class="px-3 py-3 border-t border-gray-100">
+              <a href="${prof.drive}" target="_blank" rel="noopener noreferrer"
+                 class="flex items-center gap-2.5 p-2.5 rounded-lg border transition-all hover:shadow-sm group"
+                 style="border-color: ${cor}30; background-color: ${cor}08;">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                     style="background-color: ${cor}20;">
+                  <i data-lucide="hard-drive" class="w-4 h-4" style="color: ${cor};"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-gray-700 group-hover:text-gray-900 truncate">Pasta da Disciplina</p>
+                  <p class="text-[10px] text-gray-400 truncate">${prof.drive}</p>
+                </div>
+                <i data-lucide="external-link" class="w-3.5 h-3.5 text-gray-400 shrink-0 group-hover:text-gray-600"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
     }
 
     function renderizarBiblioteca() {
       const container = document.getElementById('biblioteca-lista');
-      if (bibliotecaList.length === 0) {
-        container.innerHTML = `<p class="text-sm text-gray-400 text-center mt-8 italic">Nenhuma obra cadastrada.</p>`;
-        return;
-      }
-      
+      if (bibliotecaList.length === 0) { container.innerHTML = `<p class="text-sm text-gray-400 text-center mt-8 italic">Nenhuma obra cadastrada.</p>`; return; }
       const livrosOrdenados = [...bibliotecaList].sort((a,b) => a.titulo.localeCompare(b.titulo));
-
       container.innerHTML = livrosOrdenados.map(livro => {
         const fileId = getDriveFileId(livro.url);
-        
-        let iconeHtml = '';
-        if(fileId) {
-             iconeHtml = `<img src="https://drive.google.com/thumbnail?id=${fileId}&sz=w100-h140" onerror="this.onerror=null; this.outerHTML='<div class=\\'bg-red-50 text-red-500 w-10 h-14 flex items-center justify-center rounded-md border border-red-100 flex-shrink-0\\'><i data-lucide=\\'file-text\\' class=\\'w-6 h-6\\'></i></div>'" alt="Capa" class="w-10 h-14 object-cover rounded-md border border-gray-200 shadow-sm flex-shrink-0" />`;
-        } else {
-             iconeHtml = `<div class="bg-red-50 text-red-500 w-10 h-14 flex items-center justify-center rounded-md border border-red-100 flex-shrink-0"><i data-lucide="file-text" class="w-6 h-6"></i></div>`;
-        }
-
+        let iconeHtml = fileId
+          ? `<img src="https://drive.google.com/thumbnail?id=${fileId}&sz=w100-h140" onerror="this.onerror=null; this.outerHTML='<div class=\\'bg-red-50 text-red-500 w-10 h-14 flex items-center justify-center rounded-md border border-red-100 flex-shrink-0\\'><i data-lucide=\\'file-text\\' class=\\'w-6 h-6\\'></i></div>'" alt="Capa" class="w-10 h-14 object-cover rounded-md border border-gray-200 shadow-sm flex-shrink-0" />`
+          : `<div class="bg-red-50 text-red-500 w-10 h-14 flex items-center justify-center rounded-md border border-red-100 flex-shrink-0"><i data-lucide="file-text" class="w-6 h-6"></i></div>`;
         return `
         <div class="relative group border border-gray-100 rounded-lg p-2.5 hover:bg-indigo-50 transition-colors shadow-sm bg-white">
           <a href="${livro.url}" target="_blank" rel="noopener noreferrer" class="flex gap-3 items-center">
@@ -986,25 +1056,16 @@
               ${livro.autor ? `<p class="text-xs text-gray-500 mt-1 line-clamp-1"><i data-lucide="user" class="w-3 h-3 inline mr-1"></i>${livro.autor}</p>` : ''}
             </div>
           </a>
-          ${isAdminMode ? `
-            <button onclick="apagarLivro('${livro.id}')" class="absolute top-2 right-2 p-1.5 bg-red-50 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 shadow-sm" title="Excluir Obra">
-              <i data-lucide="trash-2" class="w-3 h-3"></i>
-            </button>
-          ` : ''}
-        </div>
-      `}).join('');
+          ${isAdminMode ? `<button onclick="apagarLivro('${livro.id}')" class="absolute top-2 right-2 p-1.5 bg-red-50 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 shadow-sm" title="Excluir Obra"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : ''}
+        </div>`;
+      }).join('');
       lucide.createIcons();
     }
 
     function renderizarLinksImportantes() {
       const container = document.getElementById('links-importantes-lista');
-      if (linksImportantesList.length === 0) {
-        container.innerHTML = `<p class="text-sm text-gray-400 text-center mt-8 italic">Nenhum link importante adicionado.</p>`;
-        return;
-      }
-      
+      if (linksImportantesList.length === 0) { container.innerHTML = `<p class="text-sm text-gray-400 text-center mt-8 italic">Nenhum link importante adicionado.</p>`; return; }
       const linksOrdenados = [...linksImportantesList].sort((a,b) => a.titulo.localeCompare(b.titulo));
-
       container.innerHTML = linksOrdenados.map(link => {
         const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain_url=${encodeURIComponent(link.url)}&sz=64`;
         return `
@@ -1016,13 +1077,8 @@
               ${link.descricao ? `<p class="text-xs text-gray-500 mt-1 line-clamp-2 leading-snug">${link.descricao}</p>` : ''}
             </div>
           </a>
-          ${isAdminMode ? `
-            <button onclick="apagarLinkImportante('${link.id}')" class="absolute top-2 right-2 p-1.5 bg-red-50 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 shadow-sm" title="Excluir Link">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
-          ` : ''}
-        </div>
-        `;
+          ${isAdminMode ? `<button onclick="apagarLinkImportante('${link.id}')" class="absolute top-2 right-2 p-1.5 bg-red-50 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 shadow-sm" title="Excluir Link"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+        </div>`;
       }).join('');
       lucide.createIcons();
     }
@@ -1030,89 +1086,45 @@
     function renderizarListaAlunos() {
       const container = document.getElementById('lista-alunos-cadastrados');
       if (!container) return;
-      
-      if (alunosPermitidos.length === 0) {
-        container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum usuário encontrado.</li>`;
-        return;
-      }
+      if (alunosPermitidos.length === 0) { container.innerHTML = `<li class="text-gray-400 text-xs italic">Nenhum usuário encontrado.</li>`; return; }
       container.innerHTML = alunosPermitidos.map(aluno => `
         <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200 gap-3">
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-gray-800 truncate">${aluno.nome || 'Sem Nome'} <span class="text-[10px] text-blue-500 font-mono bg-blue-50 px-1 rounded ml-1">@${aluno.usuario || 'user'}</span></p>
             <p class="text-[10px] text-gray-500 truncate">${aluno.email}</p>
           </div>
-          
           <label class="relative inline-flex items-center cursor-pointer ml-auto shrink-0" title="Definir permissão">
             <input type="checkbox" class="sr-only peer" ${aluno.role === 'admin' ? 'checked' : ''} onchange="alterarRoleAluno('${aluno.id}', this.checked)">
             <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-600 shadow-inner"></div>
             <span class="ml-1.5 text-[9px] font-bold uppercase ${aluno.role === 'admin' ? 'text-indigo-600' : 'text-gray-400'} w-8 text-center">${aluno.role === 'admin' ? 'Admin' : 'Aluno'}</span>
           </label>
-
           <button onclick="apagarAluno('${aluno.id}')" class="text-red-400 hover:text-red-600 p-1 rounded hover:bg-red-50 shrink-0" title="Apagar Usuário">
             <i data-lucide="trash-2" class="w-4 h-4"></i>
           </button>
-        </li>
-      `).join('');
-      lucide.createIcons();
-    }
-
-    function renderizarMural() {
-      const container = document.getElementById('mural-lista');
-      if (recadosList.length === 0) {
-        container.innerHTML = `<p class="text-gray-400 text-xs text-center mt-4">Nenhum recado ainda. Seja o primeiro!</p>`;
-        return;
-      }
-
-      const recadosOrdenados = [...recadosList].sort((a, b) => a.timestamp - b.timestamp);
-      container.innerHTML = recadosOrdenados.map(recado => {
-        const data = new Date(recado.timestamp).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-        return `
-          <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 relative group">
-            <div class="flex justify-between items-start mb-1">
-              <span class="text-xs font-bold text-gray-700 truncate mr-2">${recado.autor}</span>
-              <span class="text-[10px] text-gray-400 whitespace-nowrap">${data}</span>
-            </div>
-            <p class="text-xs text-gray-600 break-words">${recado.texto}</p>
-            ${isAdminMode ? `
-              <button onclick="apagarRecado('${recado.id}')" class="absolute -top-2 -right-2 p-1.5 bg-red-100 text-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-200">
-                <i data-lucide="x" class="w-3 h-3"></i>
-              </button>
-            ` : ''}
-          </div>
-        `;
-      }).join('');
-      container.scrollTop = container.scrollHeight;
+        </li>`).join('');
       lucide.createIcons();
     }
 
     function renderizarArquivos() {
       const container = document.getElementById('arquivos-lista');
-      if (arquivosList.length === 0) {
-        container.innerHTML = `<p class="text-xs text-gray-400 mt-4 text-center">Nenhum material disponível.</p>`;
-        return;
-      }
-
+      if (arquivosList.length === 0) { container.innerHTML = `<p class="text-xs text-gray-400 mt-4 text-center">Nenhum material disponível.</p>`; return; }
       const pastas = {};
       arquivosList.forEach(arquivo => {
         const pastaNome = arquivo.pasta && arquivo.pasta.trim() !== '' ? arquivo.pasta.trim() : 'Geral';
         if (!pastas[pastaNome]) pastas[pastaNome] = [];
         pastas[pastaNome].push(arquivo);
       });
-
       const nomesPastas = Object.keys(pastas).sort((a, b) => {
         if (a === 'Geral') return 1;
         if (b === 'Geral') return -1;
         return a.localeCompare(b);
       });
-
       let html = '';
-
       nomesPastas.forEach(pastaNome => {
         const arquivosHtml = pastas[pastaNome].map(arquivo => {
           let iconeFonte = arquivo.fonte === 'github' ? 'github' : (arquivo.fonte === 'drive' ? 'hard-drive' : 'link');
           let iconeTipo = (arquivo.tipo === 'pdf' || arquivo.tipo === 'doc') ? 'file-text' : (arquivo.tipo === 'video' ? 'video' : 'book-open');
           let corTipo = arquivo.tipo === 'pdf' ? 'text-red-500' : (arquivo.tipo === 'video' ? 'text-purple-500' : 'text-gray-700');
-
           return `
           <div class="relative group mt-1">
             <a href="${arquivo.url}" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
@@ -1128,18 +1140,11 @@
             </a>
             ${isAdminMode ? `
               <div class="absolute right-1 top-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onclick="editarArquivo('${arquivo.id}')" class="p-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded" title="Mover/Editar">
-                  <i data-lucide="edit" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="apagarArquivo('${arquivo.id}')" class="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded" title="Excluir">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-            ` : ''}
-          </div>
-          `;
+                <button onclick="editarArquivo('${arquivo.id}')" class="p-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded" title="Editar"><i data-lucide="edit" class="w-3.5 h-3.5"></i></button>
+                <button onclick="apagarArquivo('${arquivo.id}')" class="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded" title="Excluir"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              </div>` : ''}
+          </div>`;
         }).join('');
-
         html += `
         <details class="group bg-white border border-gray-200 rounded-lg overflow-hidden mb-2 text-left" open>
           <summary class="flex items-center justify-between p-2.5 bg-gray-50 cursor-pointer select-none hover:bg-gray-100 transition-colors outline-none">
@@ -1149,23 +1154,17 @@
             </div>
             <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500 transition-transform group-open:rotate-180"></i>
           </summary>
-          <div class="p-1.5 space-y-0.5 bg-white border-t border-gray-100">
-            ${arquivosHtml}
-          </div>
-        </details>
-        `;
+          <div class="p-1.5 space-y-0.5 bg-white border-t border-gray-100">${arquivosHtml}</div>
+        </details>`;
       });
-
       container.innerHTML = html;
       lucide.createIcons();
     }
 
-    // --- LÓGICA DO RELÓGIO E PRÓXIMO EVENTO ---
+    // --- RELÓGIO E PRÓXIMO EVENTO ---
     function calcularProximoEvento() {
       const now = new Date();
-      // Remover os milissegundos e segundos do `now` para não ter problemas de "já passou há 10 segundos" e o evento desaparecer da lista muito rápido
       const currentNow = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0);
-      
       let eventoMaisProximo = null;
       const diasMap = { 'Domingo':0, 'Segunda':1, 'Terça':2, 'Quarta':3, 'Quinta':4, 'Sexta':5, 'Sábado':6 };
 
@@ -1177,58 +1176,33 @@
         if (aula.tipoRepeticao === 'unico' && aula.dataUnica) {
           const [ano, mes, dia] = aula.dataUnica.split('-').map(Number);
           eventDate = new Date(ano, mes - 1, dia, hr, min, 0);
-          
-          // Se for evento único e já passou do horário exato (currentNow >= eventDate), nós ignoramos este evento.
-          if (currentNow >= eventDate) {
-              eventDate = null;
-          }
-          
+          if (currentNow >= eventDate) eventDate = null;
         } else if (aula.tipoRepeticao === 'semanal' && aula.dia) {
           const targetDay = diasMap[aula.dia];
           eventDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hr, min, 0);
-          
-          // Lógica de "Próximo dia X da semana":
-          // Se hoje é o dia do evento (now.getDay() === targetDay)
           if (now.getDay() === targetDay) {
-              // Verifica se a hora do evento já passou HOJE
-              if (currentNow >= eventDate) {
-                  // Se já passou, o próximo é só daqui a 7 dias
-                  eventDate.setDate(eventDate.getDate() + 7);
-              }
+            if (currentNow >= eventDate) eventDate.setDate(eventDate.getDate() + 7);
           } else {
-              // Se hoje não é o dia do evento, encontra quantos dias faltam para o próximo
-              const daysUntilNext = (targetDay + 7 - now.getDay()) % 7;
-              eventDate.setDate(eventDate.getDate() + daysUntilNext);
+            const daysUntilNext = (targetDay + 7 - now.getDay()) % 7;
+            eventDate.setDate(eventDate.getDate() + daysUntilNext);
           }
-
-          // Verifica se o evento recorrente já passou da data de Fim
           if (aula.dataFim) {
             const [anoF, mesF, diaF] = aula.dataFim.split('-').map(Number);
             const endBoundary = new Date(anoF, mesF - 1, diaF, 23, 59, 59);
-            // Se a próxima ocorrência calculada (eventDate) for DEPOIS do dia que a aula acaba, a aula não existe mais.
-            if (eventDate > endBoundary) {
-                eventDate = null;
-            }
+            if (eventDate > endBoundary) eventDate = null;
           }
-          
-          // Se tiver data de inicio, e o próximo evento calculado (eventDate) for ANTES da data de inicio,
-          // precisamos jogar o eventDate para o primeiro dia de ocorrência real.
           if (aula.dataInicio && eventDate) {
-               const [anoI, mesI, diaI] = aula.dataInicio.split('-').map(Number);
-               const startBoundary = new Date(anoI, mesI - 1, diaI, 0, 0, 0);
-               
-               if (eventDate < startBoundary) {
-                   // A aula ainda nem começou. Encontrar a primeira ocorrencia depois da data de inicio.
-                   eventDate = new Date(startBoundary.getFullYear(), startBoundary.getMonth(), startBoundary.getDate(), hr, min, 0);
-                   const daysToTarget = (targetDay + 7 - eventDate.getDay()) % 7;
-                   eventDate.setDate(eventDate.getDate() + daysToTarget);
-               }
+            const [anoI, mesI, diaI] = aula.dataInicio.split('-').map(Number);
+            const startBoundary = new Date(anoI, mesI - 1, diaI, 0, 0, 0);
+            if (eventDate < startBoundary) {
+              eventDate = new Date(startBoundary.getFullYear(), startBoundary.getMonth(), startBoundary.getDate(), hr, min, 0);
+              const daysToTarget = (targetDay + 7 - eventDate.getDay()) % 7;
+              eventDate.setDate(eventDate.getDate() + daysToTarget);
+            }
           }
         }
 
-        // Se encontramos uma data válida e futura para ESTA aula
         if (eventDate && eventDate > currentNow) {
-          // Se for o primeiro evento que encontramos, ou se este evento for ANTES do eventoMaisProximo que já tinhamos guardado
           if (!eventoMaisProximo || eventDate < eventoMaisProximo.date) {
             eventoMaisProximo = { id: aula.id, date: eventDate, titulo: aula.titulo };
           }
@@ -1242,25 +1216,20 @@
     setInterval(() => {
       const now = new Date();
       document.getElementById('relogio-atual').innerText = now.toLocaleTimeString('pt-BR');
-      
       if (proximoEventoGlobal) {
         const diff = proximoEventoGlobal.date - now;
-        
         if (diff > 0) {
           const d = Math.floor(diff / (1000 * 60 * 60 * 24));
           const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          
           let tempoTexto = "";
           if (d > 0) tempoTexto += `${d}d `;
           if (h > 0 || d > 0) tempoTexto += `${h}h `;
           tempoTexto += `${m}m`;
-
           document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> Próx: ${proximoEventoGlobal.titulo} em ${tempoTexto}`;
         } else {
           document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="play-circle" class="w-3 h-3 text-red-500"></i> Evento Acontecendo Agora!`;
-          // O timeout é para não ficar recalculando no exato milissegundo. Deixa aparecer a msg por uns segundos e recalcula.
-          setTimeout(() => { calcularProximoEvento(); }, 60000); 
+          setTimeout(() => { calcularProximoEvento(); }, 60000);
         }
       } else {
         document.getElementById('proximo-evento-timer').innerHTML = `<i data-lucide="calendar" class="w-3 h-3"></i> Nenhum evento agendado`;
@@ -1268,8 +1237,7 @@
       lucide.createIcons();
     }, 1000);
 
-
-    // --- LÓGICA DO CALENDÁRIO ---
+    // --- CALENDÁRIO ---
     function atualizarCalendario() {
       if (visaoCalendario === 'semanal') renderizarCalendarioSemanal();
       else if (visaoCalendario === 'mensal') renderizarCalendarioMensal();
@@ -1279,208 +1247,127 @@
     function renderizarCalendarioAnual() {
       const container = document.getElementById('calendario-grid');
       container.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 bg-gray-50 h-full content-start overflow-y-auto no-scrollbar";
-
       const dataAtual = new Date();
       const ano = dataAtual.getFullYear();
       document.getElementById('titulo-calendario').innerText = `Visão Anual / ${ano}`;
-
       const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
       const headerDias = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
       const mapeamentoDias = { 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta' };
-
       let html = '';
-
       for (let mes = 0; mes < 12; mes++) {
         const diasNoMes = new Date(ano, mes + 1, 0).getDate();
         const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
-
         html += `<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">`;
         html += `<div class="bg-blue-50 border-b border-blue-100 px-3 py-2 text-center font-bold text-blue-800 text-sm uppercase tracking-wider">${nomesMeses[mes]}</div>`;
-        html += `<div class="p-3 flex-1">`;
-        html += `<div class="grid grid-cols-7 gap-1 text-center mb-2">`;
-        headerDias.forEach(dia => {
-          html += `<div class="text-[10px] font-bold text-gray-400">${dia}</div>`;
-        });
-        html += `</div>`;
-        html += `<div class="grid grid-cols-7 gap-1 text-center">`;
-
-        for (let i = 0; i < primeiroDiaSemana; i++) {
-          html += `<div></div>`;
-        }
-
+        html += `<div class="p-3 flex-1"><div class="grid grid-cols-7 gap-1 text-center mb-2">`;
+        headerDias.forEach(dia => { html += `<div class="text-[10px] font-bold text-gray-400">${dia}</div>`; });
+        html += `</div><div class="grid grid-cols-7 gap-1 text-center">`;
+        for (let i = 0; i < primeiroDiaSemana; i++) html += `<div></div>`;
         for (let dia = 1; dia <= diasNoMes; dia++) {
           const dataDia = new Date(ano, mes, dia);
           const diaDaSemanaNum = dataDia.getDay();
           const nomeDiaAula = mapeamentoDias[diaDaSemanaNum];
-
           const mesStr = String(mes + 1).padStart(2, '0');
           const diaStr = String(dia).padStart(2, '0');
           const dataAtualFormatada = `${ano}-${mesStr}-${diaStr}`;
           const dataAtualLoopObj = new Date(ano, mes, dia, 12, 0, 0);
-
           let temAula = false;
           aulasList.forEach(aula => {
-            if (aula.tipoRepeticao === 'unico') {
-              if (aula.dataUnica === dataAtualFormatada) temAula = true;
-            } else if (aula.tipoRepeticao === 'semanal') {
-               if (nomeDiaAula && aula.dia === nomeDiaAula) {
-                 let dentroDoPeriodo = true;
-                 if (aula.dataInicio) {
-                   const dataInicioObj = new Date(aula.dataInicio + 'T00:00:00');
-                   if (dataAtualLoopObj < dataInicioObj) dentroDoPeriodo = false;
-                 }
-                 if (aula.dataFim) {
-                   const dataFimObj = new Date(aula.dataFim + 'T23:59:59');
-                   if (dataAtualLoopObj > dataFimObj) dentroDoPeriodo = false;
-                 }
-                 if (dentroDoPeriodo) temAula = true;
-               }
+            if (aula.tipoRepeticao === 'unico') { if (aula.dataUnica === dataAtualFormatada) temAula = true; }
+            else if (aula.tipoRepeticao === 'semanal') {
+              if (nomeDiaAula && aula.dia === nomeDiaAula) {
+                let dentro = true;
+                if (aula.dataInicio) { const s = new Date(aula.dataInicio + 'T00:00:00'); if (dataAtualLoopObj < s) dentro = false; }
+                if (aula.dataFim) { const e = new Date(aula.dataFim + 'T23:59:59'); if (dataAtualLoopObj > e) dentro = false; }
+                if (dentro) temAula = true;
+              }
             }
           });
-
-          const temAniversario = alunosPermitidos.some(a => {
-              if(!a.aniversario) return false;
-              const parts = a.aniversario.split('-');
-              return parts[1] === mesStr && parts[2] === diaStr;
-          });
-
+          const temAniversario = alunosPermitidos.some(a => { if(!a.aniversario) return false; const p = a.aniversario.split('-'); return p[1] === mesStr && p[2] === diaStr; });
           const isHoje = dataAtual.getDate() === dia && dataAtual.getMonth() === mes && dataAtual.getFullYear() === ano;
-          
           let classesDia = "w-6 h-6 mx-auto flex items-center justify-center rounded-full text-[10px] sm:text-xs transition-colors ";
           let titleAtributo = "";
-          
-          if (isHoje) {
-              classesDia += "bg-blue-600 text-white font-bold shadow-md ring-2 ring-blue-200 ring-offset-1";
-              titleAtributo = "Hoje";
-          } else if (temAniversario) {
-              classesDia += "bg-gradient-to-br from-pink-400 to-red-400 text-white font-bold shadow-sm cursor-help";
-              titleAtributo = "Aniversário!";
-          } else if (temAula) {
-              classesDia += "bg-indigo-100 text-indigo-700 font-semibold border border-indigo-200";
-              titleAtributo = "Aula agendada";
-          } else {
-              classesDia += "text-gray-500 hover:bg-gray-100 cursor-default";
-          }
-
+          if (isHoje) { classesDia += "bg-blue-600 text-white font-bold shadow-md ring-2 ring-blue-200 ring-offset-1"; titleAtributo = "Hoje"; }
+          else if (temAniversario) { classesDia += "bg-gradient-to-br from-pink-400 to-red-400 text-white font-bold shadow-sm cursor-help"; titleAtributo = "Aniversário!"; }
+          else if (temAula) { classesDia += "bg-indigo-100 text-indigo-700 font-semibold border border-indigo-200"; titleAtributo = "Aula agendada"; }
+          else { classesDia += "text-gray-500 hover:bg-gray-100 cursor-default"; }
           html += `<div><div class="${classesDia}" title="${titleAtributo}">${dia}</div></div>`;
         }
         html += `</div></div></div>`;
       }
-      
-      // Adicionar legenda
-      html += `
-        <div class="col-span-full mt-2 p-3 bg-white border border-gray-200 rounded-lg flex flex-wrap justify-center gap-4 text-xs text-gray-600">
-          <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-blue-600 rounded-full"></div> Hoje</div>
-          <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-gradient-to-br from-pink-400 to-red-400 rounded-full"></div> Aniversário</div>
-          <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-indigo-100 border border-indigo-200 rounded-full"></div> Aula/Evento</div>
-        </div>
-      `;
-      
+      html += `<div class="col-span-full mt-2 p-3 bg-white border border-gray-200 rounded-lg flex flex-wrap justify-center gap-4 text-xs text-gray-600">
+        <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-blue-600 rounded-full"></div> Hoje</div>
+        <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-gradient-to-br from-pink-400 to-red-400 rounded-full"></div> Aniversário</div>
+        <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-indigo-100 border border-indigo-200 rounded-full"></div> Aula/Evento</div>
+      </div>`;
       container.innerHTML = html;
     }
 
     function renderizarCalendarioSemanal() {
       const container = document.getElementById('calendario-grid');
       container.className = "grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full";
-      
       const today = new Date();
       const currentDayOfWeek = today.getDay();
       const mapDiasParaData = {};
       diasSemana.forEach((nomeDia, index) => {
-          const targetDay = index + 1;
-          const diff = targetDay - currentDayOfWeek;
-          const targetDate = new Date(today);
-          targetDate.setDate(today.getDate() + diff);
-          mapDiasParaData[nomeDia] = targetDate;
+        const targetDay = index + 1;
+        const diff = targetDay - currentDayOfWeek;
+        const targetDate = new Date(today);
+        targetDate.setDate(today.getDate() + diff);
+        mapDiasParaData[nomeDia] = targetDate;
       });
-
       container.innerHTML = diasSemana.map(dia => {
         const dataDesteDia = mapDiasParaData[dia];
         const mesDesteDia = String(dataDesteDia.getMonth() + 1).padStart(2, '0');
         const diaDesteDia = String(dataDesteDia.getDate()).padStart(2, '0');
-        
-        const aniversariantes = alunosPermitidos.filter(a => {
-            if(!a.aniversario) return false;
-            const parts = a.aniversario.split('-');
-            return parts[1] === mesDesteDia && parts[2] === diaDesteDia;
-        });
-
+        const aniversariantes = alunosPermitidos.filter(a => { if(!a.aniversario) return false; const p = a.aniversario.split('-'); return p[1] === mesDesteDia && p[2] === diaDesteDia; });
         let bgClassDay = "bg-white";
         let titleClassDay = "bg-gray-50 border-b border-gray-200";
         let festivoHTML = "";
-
         if (aniversariantes.length > 0) {
-            bgClassDay = "bg-gradient-to-b from-pink-50/50 to-yellow-50/50";
-            titleClassDay = "bg-gradient-to-r from-pink-100 to-yellow-100 border-b border-pink-200";
-            const nomes = aniversariantes.map(a => a.nome.split(' ')[0]).join(', ');
-            festivoHTML = `<div class="text-[11px] text-pink-600 font-bold mb-2 flex items-center justify-center gap-1.5 bg-white/60 py-1 rounded-md border border-pink-100 shadow-sm"><i data-lucide="party-popper" class="w-4 h-4"></i> Aniversário: ${nomes}!</div>`;
+          bgClassDay = "bg-gradient-to-b from-pink-50/50 to-yellow-50/50";
+          titleClassDay = "bg-gradient-to-r from-pink-100 to-yellow-100 border-b border-pink-200";
+          const nomes = aniversariantes.map(a => a.nome.split(' ')[0]).join(', ');
+          festivoHTML = `<div class="text-[11px] text-pink-600 font-bold mb-2 flex items-center justify-center gap-1.5 bg-white/60 py-1 rounded-md border border-pink-100 shadow-sm"><i data-lucide="party-popper" class="w-4 h-4"></i> Aniversário: ${nomes}!</div>`;
         }
-
         const aulasDoDia = aulasList.filter(aula => {
-          if (aula.tipoRepeticao === 'semanal') {
-            return aula.dia === dia;
-          } else if (aula.tipoRepeticao === 'unico') {
-            if (aula.dataUnica) {
-              const dataEvento = new Date(aula.dataUnica + 'T12:00:00');
-              const diaDaSemanaNum = dataEvento.getDay();
-              const mapeamentoDias = { 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta' };
-              return mapeamentoDias[diaDaSemanaNum] === dia;
-            }
+          if (aula.tipoRepeticao === 'semanal') return aula.dia === dia;
+          else if (aula.tipoRepeticao === 'unico' && aula.dataUnica) {
+            const dataEvento = new Date(aula.dataUnica + 'T12:00:00');
+            const diaDaSemanaNum = dataEvento.getDay();
+            const mapeamentoDias = { 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta' };
+            return mapeamentoDias[diaDaSemanaNum] === dia;
           }
           return false;
         });
-        
         let aulasHTML = '';
         if (aulasDoDia.length > 0) {
           aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
           aulasHTML = aulasDoDia.map(aula => {
             const isDestaque = proximoEventoGlobal && proximoEventoGlobal.id === aula.id;
             const classDestaque = isDestaque ? 'evento-destaque' : '';
-
-            const btnLink = aula.link 
-              ? `<a href="${aula.link}" target="_blank" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm"><i data-lucide="video" class="w-3 h-3"></i> Acessar Aula</a>` 
-              : '';
-            
-            const badgeUnico = aula.tipoRepeticao === 'unico' 
-              ? `<span class="bg-white/50 text-gray-700 text-[10px] px-1.5 py-0.5 rounded ml-2 border border-gray-200/50">${new Date(aula.dataUnica + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})}</span>` 
-              : '';
-
-            return `
-            <div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 flex flex-col ${aula.cor} ${classDestaque}">
+            const btnLink = aula.link ? `<a href="${aula.link}" target="_blank" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm"><i data-lucide="video" class="w-3 h-3"></i> Acessar Aula</a>` : '';
+            const badgeUnico = aula.tipoRepeticao === 'unico' ? `<span class="bg-white/50 text-gray-700 text-[10px] px-1.5 py-0.5 rounded ml-2 border border-gray-200/50">${new Date(aula.dataUnica + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})}</span>` : '';
+            return `<div class="relative group p-3 rounded-lg border-l-4 shadow-sm transition-transform hover:-translate-y-1 flex flex-col ${aula.cor} ${classDestaque}">
               <div class="flex-1">
                 <p class="text-xs font-bold mb-1 opacity-80 flex items-center">${aula.hora} ${badgeUnico}</p>
                 <h4 class="font-semibold text-sm leading-tight mb-2 pr-12">${aula.titulo}</h4>
                 <p class="text-xs opacity-90 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${aula.local}</p>
               </div>
               ${btnLink}
-              ${isAdminMode ? `
-                <div class="absolute top-2 right-2 flex flex-col md:flex-row gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onclick="editarAula('${aula.id}')" class="p-1 bg-white/70 hover:bg-blue-100 text-blue-600 rounded" title="Editar">
-                    <i data-lucide="edit" class="w-4 h-4"></i>
-                  </button>
-                  <button onclick="apagarAula('${aula.id}')" class="p-1 bg-white/70 hover:bg-red-100 text-red-600 rounded" title="Excluir">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                  </button>
-                </div>
-              ` : ''}
-            </div>
-          `;
+              ${isAdminMode ? `<div class="absolute top-2 right-2 flex flex-col md:flex-row gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onclick="editarAula('${aula.id}')" class="p-1 bg-white/70 hover:bg-blue-100 text-blue-600 rounded" title="Editar"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button onclick="apagarAula('${aula.id}')" class="p-1 bg-white/70 hover:bg-red-100 text-red-600 rounded" title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </div>` : ''}
+            </div>`;
           }).join('');
         } else {
           aulasHTML = `<div class="h-full flex items-center justify-center text-sm text-gray-400 italic py-6">Livre</div>`;
         }
-
-        return `
-          <div class="min-h-[400px] flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 last:border-0 ${bgClassDay}">
-            <div class="py-3 px-4 text-center ${titleClassDay}">
-              <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">${dia}</h3>
-            </div>
-            <div class="flex-1 p-3 space-y-3">
-              ${festivoHTML}
-              ${aulasHTML}
-            </div>
-          </div>
-        `;
+        return `<div class="min-h-[400px] flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 last:border-0 ${bgClassDay}">
+          <div class="py-3 px-4 text-center ${titleClassDay}"><h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">${dia}</h3></div>
+          <div class="flex-1 p-3 space-y-3">${festivoHTML}${aulasHTML}</div>
+        </div>`;
       }).join('');
       lucide.createIcons();
     }
@@ -1488,185 +1375,105 @@
     function renderizarCalendarioMensal() {
       const container = document.getElementById('calendario-grid');
       container.className = "w-full";
-
       const dataAtual = new Date();
       const ano = dataAtual.getFullYear();
       const mes = dataAtual.getMonth();
       const diasNoMes = new Date(ano, mes + 1, 0).getDate();
       const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
-
       const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
       document.getElementById('titulo-calendario').innerText = `Mês de ${nomesMeses[mes]} / ${ano}`;
-
       const headerDias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
       const mapeamentoDias = { 1: 'Segunda', 2: 'Terça', 3: 'Quarta', 4: 'Quinta', 5: 'Sexta' };
-
       let html = '<div class="grid grid-cols-7 gap-px bg-gray-200 w-full">';
-
       headerDias.forEach(dia => {
         html += `<div class="bg-gray-50 p-2 text-center text-xs font-bold text-gray-500 uppercase hidden md:block">${dia}</div>`;
         html += `<div class="bg-gray-50 p-1 text-center text-[10px] font-bold text-gray-500 uppercase md:hidden">${dia.substring(0,1)}</div>`;
       });
-
-      for(let i = 0; i < primeiroDiaSemana; i++) {
-        html += `<div class="bg-gray-50 min-h-[80px] md:min-h-[120px]"></div>`;
-      }
-
+      for(let i = 0; i < primeiroDiaSemana; i++) html += `<div class="bg-gray-50 min-h-[80px] md:min-h-[120px]"></div>`;
       for(let dia = 1; dia <= diasNoMes; dia++) {
         const dataDia = new Date(ano, mes, dia);
         const diaDaSemanaNum = dataDia.getDay();
         const nomeDiaAula = mapeamentoDias[diaDaSemanaNum];
-
         const anoStr = dataDia.getFullYear();
         const mesStr = String(dataDia.getMonth() + 1).padStart(2, '0');
         const diaStr = String(dataDia.getDate()).padStart(2, '0');
         const dataAtualFormatada = `${anoStr}-${mesStr}-${diaStr}`;
-        const dataAtualLoopObj = new Date(ano, mes, dia, 12, 0, 0); 
-
+        const dataAtualLoopObj = new Date(ano, mes, dia, 12, 0, 0);
         let aulasDoDia = [];
-        
         aulasList.forEach(aula => {
-          if (aula.tipoRepeticao === 'unico') {
-            if (aula.dataUnica === dataAtualFormatada) aulasDoDia.push(aula);
-          } else if (aula.tipoRepeticao === 'semanal') {
-             if (nomeDiaAula && aula.dia === nomeDiaAula) {
-               let dentroDoPeriodo = true;
-               if (aula.dataInicio) {
-                 const dataInicioObj = new Date(aula.dataInicio + 'T00:00:00');
-                 if (dataAtualLoopObj < dataInicioObj) dentroDoPeriodo = false;
-               }
-               if (aula.dataFim) {
-                 const dataFimObj = new Date(aula.dataFim + 'T23:59:59');
-                 if (dataAtualLoopObj > dataFimObj) dentroDoPeriodo = false;
-               }
-               if (dentroDoPeriodo) aulasDoDia.push(aula);
-             }
-          } else {
-            if (nomeDiaAula && aula.dia === nomeDiaAula) aulasDoDia.push(aula);
-          }
+          if (aula.tipoRepeticao === 'unico') { if (aula.dataUnica === dataAtualFormatada) aulasDoDia.push(aula); }
+          else if (aula.tipoRepeticao === 'semanal') {
+            if (nomeDiaAula && aula.dia === nomeDiaAula) {
+              let dentro = true;
+              if (aula.dataInicio) { const s = new Date(aula.dataInicio + 'T00:00:00'); if (dataAtualLoopObj < s) dentro = false; }
+              if (aula.dataFim) { const e = new Date(aula.dataFim + 'T23:59:59'); if (dataAtualLoopObj > e) dentro = false; }
+              if (dentro) aulasDoDia.push(aula);
+            }
+          } else { if (nomeDiaAula && aula.dia === nomeDiaAula) aulasDoDia.push(aula); }
         });
-
         aulasDoDia.sort((a,b) => a.hora.localeCompare(b.hora));
-
         const hojeDate = new Date();
         const isHoje = hojeDate.getDate() === dia && hojeDate.getMonth() === mes && hojeDate.getFullYear() === ano;
         let classeHoje = isHoje ? 'bg-blue-50 ring-inset ring-2 ring-blue-300' : 'bg-white hover:bg-gray-50';
         const classeTextoDia = isHoje ? 'text-blue-700' : 'text-gray-400';
-
-        const aniversariantes = alunosPermitidos.filter(a => {
-            if(!a.aniversario) return false;
-            const parts = a.aniversario.split('-');
-            return parts[1] === mesStr && parts[2] === diaStr;
-        });
-
+        const aniversariantes = alunosPermitidos.filter(a => { if(!a.aniversario) return false; const p = a.aniversario.split('-'); return p[1] === mesStr && p[2] === diaStr; });
         let headerAniversario = "";
         if (aniversariantes.length > 0) {
-            const nomes = aniversariantes.map(a => a.nome.split(' ')[0]).join(', ');
-            headerAniversario = `<div class="text-[8px] md:text-[9px] text-pink-600 font-bold mb-1 leading-tight flex items-center gap-0.5 bg-pink-50 p-0.5 rounded border border-pink-100"><i data-lucide="party-popper" class="w-3 h-3"></i> <span class="truncate">${nomes}</span></div>`;
-            classeHoje = isHoje ? 'bg-gradient-to-b from-pink-100 to-yellow-100 ring-inset ring-2 ring-pink-400' : 'bg-gradient-to-b from-pink-50 to-yellow-50 hover:from-pink-100 hover:to-yellow-100 border-t border-pink-100';
+          const nomes = aniversariantes.map(a => a.nome.split(' ')[0]).join(', ');
+          headerAniversario = `<div class="text-[8px] md:text-[9px] text-pink-600 font-bold mb-1 leading-tight flex items-center gap-0.5 bg-pink-50 p-0.5 rounded border border-pink-100"><i data-lucide="party-popper" class="w-3 h-3"></i> <span class="truncate">${nomes}</span></div>`;
+          classeHoje = isHoje ? 'bg-gradient-to-b from-pink-100 to-yellow-100 ring-inset ring-2 ring-pink-400' : 'bg-gradient-to-b from-pink-50 to-yellow-50 hover:from-pink-100 hover:to-yellow-100 border-t border-pink-100';
         }
-
         html += `<div class="${classeHoje} p-1 md:p-2 min-h-[80px] md:min-h-[120px] relative transition-colors border-t border-gray-100 flex flex-col overflow-hidden">`;
         html += `  <span class="text-[10px] md:text-xs font-bold ${classeTextoDia} self-end mb-1 z-10 relative">${dia}</span>`;
-        html += `  <div class="space-y-1 flex-1 overflow-y-auto no-scrollbar">`;
-        html += headerAniversario;
-        
+        html += `  <div class="space-y-1 flex-1 overflow-y-auto no-scrollbar">${headerAniversario}`;
         aulasDoDia.forEach(aula => {
           const isDestaque = proximoEventoGlobal && proximoEventoGlobal.id === aula.id;
           const classDestaque = isDestaque ? 'evento-destaque' : '';
-
-          html += `
-            <div class="text-[9px] md:text-[10px] p-1 md:p-1.5 rounded leading-tight ${aula.cor} ${classDestaque} opacity-90 relative group" title="${aula.titulo}">
-              <div class="font-bold truncate mb-0.5 pr-4">${aula.hora.split(' ')[0]} - ${aula.titulo}</div>
-              ${aula.link ? `<a href="${aula.link}" target="_blank" class="hidden md:flex items-center gap-1 text-blue-700 hover:text-blue-900 mt-1" title="Entrar no Meet/Zoom"><i data-lucide="video" class="w-3 h-3"></i> Chamada</a>` : `<span class="hidden md:inline text-gray-600 truncate"><i data-lucide="map-pin" class="w-2.5 h-2.5 inline mr-0.5"></i>${aula.local}</span>`}
-              
-              ${isAdminMode ? `
-                <button onclick="apagarAula('${aula.id}')" class="absolute top-1 right-1 p-0.5 bg-white/80 hover:bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Excluir Aula">
-                  <i data-lucide="trash-2" class="w-3 h-3"></i>
-                </button>
-              ` : ''}
-            </div>
-          `;
+          html += `<div class="text-[9px] md:text-[10px] p-1 md:p-1.5 rounded leading-tight ${aula.cor} ${classDestaque} opacity-90 relative group" title="${aula.titulo}">
+            <div class="font-bold truncate mb-0.5 pr-4">${aula.hora.split(' ')[0]} - ${aula.titulo}</div>
+            ${aula.link ? `<a href="${aula.link}" target="_blank" class="hidden md:flex items-center gap-1 text-blue-700 hover:text-blue-900 mt-1" title="Entrar no Meet/Zoom"><i data-lucide="video" class="w-3 h-3"></i> Chamada</a>` : `<span class="hidden md:inline text-gray-600 truncate"><i data-lucide="map-pin" class="w-2.5 h-2.5 inline mr-0.5"></i>${aula.local}</span>`}
+            ${isAdminMode ? `<button onclick="apagarAula('${aula.id}')" class="absolute top-1 right-1 p-0.5 bg-white/80 hover:bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Excluir Aula"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : ''}
+          </div>`;
         });
-
-        html += `  </div>`;
-        html += `</div>`;
+        html += `  </div></div>`;
       }
-
       const totalCelulas = primeiroDiaSemana + diasNoMes;
       const celulasRestantes = totalCelulas % 7 === 0 ? 0 : 7 - (totalCelulas % 7);
-      for(let i = 0; i < celulasRestantes; i++) {
-        html += `<div class="bg-gray-50 min-h-[80px] md:min-h-[120px] border-t border-gray-100"></div>`;
-      }
-
+      for(let i = 0; i < celulasRestantes; i++) html += `<div class="bg-gray-50 min-h-[80px] md:min-h-[120px] border-t border-gray-100"></div>`;
       html += '</div>';
       container.innerHTML = html;
       lucide.createIcons();
     }
 
+    // Botões de visão de calendário
     const btnSemanal = document.getElementById('btn-visao-semanal');
     const btnMensal = document.getElementById('btn-visao-mensal');
     const btnAnual = document.getElementById('btn-visao-anual');
-
     function setActiveBtn(ativo, ...inativos) {
-        ativo.className = "px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all";
-        inativos.forEach(btn => {
-            btn.className = "px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all bg-transparent";
-        });
+      ativo.className = "px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-800 transition-all";
+      inativos.forEach(btn => { btn.className = "px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all bg-transparent"; });
     }
-
-    btnSemanal.addEventListener('click', () => {
-      visaoCalendario = 'semanal';
-      document.getElementById('titulo-calendario').innerText = "A Sua Semana";
-      setActiveBtn(btnSemanal, btnMensal, btnAnual);
-      atualizarCalendario();
-    });
-
-    btnMensal.addEventListener('click', () => {
-      visaoCalendario = 'mensal';
-      setActiveBtn(btnMensal, btnSemanal, btnAnual);
-      atualizarCalendario();
-    });
-
-    btnAnual.addEventListener('click', () => {
-      visaoCalendario = 'anual';
-      setActiveBtn(btnAnual, btnSemanal, btnMensal);
-      atualizarCalendario();
-    });
+    btnSemanal.addEventListener('click', () => { visaoCalendario = 'semanal'; document.getElementById('titulo-calendario').innerText = "A Sua Semana"; setActiveBtn(btnSemanal, btnMensal, btnAnual); atualizarCalendario(); });
+    btnMensal.addEventListener('click', () => { visaoCalendario = 'mensal'; setActiveBtn(btnMensal, btnSemanal, btnAnual); atualizarCalendario(); });
+    btnAnual.addEventListener('click', () => { visaoCalendario = 'anual'; setActiveBtn(btnAnual, btnSemanal, btnMensal); atualizarCalendario(); });
 
     const selectTipoRepeticao = document.getElementById('aula-tipo-repeticao');
     const camposSemanal = document.getElementById('campos-repeticao-semanal');
     const camposUnico = document.getElementById('campos-evento-unico');
-
     selectTipoRepeticao.addEventListener('change', (e) => {
-      if (e.target.value === 'unico') {
-        camposSemanal.classList.add('hidden');
-        camposUnico.classList.remove('hidden');
-        document.getElementById('aula-data-unica').required = true;
-      } else {
-        camposSemanal.classList.remove('hidden');
-        camposUnico.classList.add('hidden');
-        document.getElementById('aula-data-unica').required = false;
-      }
+      if (e.target.value === 'unico') { camposSemanal.classList.add('hidden'); camposUnico.classList.remove('hidden'); document.getElementById('aula-data-unica').required = true; }
+      else { camposSemanal.classList.remove('hidden'); camposUnico.classList.add('hidden'); document.getElementById('aula-data-unica').required = false; }
     });
 
-    // --- 7. FLUXO DE AUTENTICAÇÃO E MODAL UNIFICADO ---
-    
+    // --- AUTENTICAÇÃO ---
     window.mudarAuthView = (viewName) => {
-      document.getElementById('auth-view-selecao').classList.add('hidden');
-      document.getElementById('auth-view-login-aluno').classList.add('hidden');
-      document.getElementById('auth-view-cadastro-aluno').classList.add('hidden');
-      document.getElementById('auth-view-login-admin').classList.add('hidden');
-      document.getElementById('auth-view-atualizar-usuario').classList.add('hidden');
-      document.getElementById('auth-view-atualizar-aniversario').classList.add('hidden');
-      
+      ['selecao','login-aluno','cadastro-aluno','login-admin','atualizar-usuario','atualizar-aniversario'].forEach(v => {
+        document.getElementById(`auth-view-${v}`).classList.add('hidden');
+      });
       document.getElementById(`auth-view-${viewName}`).classList.remove('hidden');
-      
-      document.getElementById('login-erro').classList.add('hidden');
-      document.getElementById('admin-erro').classList.add('hidden');
-      document.getElementById('cadastro-msg').classList.add('hidden');
-      document.getElementById('atualizar-msg').classList.add('hidden');
-      document.getElementById('atualizar-aniversario-msg').classList.add('hidden');
+      ['login-erro','admin-erro','cadastro-msg','atualizar-msg','atualizar-aniversario-msg'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
     };
 
     const roleText = document.getElementById('user-role-text');
@@ -1677,320 +1484,185 @@
     const btnNovoLivro = document.getElementById('btn-novo-livro');
     const btnacessarAlunos = document.getElementById('btn-acessar-alunos');
     const btnNovoLinkImportante = document.getElementById('btn-novo-link-importante');
-    
-    const inputNomeRecado = document.getElementById('input-nome-recado');
-    const inputRecado = document.getElementById('input-recado');
-    const btnEnviarRecado = document.getElementById('btn-enviar-recado');
+    const btnNovoProfessor = document.getElementById('btn-novo-professor');
 
     function alternarModoUI(paraAdmin, userObj = null) {
       isAdminMode = paraAdmin;
       currentAlunoObj = userObj;
-      
       if (paraAdmin) {
         const nomeAdmin = userObj ? userObj.nome : ("Prof. " + USUARIO_ADMINISTRADOR);
         roleText.innerText = nomeAdmin;
         roleText.classList.replace('text-gray-800', 'text-indigo-700');
         roleBadge.innerText = "Modo Edição (Admin)";
         roleBadge.classList.replace('text-gray-500', 'text-indigo-500');
-        
         userAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=" + nomeAdmin;
         userAvatar.classList.replace('border-white', 'border-indigo-500');
-
         btnNovaAula.classList.remove('hidden');
         btnNovoArquivo.classList.remove('hidden');
         btnNovoLivro.classList.remove('hidden');
         btnacessarAlunos.classList.remove('hidden');
         btnNovoLinkImportante.classList.remove('hidden');
-        
-        inputNomeRecado.classList.add('hidden');
-        inputNomeRecado.disabled = true;
-        inputNomeRecado.required = false;
-        
-        inputRecado.disabled = false;
-        btnEnviarRecado.disabled = false;
-        inputRecado.placeholder = "Avisar turma...";
+        btnNovoProfessor.classList.remove('hidden');
       } else {
         const nomeAluno = userObj.nome || userObj.email.split('@')[0];
         roleText.innerText = nomeAluno;
         roleText.classList.replace('text-indigo-700', 'text-gray-800');
         roleBadge.innerText = "Modo Leitura (Aluno)";
         roleBadge.classList.replace('text-indigo-500', 'text-gray-500');
-        
         userAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userObj.email}`;
         userAvatar.classList.replace('border-indigo-500', 'border-white');
-
         btnNovaAula.classList.add('hidden');
         btnNovoArquivo.classList.add('hidden');
         btnNovoLivro.classList.add('hidden');
         btnacessarAlunos.classList.add('hidden');
         btnNovoLinkImportante.classList.add('hidden');
-        
-        inputNomeRecado.classList.remove('hidden');
-        inputNomeRecado.disabled = false;
-        inputNomeRecado.required = true;
-        if(userObj.nome) {
-          inputNomeRecado.value = userObj.nome; 
-        }
-        
-        inputRecado.disabled = false;
-        btnEnviarRecado.disabled = false;
-        inputRecado.placeholder = "Escreva um recado...";
+        btnNovoProfessor.classList.add('hidden');
       }
-      
       renderizarArquivos();
       atualizarCalendario();
-      renderizarMural();
       renderizarLinksImportantes();
       renderizarBiblioteca();
+      renderizarProfessores();
     }
 
-    setTimeout(() => {
-      document.getElementById('modal-auth').classList.remove('hidden');
-    }, 200);
+    setTimeout(() => { document.getElementById('modal-auth').classList.remove('hidden'); }, 200);
 
-    // Login Master (Antigo)
     document.getElementById('form-login-admin').addEventListener('submit', (e) => {
       e.preventDefault();
       const usuarioDigitado = document.getElementById('admin-usuario-input').value.trim();
       const senhaDigitada = document.getElementById('admin-senha-input').value;
-      
       if (usuarioDigitado === USUARIO_ADMINISTRADOR && senhaDigitada === SENHA_ADMINISTRADOR) {
         document.getElementById('modal-auth').classList.add('hidden');
         alternarModoUI(true);
         registrarAcesso("Prof. " + USUARIO_ADMINISTRADOR);
         mostrarNovidades();
         e.target.reset();
-      } else {
-        document.getElementById('admin-erro').classList.remove('hidden');
-      }
+      } else { document.getElementById('admin-erro').classList.remove('hidden'); }
     });
 
-    // Login Flexível (Aluno ou Admin Cadastrado) usando Email OU Usuário
     document.getElementById('form-login-aluno').addEventListener('submit', (e) => {
       e.preventDefault();
       const inputIdentificador = document.getElementById('login-identificador').value.trim().toLowerCase();
-      
-      // Busca aluno que o e-mail ou o username (se existir) seja igual ao digitado
-      const alunoEncontrado = alunosPermitidos.find(a => 
-        a.email === inputIdentificador || 
-        (a.usuario && a.usuario.toLowerCase() === inputIdentificador)
-      );
-      
+      const alunoEncontrado = alunosPermitidos.find(a => a.email === inputIdentificador || (a.usuario && a.usuario.toLowerCase() === inputIdentificador));
       const erroEl = document.getElementById('login-erro');
-
       if (alunoEncontrado) {
-          // VERIFICA SE O ALUNO JÁ TEM UM USUÁRIO CADASTRADO (Para alunos antigos que só usavam e-mail)
-          if (!alunoEncontrado.usuario) {
-             document.getElementById('atualizar-usuario-id').value = alunoEncontrado.id;
-             mudarAuthView('atualizar-usuario');
-             return;
-          }
-          
-          // VERIFICA SE O ALUNO JÁ TEM DATA DE ANIVERSÁRIO CADASTRADA
-          if (!alunoEncontrado.aniversario) {
-             document.getElementById('atualizar-aniversario-id').value = alunoEncontrado.id;
-             mudarAuthView('atualizar-aniversario');
-             return;
-          }
-
+        if (!alunoEncontrado.usuario) { document.getElementById('atualizar-usuario-id').value = alunoEncontrado.id; mudarAuthView('atualizar-usuario'); return; }
+        if (!alunoEncontrado.aniversario) { document.getElementById('atualizar-aniversario-id').value = alunoEncontrado.id; mudarAuthView('atualizar-aniversario'); return; }
         document.getElementById('modal-auth').classList.add('hidden');
-        
-        if(alunoEncontrado.role === 'admin') {
-          alternarModoUI(true, alunoEncontrado);
-        } else {
-          alternarModoUI(false, alunoEncontrado);
-        }
-        
+        if(alunoEncontrado.role === 'admin') alternarModoUI(true, alunoEncontrado);
+        else alternarModoUI(false, alunoEncontrado);
         registrarAcesso(alunoEncontrado.nome || alunoEncontrado.email.split('@')[0]);
-        mostrarNovidades(); // Dispara o modal flutuante de novidades
+        mostrarNovidades();
         e.target.reset();
-      } else {
-        erroEl.textContent = "Cadastro não encontrado. Por favor, crie seu acesso.";
-        erroEl.classList.remove('hidden');
-      }
+      } else { erroEl.textContent = "Cadastro não encontrado. Por favor, crie seu acesso."; erroEl.classList.remove('hidden'); }
     });
 
-    // Submissão da tela de Atualização Obrigatória de Usuário
     document.getElementById('form-atualizar-usuario').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('atualizar-usuario-id').value;
-        const novoUsuario = document.getElementById('input-novo-usuario').value.trim();
-        const msgEl = document.getElementById('atualizar-msg');
-        msgEl.classList.remove('hidden');
-
-        if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === novoUsuario.toLowerCase())) {
-            msgEl.textContent = "Este usuário já está em uso. Escolha outro.";
-            msgEl.className = "text-center text-xs text-red-600 font-medium";
-            return;
-        }
-
-        try {
-            await updateDoc(doc(db, getPath('alunos'), id), { usuario: novoUsuario });
-            
-            const alunoAtualizado = alunosPermitidos.find(a => a.id === id);
-            alunoAtualizado.usuario = novoUsuario; // Atualiza no front para uso imediato
-
-            // Após criar o usuário, verifica se falta o aniversário
-            if (!alunoAtualizado.aniversario) {
-                document.getElementById('atualizar-aniversario-id').value = alunoAtualizado.id;
-                mudarAuthView('atualizar-aniversario');
-                e.target.reset();
-                return;
-            }
-
-            document.getElementById('modal-auth').classList.add('hidden');
-            if(alunoAtualizado.role === 'admin') {
-              alternarModoUI(true, alunoAtualizado);
-            } else {
-              alternarModoUI(false, alunoAtualizado);
-            }
-            registrarAcesso(alunoAtualizado.nome || alunoAtualizado.email.split('@')[0]);
-            mostrarNovidades();
-            e.target.reset();
-
-        } catch (error) {
-            console.error("Erro ao atualizar usuário:", error);
-            msgEl.textContent = "Erro ao salvar. Tente novamente.";
-            msgEl.className = "text-center text-xs text-red-600 font-medium";
-        }
+      e.preventDefault();
+      const id = document.getElementById('atualizar-usuario-id').value;
+      const novoUsuario = document.getElementById('input-novo-usuario').value.trim();
+      const msgEl = document.getElementById('atualizar-msg');
+      msgEl.classList.remove('hidden');
+      if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === novoUsuario.toLowerCase())) { msgEl.textContent = "Este usuário já está em uso. Escolha outro."; msgEl.className = "text-center text-xs text-red-600 font-medium"; return; }
+      try {
+        await updateDoc(doc(db, getPath('alunos'), id), { usuario: novoUsuario });
+        const alunoAtualizado = alunosPermitidos.find(a => a.id === id);
+        alunoAtualizado.usuario = novoUsuario;
+        if (!alunoAtualizado.aniversario) { document.getElementById('atualizar-aniversario-id').value = alunoAtualizado.id; mudarAuthView('atualizar-aniversario'); e.target.reset(); return; }
+        document.getElementById('modal-auth').classList.add('hidden');
+        if(alunoAtualizado.role === 'admin') alternarModoUI(true, alunoAtualizado);
+        else alternarModoUI(false, alunoAtualizado);
+        registrarAcesso(alunoAtualizado.nome || alunoAtualizado.email.split('@')[0]);
+        mostrarNovidades(); e.target.reset();
+      } catch (error) { console.error("Erro ao atualizar usuário:", error); msgEl.textContent = "Erro ao salvar. Tente novamente."; msgEl.className = "text-center text-xs text-red-600 font-medium"; }
     });
 
-    // Submissão da tela de Atualização Obrigatória de Aniversário
     document.getElementById('form-atualizar-aniversario').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('atualizar-aniversario-id').value;
-        const novoAniversario = document.getElementById('input-novo-aniversario').value;
-        const msgEl = document.getElementById('atualizar-aniversario-msg');
-        msgEl.classList.remove('hidden');
-
-        try {
-            await updateDoc(doc(db, getPath('alunos'), id), { aniversario: novoAniversario });
-            
-            const alunoAtualizado = alunosPermitidos.find(a => a.id === id);
-            alunoAtualizado.aniversario = novoAniversario; 
-
-            document.getElementById('modal-auth').classList.add('hidden');
-            if(alunoAtualizado.role === 'admin') {
-              alternarModoUI(true, alunoAtualizado);
-            } else {
-              alternarModoUI(false, alunoAtualizado);
-            }
-            registrarAcesso(alunoAtualizado.nome || alunoAtualizado.email.split('@')[0]);
-            mostrarNovidades();
-            e.target.reset();
-
-        } catch (error) {
-            console.error("Erro ao atualizar aniversário:", error);
-            msgEl.textContent = "Erro ao salvar. Tente novamente.";
-            msgEl.className = "text-center text-xs text-red-600 font-medium";
-        }
+      e.preventDefault();
+      const id = document.getElementById('atualizar-aniversario-id').value;
+      const novoAniversario = document.getElementById('input-novo-aniversario').value;
+      const msgEl = document.getElementById('atualizar-aniversario-msg');
+      msgEl.classList.remove('hidden');
+      try {
+        await updateDoc(doc(db, getPath('alunos'), id), { aniversario: novoAniversario });
+        const alunoAtualizado = alunosPermitidos.find(a => a.id === id);
+        alunoAtualizado.aniversario = novoAniversario;
+        document.getElementById('modal-auth').classList.add('hidden');
+        if(alunoAtualizado.role === 'admin') alternarModoUI(true, alunoAtualizado);
+        else alternarModoUI(false, alunoAtualizado);
+        registrarAcesso(alunoAtualizado.nome || alunoAtualizado.email.split('@')[0]);
+        mostrarNovidades(); e.target.reset();
+      } catch (error) { console.error("Erro ao atualizar aniversário:", error); msgEl.textContent = "Erro ao salvar. Tente novamente."; msgEl.className = "text-center text-xs text-red-600 font-medium"; }
     });
 
-    // Cadastro de Aluno com Nome de Usuário (1 Palavra)
     document.getElementById('form-cadastro-aluno').addEventListener('submit', async (e) => {
       e.preventDefault();
       const nome = document.getElementById('cadastro-nome').value.trim();
       const usuario = document.getElementById('cadastro-usuario').value.trim();
       const email = document.getElementById('cadastro-email').value.trim().toLowerCase();
       const aniversario = document.getElementById('cadastro-aniversario').value;
-      
       const msgEl = document.getElementById('cadastro-msg');
       msgEl.classList.remove('hidden');
-
-      if (alunosPermitidos.some(a => a.email === email)) {
-        msgEl.textContent = "Este e-mail já possui conta. Faça login.";
-        msgEl.className = "text-center text-xs text-blue-600 font-medium";
-        return;
-      }
-      
-      if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === usuario.toLowerCase())) {
-        msgEl.textContent = "Este usuário já está em uso. Escolha outro.";
-        msgEl.className = "text-center text-xs text-yellow-600 font-medium";
-        return;
-      }
-
+      if (alunosPermitidos.some(a => a.email === email)) { msgEl.textContent = "Este e-mail já possui conta. Faça login."; msgEl.className = "text-center text-xs text-blue-600 font-medium"; return; }
+      if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === usuario.toLowerCase())) { msgEl.textContent = "Este usuário já está em uso. Escolha outro."; msgEl.className = "text-center text-xs text-yellow-600 font-medium"; return; }
       try {
-        const docData = { 
-            nome: nome, 
-            usuario: usuario, 
-            email: email, 
-            aniversario: aniversario,
-            role: 'aluno', 
-            dataCadastro: Date.now() 
-        };
-        await addDoc(collection(db, getPath('alunos')), docData);
-        
+        await addDoc(collection(db, getPath('alunos')), { nome, usuario, email, aniversario, role: 'aluno', dataCadastro: Date.now() });
         e.target.reset();
         msgEl.textContent = "Conta criada com sucesso! Faça Login para acessar.";
         msgEl.className = "text-center text-xs text-green-600 font-bold";
-        
         setTimeout(() => mudarAuthView('login-aluno'), 2500);
-      } catch (error) {
-        console.error("Erro no cadastro:", error);
-        msgEl.textContent = "Erro ao criar conta.";
-        msgEl.className = "text-center text-xs text-red-600 font-medium";
-      }
+      } catch (error) { console.error("Erro no cadastro:", error); msgEl.textContent = "Erro ao criar conta."; msgEl.className = "text-center text-xs text-red-600 font-medium"; }
     });
 
-    // Adição Manual de Alunos (Pelo Admin) - Adicionado campo Usuario
     document.getElementById('form-aluno-manual').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
-      
       const nome = document.getElementById('aluno-nome-manual').value.trim();
       const usuario = document.getElementById('aluno-usuario-manual').value.trim();
       const email = document.getElementById('aluno-email-manual').value.trim().toLowerCase();
-      
-      if (alunosPermitidos.some(a => a.email === email)) {
-        alert("Este e-mail já está na lista.");
-        return;
-      }
-      
-      if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === usuario.toLowerCase())) {
-        alert("Este Nome de Usuário já está sendo utilizado.");
-        return;
-      }
-
-      try {
-        await addDoc(collection(db, getPath('alunos')), { nome, usuario, email, role: 'aluno' });
-        e.target.reset();
-      } catch (error) {
-        console.error("Erro aluno manual:", error);
-      }
+      if (alunosPermitidos.some(a => a.email === email)) { alert("Este e-mail já está na lista."); return; }
+      if (alunosPermitidos.some(a => a.usuario && a.usuario.toLowerCase() === usuario.toLowerCase())) { alert("Este Nome de Usuário já está sendo utilizado."); return; }
+      try { await addDoc(collection(db, getPath('alunos')), { nome, usuario, email, role: 'aluno' }); e.target.reset(); }
+      catch (error) { console.error("Erro aluno manual:", error); }
     });
 
-    // --- 8. OUTROS MODAIS E FORMULÁRIOS DE CONTEÚDO ---
+    // --- MODAIS ---
     const modalAula = document.getElementById('modal-aula');
     const modalArquivo = document.getElementById('modal-arquivo');
     const modalLivro = document.getElementById('modal-livro');
     const modalAlunos = document.getElementById('modal-alunos');
     const modalLinkImportante = document.getElementById('modal-link-importante');
+    const modalProfessor = document.getElementById('modal-professor');
 
     btnNovaAula.addEventListener('click', () => {
-      aulaEmEdicaoId = null; 
+      aulaEmEdicaoId = null;
       document.getElementById('titulo-modal-aula').innerText = "Adicionar Nova Aula";
       document.getElementById('form-aula').reset();
-      camposSemanal.classList.remove('hidden');
-      camposUnico.classList.add('hidden');
+      camposSemanal.classList.remove('hidden'); camposUnico.classList.add('hidden');
       document.getElementById('aula-data-unica').required = false;
       modalAula.classList.remove('hidden');
     });
-    
     btnNovoArquivo.addEventListener('click', () => {
       arquivoEmEdicaoId = null;
       document.getElementById('titulo-modal-arquivo').innerText = "Cadastrar Link de Arquivo";
       document.getElementById('form-arquivo').reset();
       modalArquivo.classList.remove('hidden');
     });
-
-    btnNovoLivro.addEventListener('click', () => {
-      document.getElementById('form-livro').reset();
-      modalLivro.classList.remove('hidden');
-    });
-
+    btnNovoLivro.addEventListener('click', () => { document.getElementById('form-livro').reset(); modalLivro.classList.remove('hidden'); });
     btnacessarAlunos.addEventListener('click', () => modalAlunos.classList.remove('hidden'));
     btnNovoLinkImportante.addEventListener('click', () => modalLinkImportante.classList.remove('hidden'));
-    
+
+    // ===== ABRIR MODAL PROFESSOR =====
+    btnNovoProfessor.addEventListener('click', () => {
+      professorEmEdicaoId = null;
+      document.getElementById('titulo-modal-professor').innerHTML = `<i data-lucide="user-plus" class="w-5 h-5 text-purple-600"></i> Adicionar Professor`;
+      document.getElementById('form-professor').reset();
+      document.getElementById('prof-cor').value = '#6366f1';
+      renderColorPicker('#6366f1');
+      modalProfessor.classList.remove('hidden');
+      lucide.createIcons();
+    });
+
     document.querySelectorAll('.fechar-modal-content').forEach(btn => {
       btn.addEventListener('click', () => {
         modalAula.classList.add('hidden');
@@ -1998,166 +1670,107 @@
         modalLivro.classList.add('hidden');
         modalAlunos.classList.add('hidden');
         modalLinkImportante.classList.add('hidden');
-        aulaEmEdicaoId = null; 
-        arquivoEmEdicaoId = null;
+        modalProfessor.classList.add('hidden');
+        aulaEmEdicaoId = null; arquivoEmEdicaoId = null; professorEmEdicaoId = null;
       });
     });
 
-    document.getElementById('form-recado').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const texto = inputRecado.value.trim();
-      if (!texto) return;
-
-      let autor = '';
-      if (isAdminMode) {
-        autor = currentAlunoObj ? currentAlunoObj.nome : `👨‍🏫 Prof. ${USUARIO_ADMINISTRADOR}`;
-      } else {
-        const nomeDigitado = inputNomeRecado.value.trim();
-        if (!nomeDigitado) return;
-        autor = nomeDigitado;
-      }
-
-      try {
-        await addDoc(collection(db, getPath('recados')), { texto, autor, timestamp: Date.now() });
-        inputRecado.value = ''; 
-      } catch (error) {
-        console.error("Erro recado:", error);
-      }
-    });
-
+    // Forms conteúdo
     document.getElementById('form-aula').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
-      
       const tipoRepeticao = document.getElementById('aula-tipo-repeticao').value;
-      
       const aulaData = {
-        tipoRepeticao: tipoRepeticao,
-        dia: document.getElementById('aula-dia').value,
-        dataInicio: document.getElementById('aula-data-inicio').value,
-        dataFim: document.getElementById('aula-data-fim').value,
-        dataUnica: document.getElementById('aula-data-unica').value,
-        hora: document.getElementById('aula-hora').value,
-        titulo: document.getElementById('aula-titulo').value,
-        local: document.getElementById('aula-local').value,
-        link: document.getElementById('aula-link').value,
-        cor: document.getElementById('aula-cor').value,
+        tipoRepeticao, dia: document.getElementById('aula-dia').value,
+        dataInicio: document.getElementById('aula-data-inicio').value, dataFim: document.getElementById('aula-data-fim').value,
+        dataUnica: document.getElementById('aula-data-unica').value, hora: document.getElementById('aula-hora').value,
+        titulo: document.getElementById('aula-titulo').value, local: document.getElementById('aula-local').value,
+        link: document.getElementById('aula-link').value, cor: document.getElementById('aula-cor').value,
       };
-      
       try {
-        if (aulaEmEdicaoId) {
-          await updateDoc(doc(db, getPath('aulas'), aulaEmEdicaoId), aulaData);
-        } else {
-          await addDoc(collection(db, getPath('aulas')), aulaData);
-        }
-        
-        modalAula.classList.add('hidden');
-        e.target.reset();
-        aulaEmEdicaoId = null; 
-      } catch (error) {
-        console.error("Erro aula:", error);
-      }
+        if (aulaEmEdicaoId) await updateDoc(doc(db, getPath('aulas'), aulaEmEdicaoId), aulaData);
+        else await addDoc(collection(db, getPath('aulas')), aulaData);
+        modalAula.classList.add('hidden'); e.target.reset(); aulaEmEdicaoId = null;
+      } catch (error) { console.error("Erro aula:", error); }
     });
 
     document.getElementById('form-arquivo').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
-      
       const novoArquivo = {
-        nome: document.getElementById('arq-nome').value.trim(),
-        pasta: document.getElementById('arq-pasta').value.trim(),
-        tipo: document.getElementById('arq-tipo').value,
-        fonte: document.getElementById('arq-fonte').value,
-        url: document.getElementById('arq-url').value.trim(),
-        tamanho: document.getElementById('arq-tamanho').value.trim(),
-        timestamp: Date.now() 
+        nome: document.getElementById('arq-nome').value.trim(), pasta: document.getElementById('arq-pasta').value.trim(),
+        tipo: document.getElementById('arq-tipo').value, fonte: document.getElementById('arq-fonte').value,
+        url: document.getElementById('arq-url').value.trim(), timestamp: Date.now()
       };
-      
       try {
-        if (arquivoEmEdicaoId) {
-          await updateDoc(doc(db, getPath('arquivos'), arquivoEmEdicaoId), novoArquivo);
-        } else {
+        if (arquivoEmEdicaoId) await updateDoc(doc(db, getPath('arquivos'), arquivoEmEdicaoId), novoArquivo);
+        else {
           await addDoc(collection(db, getPath('arquivos')), novoArquivo);
-          
           if (document.getElementById('arq-notificar').checked) {
-              const tipoTexto = novoArquivo.tipo === 'pdf' ? 'PDF/Documento' : (novoArquivo.tipo === 'video' ? 'Vídeo' : 'Código/Outro');
-              const nomeAutor = currentAlunoObj ? currentAlunoObj.nome : `Prof. ${USUARIO_ADMINISTRADOR}`;
-              
-              const msg = `🚨 *Atenção!* \n\n*Novo Material Adicionado:*\n\n📁 *Tipo:* ${tipoTexto}\n📄 *Nome:* ${novoArquivo.nome}\n👤 *Autor:* ${nomeAutor}\n\nAcesse o portal para conferir!`;
-              copiarParaAreaDeTransferenciaEObrirWhatsApp(msg);
+            const tipoTexto = novoArquivo.tipo === 'pdf' ? 'PDF/Documento' : (novoArquivo.tipo === 'video' ? 'Vídeo' : 'Código/Outro');
+            const nomeAutor = currentAlunoObj ? currentAlunoObj.nome : `Prof. ${USUARIO_ADMINISTRADOR}`;
+            copiarParaAreaDeTransferenciaEObrirWhatsApp(`🚨 *Atenção!* \n\n*Novo Material Adicionado:*\n\n📁 *Tipo:* ${tipoTexto}\n📄 *Nome:* ${novoArquivo.nome}\n👤 *Autor:* ${nomeAutor}\n\nAcesse o portal para conferir!`);
           }
         }
-        
-        modalArquivo.classList.add('hidden');
-        e.target.reset();
-        arquivoEmEdicaoId = null;
-      } catch (error) {
-        console.error("Erro arquivo:", error);
-      }
+        modalArquivo.classList.add('hidden'); e.target.reset(); arquivoEmEdicaoId = null;
+      } catch (error) { console.error("Erro arquivo:", error); }
     });
 
-    // Submit Novo Livro na Biblioteca
     document.getElementById('form-livro').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
-      
-      const novoLivro = {
-        titulo: document.getElementById('livro-titulo').value.trim(),
-        autor: document.getElementById('livro-autor').value.trim(),
-        url: document.getElementById('livro-url').value.trim(),
-        timestamp: Date.now()
-      };
-      
+      const novoLivro = { titulo: document.getElementById('livro-titulo').value.trim(), autor: document.getElementById('livro-autor').value.trim(), url: document.getElementById('livro-url').value.trim(), timestamp: Date.now() };
       try {
         await addDoc(collection(db, getPath('biblioteca')), novoLivro);
-        
         if (document.getElementById('livro-notificar').checked) {
-              const nomeAutorPost = currentAlunoObj ? currentAlunoObj.nome : `Prof. ${USUARIO_ADMINISTRADOR}`;
-              const msg = `📚 *Atenção!* \n\n*Nova Obra na Biblioteca:*\n\n📖 *Título:* ${novoLivro.titulo}\n✍️ *Autor da Obra:* ${novoLivro.autor || 'Desconhecido'}\n👤 *Adicionado por:* ${nomeAutorPost}\n\nAcesse o portal para fazer a leitura!`;
-              copiarParaAreaDeTransferenciaEObrirWhatsApp(msg);
+          const nomeAutorPost = currentAlunoObj ? currentAlunoObj.nome : `Prof. ${USUARIO_ADMINISTRADOR}`;
+          copiarParaAreaDeTransferenciaEObrirWhatsApp(`📚 *Atenção!* \n\n*Nova Obra na Biblioteca:*\n\n📖 *Título:* ${novoLivro.titulo}\n✍️ *Autor da Obra:* ${novoLivro.autor || 'Desconhecido'}\n👤 *Adicionado por:* ${nomeAutorPost}\n\nAcesse o portal para fazer a leitura!`);
         }
-
-        modalLivro.classList.add('hidden');
-        e.target.reset();
-      } catch (error) {
-        console.error("Erro ao adicionar livro:", error);
-      }
+        modalLivro.classList.add('hidden'); e.target.reset();
+      } catch (error) { console.error("Erro ao adicionar livro:", error); }
     });
 
-    // Submit Novo Link Importante
     document.getElementById('form-link-importante').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdminMode) return;
-      
-      const novoLink = {
-        titulo: document.getElementById('link-imp-titulo').value.trim(),
-        url: document.getElementById('link-imp-url').value.trim(),
-        descricao: document.getElementById('link-imp-descricao').value.trim(),
+      const novoLink = { titulo: document.getElementById('link-imp-titulo').value.trim(), url: document.getElementById('link-imp-url').value.trim(), descricao: document.getElementById('link-imp-descricao').value.trim(), timestamp: Date.now() };
+      try { await addDoc(collection(db, getPath('links_importantes')), novoLink); modalLinkImportante.classList.add('hidden'); e.target.reset(); }
+      catch (error) { console.error("Erro ao adicionar link importante:", error); }
+    });
+
+    // ===== SUBMIT PROFESSOR =====
+    document.getElementById('form-professor').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!isAdminMode) return;
+      const dadosProfessor = {
+        nome: document.getElementById('prof-nome').value.trim(),
+        disciplina: document.getElementById('prof-disciplina').value.trim(),
+        drive: document.getElementById('prof-drive').value.trim(),
+        cor: document.getElementById('prof-cor').value,
         timestamp: Date.now()
       };
-      
       try {
-        await addDoc(collection(db, getPath('links_importantes')), novoLink);
-        modalLinkImportante.classList.add('hidden');
-        e.target.reset();
+        if (professorEmEdicaoId) {
+          await updateDoc(doc(db, getPath('professores'), professorEmEdicaoId), dadosProfessor);
+          mostrarToast("Professor atualizado com sucesso!");
+        } else {
+          await addDoc(collection(db, getPath('professores')), dadosProfessor);
+          mostrarToast("Professor adicionado com sucesso!");
+        }
+        modalProfessor.classList.add('hidden');
+        document.getElementById('form-professor').reset();
+        professorEmEdicaoId = null;
       } catch (error) {
-        console.error("Erro ao adicionar link importante:", error);
+        console.error("Erro ao salvar professor:", error);
+        mostrarToast("Erro ao salvar. Tente novamente.");
       }
     });
 
-    // --- 9. MENU MOBILE ---
+    // --- MENU MOBILE ---
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
-    
-    document.getElementById('btn-open-sidebar').addEventListener('click', () => {
-      sidebar.classList.remove('-translate-x-full');
-      overlay.classList.remove('hidden');
-    });
-
-    const closeSidebar = () => {
-      sidebar.classList.add('-translate-x-full');
-      overlay.classList.add('hidden');
-    };
+    document.getElementById('btn-open-sidebar').addEventListener('click', () => { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); });
+    const closeSidebar = () => { sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); };
     document.getElementById('btn-close-sidebar').addEventListener('click', closeSidebar);
     overlay.addEventListener('click', closeSidebar);
 
