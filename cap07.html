@@ -1,591 +1,244 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guia Interativo: Ética na Pesquisa Científica</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capítulo 7 - Ética na Pesquisa</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Chosen Palette: Trust Blue & Academic Neutral -->
-    <!-- Application Structure Plan: The SPA uses a dashboard/tabbed layout to guide the user through the logical phases of research ethics: 1. The Core Dilemma (Context), 2. Regulations (Rules), 3. CEP/CONEP System (Process), 4. TCLE (Practical Tool), 5. The Risk Myth (Crucial Alert). This structures the theoretical book chapter into a practical, task-oriented exploration flow. -->
-    <!-- Visualization & Content Choices: 
-         1. Intro: Doughnut Chart (Chart.js) -> Shows the tension between Market/Profit vs. Human Dignity. Goal: Inform.
-         2. History: HTML/CSS Interactive Timeline -> Shows the evolution of norms. Goal: Change/Time.
-         3. System: HTML/CSS CSS Grid Hierarchy -> Explains CEP/CONEP relation. Goal: Organize.
-         4. TCLE: JS Interactive Progress Checklist -> Allows user to "verify" a TCLE. Goal: Inform/Interact.
-         5. Risks: Bar Chart (Chart.js) -> Visualizes types of risks in Human Sciences vs. biomedical. Goal: Compare.
-         Libraries: Vanilla JS, Chart.js. NO SVG, NO MERMAID.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#1e3a8a', // blue-900
-                        secondary: '#3b82f6', // blue-500
-                        accent: '#f59e0b', // amber-500
-                        light: '#f8fafc', // slate-50
-                        dark: '#1e293b', // slate-800
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        /* Custom Styles & Chart Container Constraints */
-        body {
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
-        
-        /* Hide scrollbar for a cleaner app feel but keep functionality */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Chart Container Mandatory Styling */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px; /* Constrains width on large screens */
-            margin-left: auto;
-            margin-right: auto;
-            height: 40vh; /* Responsive height */
-            min-height: 250px;
-            max-height: 400px; /* Prevents extreme vertical stretching */
-            padding: 1rem;
-        }
-
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
-
-        /* Nav Tab Active State */
-        .nav-tab.active {
-            background-color: #eff6ff;
-            border-left: 4px solid #1e3a8a;
-            color: #1e3a8a;
-            font-weight: 600;
-        }
-
-        /* Timeline Styling (CSS only, no SVG) */
-        .timeline-item { border-left: 2px solid #cbd5e1; padding-left: 1.5rem; position: relative; margin-bottom: 1.5rem; cursor: pointer; transition: all 0.2s;}
-        .timeline-item::before { content: ''; position: absolute; left: -0.45rem; top: 0; width: 1rem; height: 1rem; background-color: #3b82f6; border-radius: 50%; border: 3px solid #f8fafc; }
-        .timeline-item:hover { background-color: #f1f5f9; border-radius: 0 0.5rem 0.5rem 0; }
-        .timeline-item.active-timeline::before { background-color: #f59e0b; transform: scale(1.2); }
-        .timeline-content { display: none; margin-top: 0.5rem; color: #475569; font-size: 0.9rem;}
-        .timeline-item.active-timeline .timeline-content { display: block; animation: fadeIn 0.3s ease-in-out; }
-
-        /* Hierarchy Diagram (CSS only) */
-        .org-box { border: 2px solid #e2e8f0; border-top: 4px solid #1e3a8a; border-radius: 0.5rem; padding: 1rem; background: white; text-align: center; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        .connector-line { width: 2px; height: 30px; background-color: #cbd5e1; margin: 0 auto; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-    </style>
+    /* Gráfico de Rosca CSS */
+    .donut-chart {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #3b82f6 0% 65%, /* Azul - Bem-estar Humano */
+        #f59e0b 65% 100% /* Laranja - Maximização do Lucro */
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-hole {
+      width: 130px;
+      height: 130px;
+      background-color: white;
+      border-radius: 50%;
+    }
+  </style>
 </head>
-<body class="flex flex-col md:flex-row min-h-screen font-sans">
+<body class="bg-gray-50 font-sans flex h-screen overflow-hidden text-gray-800">
 
-    <!-- Mobile Header -->
-    <header class="md:hidden bg-primary text-white p-4 flex justify-between items-center shadow-md z-20">
-        <h1 class="text-xl font-bold">⚖️ Ética na Pesquisa</h1>
-        <button id="mobileMenuBtn" class="text-2xl focus:outline-none">☰</button>
-    </header>
+  <!-- BOTÃO MENU MOBILE -->
+  <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-md shadow-md text-gray-700">
+    <i data-lucide="menu" class="w-6 h-6"></i>
+  </button>
 
-    <!-- Sidebar Navigation -->
-    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-64 bg-white border-r border-slate-200 h-auto md:h-screen sticky top-0 z-10 shadow-lg md:shadow-none transition-transform duration-300">
-        <div class="p-6 hidden md:block border-b border-slate-100">
-            <h1 class="text-2xl font-bold text-primary flex items-center gap-2">
-                <span>⚖️</span> Ética Pq.
-            </h1>
-            <p class="text-xs text-slate-500 mt-1">Cap. 7 - Toledo et al.</p>
+  <!-- OVERLAY MOBILE -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+  <!-- SIDEBAR ESQUERDA -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-80 bg-white border-r border-gray-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col shadow-xl lg:shadow-none">
+    
+    <!-- CABEÇALHO ABNT (Substitui o antigo "Ética Pq.") -->
+    <div class="p-6 border-b border-gray-100 bg-slate-50 shrink-0">
+      <div class="flex justify-between items-start mb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="scale" class="w-5 h-5 text-slate-500"></i>
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Referência ABNT</span>
         </div>
-        
-        <div class="flex flex-col py-4 gap-1 overflow-y-auto">
-            <button onclick="navigateTo('intro')" class="nav-tab active text-left px-6 py-3 text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors flex items-center gap-3">
-                <span>📖</span> <span class="text-sm">1. O Dilema Ético</span>
-            </button>
-            <button onclick="navigateTo('history')" class="nav-tab text-left px-6 py-3 text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors flex items-center gap-3">
-                <span>⏳</span> <span class="text-sm">2. Marcos e Normas</span>
-            </button>
-            <button onclick="navigateTo('system')" class="nav-tab text-left px-6 py-3 text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors flex items-center gap-3">
-                <span>🏛️</span> <span class="text-sm">3. Sistema CEP/CONEP</span>
-            </button>
-            <button onclick="navigateTo('tcle')" class="nav-tab text-left px-6 py-3 text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors flex items-center gap-3">
-                <span>📝</span> <span class="text-sm">4. Construindo o TCLE</span>
-            </button>
-            <button onclick="navigateTo('risks')" class="nav-tab text-left px-6 py-3 text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors flex items-center gap-3">
-                <span>⚠️</span> <span class="text-sm">5. O Mito do Risco Zero</span>
-            </button>
-            <button onclick="navigateTo('resources')" class="nav-tab text-left px-6 py-3 text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors flex items-center gap-3">
-                <span>🔗</span> <span class="text-sm">6. Links e Atualizações</span>
-            </button>
-        </div>
-        <div class="mt-auto p-4 border-t border-slate-200">
-            <div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100">
-                Resumo expandido interativo para seminários e estudos acadêmicos.
-            </div>
-        </div>
+        <button id="close-sidebar" class="lg:hidden text-gray-400 hover:text-gray-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <div class="space-y-2">
+        <p class="text-xs font-bold text-slate-800 leading-snug">
+          TOLEDO, C. A. A.; GONZAGA, M. T. C.; BARBOZA, M. A.
+        </p>
+        <p class="text-sm text-blue-700 font-semibold leading-tight">
+          A ética na pesquisa acadêmica envolvendo seres humanos.
+        </p>
+        <p class="text-[10px] text-slate-500 leading-relaxed text-justify">
+          In: <span class="italic">Metodologia e Técnicas de Pesquisa nas Áreas de Ciências Humanas</span>. Cap. 7, p. 203-272.
+        </p>
+      </div>
+    </div>
+
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav class="flex-1 overflow-y-auto py-4">
+      <ul class="space-y-1 px-3">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-blue-700 bg-blue-50/80 rounded-lg border-l-4 border-blue-600 transition-colors">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            1. O Dilema Ético
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg border-l-4 border-transparent transition-colors">
+            <i data-lucide="hourglass" class="w-4 h-4"></i>
+            2. Marcos e Normas
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg border-l-4 border-transparent transition-colors">
+            <i data-lucide="landmark" class="w-4 h-4"></i>
+            3. Sistema CEP/CONEP
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg border-l-4 border-transparent transition-colors">
+            <i data-lucide="file-signature" class="w-4 h-4"></i>
+            4. Construindo o TCLE
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg border-l-4 border-transparent transition-colors">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            5. O Mito do Risco Zero
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg border-l-4 border-transparent transition-colors">
+            <i data-lucide="link" class="w-4 h-4"></i>
+            6. Links e Atualizações
+          </a>
+        </li>
+      </ul>
     </nav>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto bg-light">
+    <!-- RODAPÉ DA SIDEBAR -->
+    <div class="p-4 border-t border-gray-200 bg-white shrink-0">
+      <a href="#" class="block w-full text-center px-4 py-3 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-100">
+        Resumo expandido interativo para seminários e estudos acadêmicos.
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 lg:ml-80 h-full overflow-y-auto bg-gray-50">
+    <div class="max-w-5xl mx-auto p-6 lg:p-10 lg:pt-12 pt-20">
+      
+      <!-- TÍTULO DA SEÇÃO -->
+      <header class="mb-10">
+        <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">Parte 1</span>
+        <h1 class="text-3xl lg:text-4xl font-extrabold text-slate-800 mt-2 tracking-tight">A Ciência, o Lucro e o Dilema Ético</h1>
+        <p class="text-slate-600 mt-4 text-lg leading-relaxed max-w-3xl">
+          Esta seção introduz o contexto fundamental do Capítulo 7. O avanço científico é uma conquista, mas frequentemente é capturado pela lógica de mercado. Explore abaixo o conflito central que torna a ética indispensável nas Ciências Humanas.
+        </p>
+      </header>
+
+      <!-- CARDS DE CONTEÚDO -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
         
-        <!-- SECTION 1: Intro -->
-        <section id="intro" class="app-section fade-in block">
-            <header class="mb-8">
-                <span class="text-secondary font-semibold text-sm uppercase tracking-wider">Parte 1</span>
-                <h2 class="text-3xl font-bold text-dark mt-1">A Ciência, o Lucro e o Dilema Ético</h2>
-            </header>
-            
-            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                Esta seção introduz o contexto fundamental do Capítulo 7. O avanço científico é uma conquista, mas frequentemente é capturado pela lógica de mercado. Explore abaixo o conflito central que torna a ética indispensável nas Ciências Humanas.
-            </p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-xl font-semibold mb-4 text-primary flex items-center gap-2"><span>🔍</span> A Crítica Social</h3>
-                    <ul class="space-y-4 text-slate-700">
-                        <li class="flex gap-3">
-                            <span class="text-accent text-xl">💰</span>
-                            <div>
-                                <strong class="block text-dark">Ciência como Mercadoria</strong>
-                                As conquistas são, por vezes, monopolizadas por grupos movidos pela maximização de lucros, tratando a ética como "entrave".
-                            </div>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="text-red-500 text-xl">🛑</span>
-                            <div>
-                                <strong class="block text-dark">Seres Humanos como "Cobaias"</strong>
-                                Sem regulação, a pesquisa corre o risco de tratar indivíduos como objetos descartáveis.
-                            </div>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="text-green-600 text-xl">🛡️</span>
-                            <div>
-                                <strong class="block text-dark">O Escudo Ético</strong>
-                                A ética não proíbe a pesquisa; ela atua como um instrumento de debate para garantir a compreensão da sociedade preservando a dignidade humana.
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center">
-                    <h3 class="text-lg font-semibold mb-2 text-center text-slate-700">O Foco da Pesquisa: Um Equilíbrio Frágil</h3>
-                    <p class="text-xs text-center text-slate-500 mb-4">Representação conceitual das forças que atuam sobre a ciência (Segundo os autores).</p>
-                    
-                    <div class="chart-container">
-                        <canvas id="dilemmaChart"></canvas>
-                    </div>
-                </div>
+        <!-- CARD 1: A CRÍTICA SOCIAL -->
+        <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 mb-6">
+            <i data-lucide="search" class="w-6 h-6 text-slate-400"></i> A Crítica Social
+          </h2>
+          
+          <div class="space-y-6">
+            <div class="flex items-start gap-4">
+              <div class="p-2 bg-yellow-50 text-yellow-600 rounded-lg shrink-0 mt-0.5">
+                <i data-lucide="coins" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-800">Ciência como Mercadoria</h3>
+                <p class="text-sm text-slate-600 mt-1 leading-relaxed">
+                  As conquistas são, por vezes, monopolizadas por grupos movidos pela maximização de lucros, tratando a ética como "entrave".
+                </p>
+              </div>
             </div>
+
+            <div class="flex items-start gap-4">
+              <div class="p-2 bg-red-50 text-red-500 rounded-lg shrink-0 mt-0.5">
+                <i data-lucide="octagon-alert" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-800">Seres Humanos como "Cobaias"</h3>
+                <p class="text-sm text-slate-600 mt-1 leading-relaxed">
+                  Sem regulação, a pesquisa corre o risco de tratar indivíduos como objetos descartáveis, exaurindo recursos naturais e a dignidade humana.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0 mt-0.5">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-800">O Escudo Ético</h3>
+                <p class="text-sm text-slate-600 mt-1 leading-relaxed">
+                  A ética não proíbe a pesquisa; ela atua como um instrumento de debate para garantir a compreensão da sociedade preservando a dignidade.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <!-- SECTION 2: History -->
-        <section id="history" class="app-section hidden">
-             <header class="mb-8">
-                <span class="text-secondary font-semibold text-sm uppercase tracking-wider">Parte 2</span>
-                <h2 class="text-3xl font-bold text-dark mt-1">Linha do Tempo Regulatória</h2>
-            </header>
-            
-            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                As regras não surgiram do nada. Foram respostas do Estado e da comunidade internacional a abusos históricos. Interaja com a linha do tempo abaixo para entender a evolução dos marcos que fundamentam a ética na pesquisa no Brasil.
-            </p>
+        <!-- CARD 2: GRÁFICO (REPRESENTAÇÃO) -->
+        <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center text-center">
+          <h2 class="text-lg font-bold text-slate-800 mb-2">O Foco da Pesquisa: Um Equilíbrio Frágil</h2>
+          <p class="text-xs text-slate-400 mb-8">Representação conceitual das forças que atuam sobre a ciência (Segundo os autores).</p>
+          
+          <!-- Gráfico de Rosca CSS -->
+          <div class="donut-chart mb-8 shadow-inner">
+            <div class="donut-hole shadow-sm"></div>
+          </div>
 
-            <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 max-w-3xl mx-auto">
-                <div id="timelineContainer">
-                    <!-- JS vai popular isso -->
-                </div>
+          <!-- Legenda -->
+          <div class="flex flex-wrap justify-center gap-6">
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-3 bg-amber-500 rounded-sm"></div>
+              <span class="text-xs font-medium text-slate-600">Maximização do Lucro</span>
             </div>
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-3 bg-blue-500 rounded-sm"></div>
+              <span class="text-xs font-medium text-slate-600">Bem-estar Humano</span>
+            </div>
+          </div>
         </section>
 
-        <!-- SECTION 3: System -->
-        <section id="system" class="app-section hidden">
-            <header class="mb-8">
-                <span class="text-secondary font-semibold text-sm uppercase tracking-wider">Parte 3</span>
-                <h2 class="text-3xl font-bold text-dark mt-1">Como Funciona o Sistema CEP/CONEP?</h2>
-            </header>
-            
-            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                O controle ético no Brasil é descentralizado. Esta seção mapeia a hierarquia de proteção ao participante de pesquisa. Passe o mouse ou clique nas caixas para entender as responsabilidades de cada instância.
-            </p>
+      </div>
+      
+      <!-- CONTINUAÇÃO DO TEXTO (EXEMPLO) -->
+      <div class="mt-10 bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+        <h3 class="font-bold text-lg text-slate-800 mb-4 border-b pb-2">O Homem na Sociedade</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4 text-justify">
+          A tendência à racionalidade técnica no campo científico faz com que diversas áreas de conhecimento, entre elas a Psicologia e a Sociologia, considerem o homem contemporâneo como uma folha em branco, na qual cada uma das culturas em que ele se encontra possa escrever os seus regulamentos e diretrizes. Para além dessa concepção, o ser humano é um ser histórico e social, resultado de sua própria história.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed text-justify">
+          Desse modo, pensar a ética em pesquisa com seres humanos nas Ciências Humanas na contemporaneidade envolve um complexo conjunto de determinações que dão cor e forma à identidade e à subjetividade humana.
+        </p>
+      </div>
 
-            <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center">
-                
-                <!-- Org Chart Hierarchy (HTML/CSS) -->
-                <div class="w-full max-w-lg">
-                    <!-- Nível 1 -->
-                    <div class="org-box border-t-red-700 cursor-pointer hover:bg-slate-50 transition" onclick="showInfo('conep')">
-                        <h3 class="font-bold text-lg text-dark">CONEP</h3>
-                        <p class="text-sm text-slate-500">Comissão Nacional de Ética em Pesquisa</p>
-                    </div>
-                    
-                    <div class="connector-line"></div>
-                    
-                    <!-- Nível 2 -->
-                    <div class="org-box border-t-primary cursor-pointer hover:bg-slate-50 transition" onclick="showInfo('cep')">
-                        <h3 class="font-bold text-lg text-dark">CEPs Institucionais</h3>
-                        <p class="text-sm text-slate-500">Comitês de Ética em Pesquisa (Ex: CEP da UEM)</p>
-                    </div>
+    </div>
+  </main>
 
-                    <div class="connector-line"></div>
-                    
-                    <!-- Nível 3 -->
-                    <div class="flex justify-between gap-4">
-                        <div class="org-box border-t-secondary w-1/2 cursor-pointer hover:bg-slate-50 transition" onclick="showInfo('pesquisador')">
-                            <h3 class="font-bold text-md text-dark">Pesquisador</h3>
-                            <p class="text-xs text-slate-500">Responsável direto</p>
-                        </div>
-                        <div class="org-box border-t-green-600 w-1/2 cursor-pointer hover:bg-slate-50 transition" onclick="showInfo('participante')">
-                            <h3 class="font-bold text-md text-dark">Participante</h3>
-                            <p class="text-xs text-slate-500">Sujeito da pesquisa</p>
-                        </div>
-                    </div>
-                </div>
+  <script>
+    // Inicializar ícones
+    lucide.createIcons();
 
-                <!-- Info Panel -->
-                <div id="infoPanel" class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg w-full max-w-lg hidden fade-in">
-                    <h4 id="infoTitle" class="font-bold text-primary mb-2"></h4>
-                    <p id="infoDesc" class="text-sm text-slate-700"></p>
-                </div>
-            </div>
-        </section>
+    // Controle do Menu Mobile
+    const btnMenu = document.getElementById('mobile-menu-btn');
+    const btnClose = document.getElementById('close-sidebar');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
 
-        <!-- SECTION 4: TCLE -->
-        <section id="tcle" class="app-section hidden">
-            <header class="mb-8">
-                <span class="text-secondary font-semibold text-sm uppercase tracking-wider">Parte 4</span>
-                <h2 class="text-3xl font-bold text-dark mt-1">O Coração da Ética: O TCLE</h2>
-            </header>
-            
-            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                O Termo de Consentimento Livre e Esclarecido (TCLE) não é mera burocracia, é a prova da autonomia. Use o checklist interativo abaixo para garantir que os elementos obrigatórios citados no texto estejam presentes na construção do seu documento.
-            </p>
+    function toggleMenu() {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-xl font-semibold mb-4 border-b pb-2">Checklist do Pesquisador</h3>
-                    <div id="checklistContainer" class="space-y-3">
-                        <!-- JS populate -->
-                    </div>
-                </div>
-
-                <div class="bg-slate-800 text-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center text-center">
-                    <div class="text-6xl mb-4">📄</div>
-                    <h3 class="text-xl font-bold mb-2">Status do Documento</h3>
-                    <div class="w-full bg-slate-600 rounded-full h-4 mb-2 mt-4">
-                        <div id="tcleProgress" class="bg-green-400 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                    <p id="tcleStatusText" class="text-slate-300 text-sm mt-2">Documento Incompleto</p>
-                    <p class="text-xs text-slate-400 mt-6 italic">Lembre-se: O TCLE deve ser impresso e assinado em 2 vias de igual teor.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 5: Risks -->
-        <section id="risks" class="app-section hidden">
-            <header class="mb-8">
-                <span class="text-secondary font-semibold text-sm uppercase tracking-wider">Parte 5</span>
-                <h2 class="text-3xl font-bold text-dark mt-1 text-red-600">O Gravíssimo "Mito do Risco Zero"</h2>
-            </header>
-            
-            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                Uma das principais causas de reprovação de projetos: afirmar que a pesquisa não oferece riscos. Analise no gráfico interativo abaixo a diferença entre os riscos biomédicos tradicionais e os riscos reais nas Ciências Humanas, e veja como mitigá-los.
-            </p>
-
-            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-8">
-                <p class="text-amber-800 font-semibold">Citação Direta (Atenção):</p>
-                <p class="text-amber-900 italic mt-1">"A menção de que: 'Não há riscos ou desconfortos envolvidos na pesquisa' não é aceitável eticamente."</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-semibold mb-4 text-center">Natureza dos Riscos nas Áreas</h3>
-                    <div class="chart-container">
-                        <canvas id="risksChart"></canvas>
-                    </div>
-                    <p class="text-xs text-center text-slate-500 mt-2">Visualização comparativa de percepção de incidência</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-semibold mb-4 border-b pb-2">Como Lidar com Riscos em Humanas</h3>
-                    
-                    <div class="space-y-4 mt-4">
-                        <div class="p-3 bg-slate-50 rounded border border-slate-100">
-                            <h4 class="font-bold text-primary flex gap-2"><span>💬</span> Entrevistas e Questionários</h4>
-                            <p class="text-sm text-slate-600 mt-1"><span class="font-semibold">Risco:</span> Cansaço, tédio, constrangimento.</p>
-                            <p class="text-sm text-green-700 mt-1"><span class="font-semibold">Mitigação:</span> Permitir pausas, garantir que o sujeito pode pular perguntas, ambiente confortável.</p>
-                        </div>
-                        <div class="p-3 bg-slate-50 rounded border border-slate-100">
-                            <h4 class="font-bold text-primary flex gap-2"><span>🧠</span> Temas Sensíveis (Violência, Traumas)</h4>
-                            <p class="text-sm text-slate-600 mt-1"><span class="font-semibold">Risco:</span> Gatilhos emocionais, sofrimento psíquico.</p>
-                            <p class="text-sm text-green-700 mt-1"><span class="font-semibold">Mitigação:</span> Interromper a coleta imediatamente se houver choro/angústia, oferecer encaminhamento psicológico.</p>
-                        </div>
-                        <div class="p-3 bg-slate-50 rounded border border-slate-100">
-                            <h4 class="font-bold text-primary flex gap-2"><span>📂</span> Coleta de Dados Documentais/Gravação</h4>
-                            <p class="text-sm text-slate-600 mt-1"><span class="font-semibold">Risco:</span> Quebra de sigilo, exposição da identidade.</p>
-                            <p class="text-sm text-green-700 mt-1"><span class="font-semibold">Mitigação:</span> Uso de pseudônimos, armazenamento criptografado, exclusão de áudios após transcrição.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 6: Resources -->
-        <section id="resources" class="app-section hidden">
-            <header class="mb-8">
-                <span class="text-secondary font-semibold text-sm uppercase tracking-wider">Parte 6</span>
-                <h2 class="text-3xl font-bold text-dark mt-1">Atualizações e Ferramentas</h2>
-            </header>
-            
-            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                O capítulo de Toledo et al. baseou-se na histórica Res. 196/96 e em processos manuais. Esta seção compila as normas atuais vigentes e os links das plataformas digitais que substituíram o envio físico de projetos.
-            </p>
-
-            <h3 class="text-xl font-bold text-primary mb-4 border-b pb-2">Atualização Normativa Obrigatória</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                <div class="bg-white border-l-4 border-primary p-5 rounded shadow-sm">
-                    <h4 class="font-bold text-lg mb-1">Resolução CNS 466/2012</h4>
-                    <p class="text-sm text-slate-600">Revogou a antiga 196/96 (citada no livro). É a atual diretriz matriz para pesquisas com seres humanos no Brasil.</p>
-                </div>
-                <div class="bg-white border-l-4 border-secondary p-5 rounded shadow-sm">
-                    <h4 class="font-bold text-lg mb-1">Resolução CNS 510/2016</h4>
-                    <p class="text-sm text-slate-600"><span class="bg-yellow-100 text-yellow-800 px-1 rounded font-bold text-xs">NOVO!</span> Marco específico para as <strong>Ciências Humanas e Sociais</strong>. Reconhece as metodologias e riscos específicos da área.</p>
-                </div>
-            </div>
-
-            <h3 class="text-xl font-bold text-primary mb-4 border-b pb-2">Plataformas Digitais</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <a href="#" class="block bg-white p-5 rounded-lg border border-slate-200 hover:shadow-md transition hover:border-primary text-center">
-                    <div class="text-4xl mb-2">💻</div>
-                    <h4 class="font-bold text-dark">Plataforma Brasil</h4>
-                    <p class="text-xs text-slate-500 mt-2">Sistema nacional e unificado de registros de pesquisas. Substituiu a entrega de pastas físicas nos CEPs.</p>
-                </a>
-                <a href="#" class="block bg-white p-5 rounded-lg border border-slate-200 hover:shadow-md transition hover:border-primary text-center">
-                    <div class="text-4xl mb-2">📜</div>
-                    <h4 class="font-bold text-dark">Plataforma Lattes</h4>
-                    <p class="text-xs text-slate-500 mt-2">Base de currículos do CNPq. O registro atualizado é pré-requisito obrigatório para submeter projetos na Plataforma Brasil.</p>
-                </a>
-                <a href="#" class="block bg-white p-5 rounded-lg border border-slate-200 hover:shadow-md transition hover:border-primary text-center">
-                    <div class="text-4xl mb-2">🏛️</div>
-                    <h4 class="font-bold text-dark">Página da CONEP</h4>
-                    <p class="text-xs text-slate-500 mt-2">Portal do Conselho Nacional de Saúde onde ficam hospedadas todas as cartilhas, manuais e resoluções atualizadas.</p>
-                </a>
-            </div>
-        </section>
-
-    </main>
-
-    <script>
-        // --- NAVIGATION LOGIC ---
-        function navigateTo(sectionId) {
-            // Update Menu UI
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            // Find tab that triggers this section
-            const trigger = Array.from(document.querySelectorAll('.nav-tab')).find(btn => btn.getAttribute('onclick').includes(sectionId));
-            if(trigger) trigger.classList.add('active');
-
-            // Update Content UI
-            document.querySelectorAll('.app-section').forEach(sec => {
-                sec.classList.add('hidden');
-                sec.classList.remove('fade-in');
-            });
-            const target = document.getElementById(sectionId);
-            target.classList.remove('hidden');
-            // small delay to allow display:block to apply before animation
-            setTimeout(() => target.classList.add('fade-in'), 10);
-
-            // Close mobile menu if open
-            const sidebar = document.getElementById('sidebar');
-            if(window.innerWidth < 768 && !sidebar.classList.contains('hidden')) {
-                sidebar.classList.add('hidden');
-            }
-        }
-
-        // Mobile Menu Toggle
-        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('hidden');
-            sidebar.classList.toggle('absolute');
-            sidebar.classList.toggle('z-50');
-        });
-
-        // --- SECTION 2: TIMELINE DATA & LOGIC ---
-        const timelineData = [
-            { year: '1947', title: 'Código de Nuremberg', desc: 'Primeiro documento internacional. Exige o consentimento voluntário após as atrocidades médicas da 2ª Guerra Mundial.' },
-            { year: '1964', title: 'Declaração de Helsinki', desc: 'Estabelece que o bem-estar do indivíduo deve sempre prevalecer sobre os interesses da ciência e da sociedade.' },
-            { year: '1996', title: 'Resolução CNS 196/96', desc: 'O grande marco brasileiro citado no Capítulo 7. Estruturou o sistema CEP/CONEP e as regras básicas de proteção.' },
-            { year: '2012', title: 'Resolução CNS 466/2012', desc: 'Atualização da 196/96, adequando-se às novas demandas tecnológicas e reforçando o respeito à dignidade humana.' },
-            { year: '2016', title: 'Resolução CNS 510/2016', desc: 'Vitória das Ciências Humanas e Sociais: cria normas específicas para metodologias não-biomédicas.' }
-        ];
-
-        const timelineContainer = document.getElementById('timelineContainer');
-        timelineData.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'timeline-item';
-            div.innerHTML = `
-                <h4 class="font-bold text-primary">${item.year}: ${item.title}</h4>
-                <p class="timeline-content">${item.desc}</p>
-            `;
-            div.onclick = () => {
-                // remove active from all
-                document.querySelectorAll('.timeline-item').forEach(el => el.classList.remove('active-timeline'));
-                // add to clicked
-                div.classList.add('active-timeline');
-            };
-            timelineContainer.appendChild(div);
-        });
-
-        // --- SECTION 3: SYSTEM LOGIC ---
-        const sysInfo = {
-            'conep': { title: 'CONEP (Comissão Nacional)', desc: 'Instância máxima ligada ao Ministério da Saúde. Coordena a rede de CEPs e julga protocolos complexos (ex: genética, novos fármacos, populações indígenas).' },
-            'cep': { title: 'CEP (Comitê Institucional)', desc: 'Colegiado multidisciplinar dentro das Universidades (ex: CEP da UEM). Avalia a viabilidade ética e metodológica dos projetos daquela instituição antes da coleta de dados.' },
-            'pesquisador': { title: 'Pesquisador Responsável', desc: 'Guardião ético da pesquisa. Deve garantir sigilo, aplicar o TCLE corretamente e paralisar a pesquisa imediatamente caso identifique riscos imprevistos à saúde física ou mental do participante.' },
-            'participante': { title: 'Sujeito da Pesquisa', desc: 'A pessoa convidada a participar. Tem o direito à recusa, à retirada a qualquer momento sem punição, e direito à assistência e reparação em caso de danos.' }
-        };
-
-        function showInfo(key) {
-            const panel = document.getElementById('infoPanel');
-            document.getElementById('infoTitle').innerText = sysInfo[key].title;
-            document.getElementById('infoDesc').innerText = sysInfo[key].desc;
-            panel.classList.remove('hidden');
-            panel.classList.remove('fade-in');
-            void panel.offsetWidth; // trigger reflow
-            panel.classList.add('fade-in');
-        }
-
-        // --- SECTION 4: TCLE CHECKLIST LOGIC ---
-        const tcleItems = [
-            "Linguagem clara, simples e sem jargões acadêmicos.",
-            "Justificativa, objetivos e procedimentos descritos.",
-            "Garantia de que é livre e pode desistir a qualquer momento sem ônus.",
-            "Descrição clara dos riscos e desconfortos (NUNCA 'risco zero').",
-            "Previsão de providências para mitigar os riscos/desconfortos.",
-            "Descrição dos benefícios (diretos ou indiretos) e retorno social.",
-            "Garantia absoluta de sigilo e confidencialidade da identidade.",
-            "Destino do material coletado (ex: o que fará com os áudios?).",
-            "Endereço e contatos do Pesquisador e do CEP local.",
-            "Declaração de que será impresso e assinado em 2 vias."
-        ];
-
-        const checkContainer = document.getElementById('checklistContainer');
-        let checkedCount = 0;
-
-        function updateTCLEProgress() {
-            const pct = (checkedCount / tcleItems.length) * 100;
-            const bar = document.getElementById('tcleProgress');
-            const status = document.getElementById('tcleStatusText');
-            bar.style.width = `${pct}%`;
-            
-            if(pct === 0) { status.innerText = "Inicie a validação"; status.className = "text-slate-400 text-sm mt-2"; }
-            else if(pct < 50) { status.innerText = "Documento Fraco"; status.className = "text-red-400 font-bold text-sm mt-2"; bar.className = "bg-red-500 h-4 rounded-full transition-all duration-500"; }
-            else if(pct < 100) { status.innerText = "Faltam itens obrigatórios"; status.className = "text-amber-400 font-bold text-sm mt-2"; bar.className = "bg-amber-400 h-4 rounded-full transition-all duration-500"; }
-            else { status.innerText = "TCLE Eticamente Aprovado! ✓"; status.className = "text-green-400 font-bold text-md mt-2"; bar.className = "bg-green-500 h-4 rounded-full transition-all duration-500"; }
-        }
-
-        tcleItems.forEach((item, i) => {
-            const label = document.createElement('label');
-            label.className = "flex items-start gap-3 p-3 border border-slate-100 rounded bg-slate-50 cursor-pointer hover:bg-blue-50 transition";
-            label.innerHTML = `
-                <input type="checkbox" class="mt-1 w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" onchange="toggleCheck(this)">
-                <span class="text-sm text-slate-700">${item}</span>
-            `;
-            checkContainer.appendChild(label);
-        });
-
-        function toggleCheck(checkbox) {
-            if(checkbox.checked) checkedCount++;
-            else checkedCount--;
-            updateTCLEProgress();
-        }
-
-        // --- CHARTS INITIALIZATION ---
-        
-        // Ensure charts resize correctly within their Tailwind managed containers
-        Chart.defaults.maintainAspectRatio = false;
-        Chart.defaults.responsive = true;
-
-        window.onload = function() {
-            // Chart 1: Dilemma (Doughnut)
-            const ctxDilemma = document.getElementById('dilemmaChart').getContext('2d');
-            new Chart(ctxDilemma, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Maximização do Lucro', 'Bem-estar Humano'],
-                    datasets: [{
-                        data: [70, 30], // Conceptual data based on text critique
-                        backgroundColor: ['#f59e0b', '#3b82f6'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    if(context.dataIndex === 0) return " Lógica de mercado (Critica do autor)";
-                                    return " Foco Ético (Obrigatório)";
-                                }
-                            }
-                        }
-                    },
-                    cutout: '70%'
-                }
-            });
-
-            // Chart 2: Risks (Bar)
-            const ctxRisks = document.getElementById('risksChart').getContext('2d');
-            new Chart(ctxRisks, {
-                type: 'bar',
-                data: {
-                    labels: [['Constra-', 'ngimento'], ['Cansaço', 'Mental'], ['Quebra de', 'Sigilo'], ['Acesso', 'Físico']],
-                    datasets: [
-                        {
-                            label: 'Risco Comum em Humanas',
-                            data: [85, 90, 70, 10],
-                            backgroundColor: '#3b82f6'
-                        },
-                        {
-                            label: 'Risco Biomédico Tradicional',
-                            data: [20, 30, 80, 95],
-                            backgroundColor: '#94a3b8'
-                        }
-                    ]
-                },
-                options: {
-                    indexAxis: 'y', // horizontal bar
-                    scales: {
-                        x: { beginAtZero: true, max: 100, title: { display: true, text: 'Incidência Estimada (%)' } }
-                    },
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    // Handle wrapped labels
-                                    return context[0].label.replace(/,/g, '');
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        };
-    </script>
+    btnMenu.addEventListener('click', toggleMenu);
+    btnClose.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+  </script>
 </body>
 </html>
